@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "ibmplexsans";
+  src: url("/fonts/IBMPlexSansThai-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "lora";
+  src: url("/fonts/Lora-Regular.ttf") format("truetype");
+}
+
+:root {
+  font-family: "ibmplexsans", sans-serif !important;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: "#000000";
+}
+
+.button-transform {
+  position: relative;
+
+  background: #c0c0c0;
+  color: #000000;
+  border: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.button-transform:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 500%;
+  height: 1000%;
+  background: #a3a7aa;
+  z-index: -1;
+  transform-origin: 0% 0%;
+  transform: translateX(calc(20% - 25px)) translateY(10%) rotate(-45deg);
+  transform: translateY(10%) translateX(16%) rotate(-45deg);
+  transition: transform 0.3s;
+}
+
+.button-transform:hover::after {
+  transform: translateY(10%) translateX(-25px) rotate(-45deg);
+  @layer components {
+    /* Customize the label (the checkbox-container)*/
+    .checkbox-container {
+      display: block;
+      position: relative;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    /* Hide the browser's default checkbox */
+    .checkbox-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    /* Create a custom checkbox */
+    .checkmark {
+      height: 16px;
+      width: 16px;
+      background-color: transparent;
+      border: 1px solid #757575;
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+    }
+
+    .careers-form-checkmark {
+      border-radius: 0px;
+    }
+
+    /* On mouse-over, add a grey background color */
+    .checkbox-container:hover input ~ .checkmark {
+      background-color: #333;
+    }
+
+    /* When the checkbox is checked, add a blue background */
+    .checkbox-container input:checked ~ .checkmark {
+      background-color: #757575;
+    }
+
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+      content: "";
+      display: none;
+    }
+
+    /* Show the checkmark when checked */
+    .checkbox-container input:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    /* Style the checkmark/indicator */
+    .checkbox-container .checkmark:after {
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+  }
+}
+
+/* DIFFERENT SO THAT IT CAN BE MADE SMALLER */
+.login-button-transform {
+  position: relative;
+
+  background: #c0c0c0;
+  color: #000000;
+  border: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.login-button-transform:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: #a3a7aa;
+  z-index: -1;
+  transform-origin: 50% 50%;
+  /* transform: translateX(calc(20% - 25px)) translateY(10%) rotate(-45deg); */
+  transform: translateY(64px) translateX(80px) rotate(45deg);
+  transition: transform 0.3s;
+}
+
+.login-button-transform:hover::after {
+  transform: translateY(64px) translateX(80px) scale(400%) rotate(45deg);
+}
+
+.hide-scrollbar {
+  /* Hide scrollbar for WebKit browsers (e.g., Chrome, Safari) */
+  -webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE and Edge */
+  -ms-overflow-style: none;
+
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none;
+}
+
+.loading-content {
+  position: relative;
+}
+
+.loading-content h1 {
+  color: #c0c0c0;
+  font-size: 2.5rem;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.loading-content h1:nth-child(1) {
+  color: transparent;
+  -webkit-text-stroke: 0.2px #fff; /* Adjusted the stroke width for visibilityk*/
+}
+
+.loading-content h1:nth-child(2) {
+  color: #fff;
+  animation: waveFlow 3s linear infinite;
+  clip-path: polygon(
+    0% 45%,
+    16% 46%,
+    33% 48%,
+    54% 52%,
+    70% 55%,
+    84% 54%,
+    100% 50%,
+    100% 100%,
+    0% 100%
+  );
+  position: absolute;
+}
+
+@keyframes waveFlow {
+  0%,
+  100% {
+    clip-path: polygon(
+      0% 45%,
+      16% 46%,
+      33% 48%,
+      54% 52%,
+      70% 55%,
+      84% 54%,
+      100% 50%,
+      100% 100%,
+      0% 100%
+    );
+  }
+  50% {
+    clip-path: polygon(
+      0% 60%,
+      15% 62%,
+      34% 65%,
+      51% 63%,
+      67% 58%,
+      84% 55%,
+      100% 56%,
+      100% 100%,
+      0% 100%
+    );
+  }
+}
+
+/* Add this CSS to your global styles or inline */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge, and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Carousel */
+.event-details-file-input .carousel-root,
+.event-details-file-input .carousel-slider,
+.event-details-file-input .slider-wrapper,
+.event-details-file-input .slider-wrapper .slider {
+  width: 100%;
+  height: 100%;
+}
+
+/* Hide the icon in the date input */
+/* input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+} */
+
+/* Hide the icon in the time input */
+/* input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+} */
+
+/* For Firefox (hides the drop-down arrow while keeping the picker functional) */
+/* input[type="date"],
+input[type="time"] {
+  -moz-appearance: textfield;
+} */

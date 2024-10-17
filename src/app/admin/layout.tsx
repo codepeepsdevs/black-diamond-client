@@ -1,0 +1,94 @@
+"use client";
+
+import React, { ComponentProps, useEffect, useState } from "react";
+import AdminSidebar from "@/components/shared/AdminSidebar";
+import useUserStore from "@/store/user.store";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+} from "@radix-ui/react-dialog";
+import { MdGppBad } from "react-icons/md";
+import { AdminButton } from "@/components";
+import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const user = useUserStore((state) => state.user);
+  const isPending = useUserStore((state) => state.isPending);
+
+  useEffect(() => {
+    if (isPending) {
+      return;
+    }
+    if (user?.role !== "admin") {
+      setShowDialog(true);
+    }
+  }, [user, isPending]);
+  return (
+    <>
+      {isPending && (
+        <div className="min-h-screen flex items-center container">
+          <LoadingMessage className="text-4xl">
+            Loading admin dashboard.
+          </LoadingMessage>
+        </div>
+      )}
+      {user?.role === "admin" && (
+        <div className={`flex min-h-[50vh] `}>
+          <AdminSidebar />
+          {/* The min-w-0 is to prevent the contents of the container from overflowing */}
+          <div className="flex-1 min-w-0">{children}</div>
+        </div>
+      )}
+
+      <UnauthorizedDialog open={showDialog} onOpenChange={setShowDialog} />
+    </>
+  );
+}
+
+function UnauthorizedDialog({ ...props }: ComponentProps<typeof Dialog>) {
+  const router = useRouter();
+  return (
+    <Dialog {...props} modal={true}>
+      <DialogPortal>
+        <DialogOverlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
+          <DialogContent className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg">
+            <div className="bg-red-500 text-white size-24 mx-auto rounded-full grid place-items-center">
+              <MdGppBad className="text-4xl" />
+            </div>
+
+            <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
+              Unauthorized access
+            </div>
+
+            <div className="text-center my-6 space-y-4">
+              <p className="text-white text-base lg:text-xl">
+                User not authorized to visit this page{" "}
+              </p>
+              {/* <p className="text-text-color text-sm lg:text-base">
+                This is a protected page
+              </p> */}
+            </div>
+
+            <div className="flex justify-center">
+              <AdminButton
+                variant="outline"
+                className=""
+                onClick={() => router.push("/")}
+              >
+                GO BACK
+              </AdminButton>
+            </div>
+          </DialogContent>
+        </DialogOverlay>
+      </DialogPortal>
+    </Dialog>
+  );
+}
