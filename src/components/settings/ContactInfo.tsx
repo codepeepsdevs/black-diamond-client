@@ -24,7 +24,7 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ form }) => {
               {...register("contactInfo.firstName", {
                 required: true,
               })}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.contactInfo?.firstName} />
           </div>
@@ -34,7 +34,7 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ form }) => {
               {...register("contactInfo.lastName", {
                 required: true,
               })}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.contactInfo?.lastName} />
           </div>
@@ -48,7 +48,7 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ form }) => {
                 // required: true,
                 disabled: true,
               })}
-              className="w-full bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="w-full bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.contactInfo?.email} />
           </div>
@@ -58,7 +58,7 @@ const ContactInfo: React.FC<ContactInfoProps> = ({ form }) => {
               {...register("contactInfo.phoneNumber", {
                 required: true,
               })}
-              className="w-full bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="w-full bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.contactInfo?.phoneNumber} />
           </div>

@@ -22,7 +22,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             <h3>Address1</h3>
             <input
               {...register("billingAddress.address1")}
-              className="w-full bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="w-full bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.address1} />
           </div>
@@ -30,7 +30,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             Address2
             <input
               {...register("billingAddress.address2")}
-              className="w-full bg-input-bg border-2 py-4 p-3 text-xs md:text-sm  border-none outline-none border-input-border"
+              className="w-full bg-input-bg border-2 py-4 p-3  border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.address2} />
           </div>
@@ -41,7 +41,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             <h3>City</h3>
             <input
               {...register("billingAddress.city")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm  border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3  border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.city} />
           </div>
@@ -49,7 +49,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             <h3>Country</h3>
             <input
               {...register("billingAddress.country")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm  border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3  border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.country} />
           </div>
@@ -60,7 +60,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             <h3>Zip/Postal Code</h3>
             <input
               {...register("billingAddress.zipCode")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm  border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3  border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.zipCode} />
           </div>
@@ -68,7 +68,7 @@ const BillingAddressInfo: React.FC<BillingAddressInfoProps> = ({ form }) => {
             <h3>State</h3>
             <input
               {...register("billingAddress.state")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm  border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3  border-none outline-none border-input-border"
             />
             <FormError error={errors.billingAddress?.state} />
           </div>
