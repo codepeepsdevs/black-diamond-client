@@ -22,7 +22,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             <h3>Address1</h3>
             <input
               {...register("address.address1")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.address1} />
           </div>
@@ -30,7 +30,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             Address2
             <input
               {...register("address.address2")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.address2} />
           </div>
@@ -41,7 +41,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             <h3>City</h3>
             <input
               {...register("address.city")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.city} />
           </div>
@@ -49,7 +49,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             <h3>Country</h3>
             <input
               {...register("address.country")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.country} />
           </div>
@@ -60,7 +60,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             <h3>Zip/Postal Code</h3>
             <input
               {...register("address.zipCode")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.zipCode} />
           </div>
@@ -68,7 +68,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({ form }) => {
             <h3>State</h3>
             <input
               {...register("address.state")}
-              className="bg-input-bg border-2 py-4 p-3 text-xs md:text-sm border-none outline-none border-input-border"
+              className="bg-input-bg border-2 py-4 p-3 border-none outline-none border-input-border"
             />
             <FormError error={errors.address?.state} />
           </div>

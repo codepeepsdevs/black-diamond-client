@@ -24,12 +24,23 @@ export default function ShareTicketButton({
       const blob = await fetch(imgData).then((res) => res.blob());
       const file = new File([blob], "ticket.png", { type: "image/png" });
 
-      try {
-        await navigator.share({
+      const shareData = {
+        files: [file],
+      };
+
+      if (
+        !navigator.canShare({
           files: [file],
-          title: "Event Ticket",
-          text: "Here’s your ticket!",
+        })
+      ) {
+        return ErrorToast({
+          title: "Share Error",
+          descriptions: ["Share format not supported"],
         });
+      }
+
+      try {
+        await navigator.share(shareData);
       } catch (error) {
         ErrorToast({
           title: "Share error",
