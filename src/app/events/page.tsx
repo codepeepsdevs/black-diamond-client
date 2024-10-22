@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import Events from "@/components/eventPage/Events";
 import { IoSearch } from "react-icons/io5";
-import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
-import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
-import { fuzzyMatch } from "@/utils/utilityFunctions";
-import { Event } from "@/constants/types";
-import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { parseAsInteger, useQueryState } from "nuqs";
-import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
+
 import { useGetEvents } from "@/api/events/events.queries";
 
 const EventTabs = [

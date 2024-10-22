@@ -20,6 +20,7 @@ import {
   GetRevenueData,
   GetRevenueResponse,
   GetTicketSoldStatsResponse,
+  GetUserOrders,
   OrderDetailsResponse,
   PaymentStatusResponse,
   TicketTypeSalesResponse,
@@ -47,7 +48,7 @@ export const useFillEventDetails = (
 };
 
 export const useUserUpcomingEventsOrders = (page?: PageData) => {
-  return useQuery<AxiosResponse<Order[]>>({
+  return useQuery<AxiosResponse<GetUserOrders>>({
     queryKey: ["upcoming-event-orders", page],
     queryFn: () => getUserUpcomingEventOrders(page),
     placeholderData: keepPreviousData,
@@ -71,7 +72,7 @@ export const useGetOrders = (options?: OptionProps & DateRangeData) => {
 };
 
 export const useUserPastEventOrders = (page?: PageData) => {
-  return useQuery<AxiosResponse<Order[]>>({
+  return useQuery<AxiosResponse<GetUserOrders>>({
     queryKey: ["past-event-orders", page],
     queryFn: () => getUserPastEventOrders(page),
     // enabled: false,

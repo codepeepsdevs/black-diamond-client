@@ -1,5 +1,10 @@
 import { DateRangeData, Order, TicketType } from "@/constants/types";
 
+export type GetUserOrders = {
+  userOrders: Order[];
+  orderCount: number;
+};
+
 export type AssignGuestOrderData = {
   orderId: string;
 };
