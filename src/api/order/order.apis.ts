@@ -8,6 +8,7 @@ import {
   PaymentStatusResponse,
   GetTicketSoldStatsResponse,
   TicketTypeSalesResponse,
+  GetUserOrders,
 } from "./order.types";
 import { DateRangeData, Event, OptionProps, PageData } from "@/constants/types";
 import { AxiosResponse } from "axios";
@@ -31,7 +32,7 @@ export const getUserUpcomingEventOrders = async (_page?: PageData) => {
   const page = _page?.page;
   const limit = _page?.limit;
 
-  return await request({
+  return await request<GetUserOrders>({
     url: `/orders/user-upcoming-events-orders?page=${page || ""}&limit=${limit || ""}`,
     method: "get",
   });
@@ -48,7 +49,7 @@ export const getUserPastEventOrders = async (_page?: PageData) => {
   const page = _page?.page;
   const limit = _page?.limit;
 
-  return await request({
+  return await request<GetUserOrders>({
     url: `/orders/user-past-events-orders?page=${page || ""}&limit=${limit || ""}`,
     method: "get",
   });

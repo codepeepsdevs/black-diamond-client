@@ -17,6 +17,7 @@ import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { formatPurchaseDate, getPDTDate } from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
+import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 
 const tabs = {
   UPCOMING_TICKETS: "upcoming-tickets",
@@ -34,10 +35,23 @@ export default function MyOrdersPage() {
   );
   const [currentTab, setCurrentTab] =
     useState<(typeof tabs)[keyof typeof tabs]>("upcoming-tickets");
-  const upcomingData = useUserUpcomingEventsOrders({ page: upage });
-  const pastData = useUserPastEventOrders({ page: ppage });
-  const userOrders = upcomingData.data?.data;
+  const upcomingData = useUserUpcomingEventsOrders({ page: upage, limit: 10 });
+  const pastData = useUserPastEventOrders({ page: ppage, limit: 10 });
+  const upcomingEventOrders = upcomingData.data?.data;
   const pastEventOrders = pastData.data?.data;
+
+  const isUlast = upcomingEventOrders?.orderCount
+    ? upage * 10 >= upcomingEventOrders.orderCount
+      ? true
+      : false
+    : true;
+
+  const isPlast = pastEventOrders?.orderCount
+    ? upage * 10 >= pastEventOrders.orderCount
+      ? true
+      : false
+    : true;
+
   return (
     <div className=" mb-20">
       <h1 className="text-4xl font-medium text-white">My Ticket Orders</h1>
@@ -68,19 +82,22 @@ export default function MyOrdersPage() {
           currentTab === "upcoming-tickets" ? "block" : "hidden"
         )}
       >
-        {upcomingData.isPending ? (
-          <div className="text-white">Loading orders of upcoming events..</div>
+        {upcomingData.isPending && !upcomingData.isError ? (
+          <>
+            {new Array(3).fill(0).map((_, index) => {
+              return (
+                <LoadingSkeleton key={index} className="w-full h-40 md:h-48" />
+              );
+            })}
+          </>
         ) : (
-          userOrders?.map((order, index) => (
+          upcomingEventOrders?.userOrders?.map((order, index) => (
             <UpcomingOrderCard order={order} key={index} />
           ))
         )}
 
         {/* UPCOMING TICKETS PAGINATION */}
         <div className="flex items-center justify-end space-x-2 py-4">
-          {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
-          {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
-          {/* TODO: implement loading indicator  */}
           <div className="space-x-2 flex items-center">
             <button
               className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
@@ -102,18 +119,24 @@ export default function MyOrdersPage() {
             <button
               className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
               onClick={() => setUPage((prev) => prev + 1)}
-              //   disabled={!table.getCanNextPage()}
+              disabled={isUlast}
             >
               <FiChevronsRight />
             </button>
           </div>
         </div>
-        {/* TODO: Implement showing from total rows */}
-        <div>
+        <div className="text-white">
           {upcomingData.isFetching ? (
             <LoadingMessage>Loading upcoming events tickets</LoadingMessage>
           ) : (
-            <div>Showing 1-10 of 1,253</div>
+            upage &&
+            upcomingEventOrders?.orderCount && (
+              <div>
+                Showing {upage * 10 - 9}-
+                {isUlast ? upcomingEventOrders.orderCount : upage * 10} of{" "}
+                {upcomingEventOrders.orderCount}
+              </div>
+            )
           )}
         </div>
         {/* END UPCOMING TICKETS PAGINATION */}
@@ -127,19 +150,22 @@ export default function MyOrdersPage() {
           currentTab === "past-tickets" ? "block" : "hidden"
         )}
       >
-        {pastData.isPending ? (
-          <div className="text-white">Loading orders of past events..</div>
+        {pastData.isPending && !pastData.isError ? (
+          <>
+            {new Array(3).fill(0).map((_, index) => {
+              return (
+                <LoadingSkeleton key={index} className="w-full h-40 md:h-48" />
+              );
+            })}
+          </>
         ) : (
-          pastEventOrders?.map((order, index) => (
+          pastEventOrders?.userOrders?.map((order, index) => (
             <PastOrderCard order={order} key={index} />
           ))
         )}
 
         {/* PAST TICKETS PAGINATION */}
         <div className="flex items-center justify-end space-x-2 py-4">
-          {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
-          {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
-          {/* TODO: implement loading indicator  */}
           <div className="space-x-2 flex items-center">
             <button
               className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
@@ -161,18 +187,24 @@ export default function MyOrdersPage() {
             <button
               className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
               onClick={() => setPPage((prev) => prev + 1)}
-              //   disabled={!table.getCanNextPage()}
+              disabled={isPlast}
             >
               <FiChevronsRight />
             </button>
           </div>
         </div>
-        {/* TODO: Implement showing from total rows */}
-        <div>
+        <div className="text-white">
           {pastData.isFetching ? (
             <LoadingMessage>Loading past event tickets</LoadingMessage>
           ) : (
-            <div>Showing 1-10 of 1,253</div>
+            ppage &&
+            pastEventOrders?.orderCount && (
+              <div>
+                Showing {ppage * 10 - 9}-
+                {isPlast ? pastEventOrders.orderCount : ppage * 10} of{" "}
+                {pastEventOrders.orderCount}
+              </div>
+            )
           )}
         </div>
         {/* END PAST TICKETS PAGINATION */}
