@@ -12,10 +12,10 @@ const EventTabs = [
     label: "Upcoming Events",
     value: "upcoming",
   },
-  {
-    label: "Past Events",
-    value: "past",
-  },
+  // {
+  //   label: "Past Events",
+  //   value: "past",
+  // },
 ] as const;
 
 const EventsPage = () => {
