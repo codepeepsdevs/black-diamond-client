@@ -3,6 +3,7 @@ import React, { ComponentProps, useCallback } from "react";
 import { FiDownload } from "react-icons/fi";
 import ErrorToast from "../toast/ErrorToast";
 import html2canvas from "html2canvas";
+import toast from "react-hot-toast";
 
 export default function DownloadTicketButton({
   className,
@@ -11,6 +12,9 @@ export default function DownloadTicketButton({
   ...props
 }: ComponentProps<"button"> & { nodeId: string; ticketName: string }) {
   const onDownload = useCallback(() => {
+    const loadingToastId = toast.loading(
+      "Preparing your ticket.. please wait.."
+    );
     const node = document.getElementById(nodeId);
     if (!node) {
       ErrorToast({
@@ -20,22 +24,46 @@ export default function DownloadTicketButton({
       return;
     }
 
-    html2canvas(node).then((canvas) => {
-      const data = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
+    html2canvas(node)
+      .then((canvas) => {
+        const data = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
 
-      // Safari iOS workaround to open the image in a new tab
-      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-        window.open(data);
-      } else {
-        link.href = data;
-        link.download = ticketName || "ticket";
+        // Safari iOS workaround to open the image in a new tab
+        // if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        const newTab = window.open();
+        if (newTab) {
+          newTab.document.write(`
+            <style>
+              body, html {
+                height: 100%;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #f5f5f5;
+              }
+            </style>
+            <img src="${data}" alt="Ticket" style="max-width: 100%; max-height: 100%;" />
+          `);
+        } else {
+          ErrorToast({
+            title: "Error",
+            descriptions: ["Unable to open ticket in new tab"],
+          });
+        }
+        // } else {
+        //   link.href = data;
+        //   link.download = ticketName || "ticket";
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    });
+        //   document.body.appendChild(link);
+        //   link.click();
+        //   document.body.removeChild(link);
+        // }
+      })
+      .finally(() => {
+        toast.success("Ticket successfully generated", { id: loadingToastId });
+      });
   }, [nodeId, ticketName]);
 
   return (

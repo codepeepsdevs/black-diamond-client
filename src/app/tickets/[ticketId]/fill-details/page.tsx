@@ -19,7 +19,7 @@ import { HiMiniCalendar } from "react-icons/hi2";
 // import { formatEventDate } from "@/utils/date-formatter";
 import {
   useCheckPaymentStatus,
-  useFillEventDetails,
+  useFillTicketDetails,
   useOrderDetails,
 } from "@/api/order/order.queries";
 import { useParams, useRouter } from "next/navigation";
@@ -98,7 +98,7 @@ export default function FillTicketDetailsPage() {
     mutate: fillTicketDetails,
     isPending: fillTicketDetailsPending,
     isError: fillTicketDetailsError,
-  } = useFillEventDetails(
+  } = useFillTicketDetails(
     (e) => {
       toast.error("An error occurred while filling ticket details");
     },

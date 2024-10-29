@@ -24,7 +24,7 @@ export default function ShareTicketButton({
       const blob = await fetch(imgData).then((res) => res.blob());
       const file = new File([blob], "ticket.png", { type: "image/png" });
 
-      const shareData = {
+      const shareData: ShareData = {
         files: [file],
       };
 

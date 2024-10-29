@@ -1,5 +1,10 @@
 import { DateRangeData, OptionProps, Order, PageData } from "@/constants/types";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import {
   assignGuestOrder,
@@ -36,14 +41,20 @@ export const useOrderDetails = (orderId: string) => {
   });
 };
 
-export const useFillEventDetails = (
+export const useFillTicketDetails = (
   onError: (error: Error) => void,
   onSuccess: (data: AxiosResponse<Order>) => void
 ) => {
+  const queryClient = useQueryClient();
   return useMutation<AxiosResponse<Order>, Error, FillTicketDetailsData>({
     mutationFn: fillTicketDetails,
     onError,
-    onSuccess,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["order-details", data.data.id],
+      });
+      onSuccess(data);
+    },
   });
 };
 
