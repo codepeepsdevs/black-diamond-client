@@ -3,84 +3,23 @@ import { FiUpload } from "react-icons/fi";
 import ErrorToast from "../toast/ErrorToast";
 import html2canvas from "html2canvas";
 import { toPng } from "html-to-image";
+import toast from "react-hot-toast";
 
 export default function ShareTicketButton({
   nodeId,
 }: {
   nodeId: string /** Nodeid is the id of the printable ticket component */;
 }) {
-  // const shareTicket = async () => {
-  //   alert("starting sharing");
-  //   const node = document.getElementById(nodeId);
-  //   alert("node gotten" + node?.className);
-  //   if (!node) {
-  //     ErrorToast({
-  //       title: "Share error",
-  //       descriptions: ["Something went wrong while trying to share ticket"],
-  //     });
-  //     return;
-  //   }
-  //   const canvas = await html2canvas(node);
-  //   // const imgData = canvas.toDataURL("image/png");
-  //   alert("canvas instantiated from node");
-
-  //   if (navigator.share) {
-  //     alert("Device can share");
-  //     // Step 2: Convert the canvas to a Blob
-  //     const blob: Blob | null = await new Promise((resolve) =>
-  //       canvas.toBlob(resolve, "image/png")
-  //     );
-
-  //     if (!blob) {
-  //       alert("Could not create an image from the HTML element.");
-  //       ErrorToast({
-  //         title: "Share Error",
-  //         descriptions: ["Unable to generate ticket to share"],
-  //       });
-  //       return;
-  //     }
-  //     const file = new File([blob], "ticket.png", { type: "image/png" });
-
-  //     const shareData: ShareData = {
-  //       files: [file],
-  //     };
-
-  //     if (
-  //       !navigator.canShare({
-  //         files: [file],
-  //       })
-  //     ) {
-  //       alert("Device cannot share file");
-  //       return ErrorToast({
-  //         title: "Share Error",
-  //         descriptions: ["Share format not supported"],
-  //       });
-  //     }
-
-  //     try {
-  //       alert("Device can share this file, sharing now");
-  //       await navigator.share(shareData);
-  //     } catch (error) {
-  //       alert("something went wrong while sharing");
-  //       ErrorToast({
-  //         title: "Share error",
-  //         descriptions: ["Something went wrong while trying to share ticket"],
-  //       });
-  //     }
-  //   } else {
-  //     ErrorToast({
-  //       title: "Share error",
-  //       descriptions: ["Sharing not supported"],
-  //     });
-  //   }
-  // };
+  const [shareProcessing, setshareProcessing] = useState(false);
   const shareTicket = async () => {
+    setshareProcessing(true);
     const node = document.getElementById(nodeId);
+    const loadingToastId = toast.loading("Preparing to share ticket..");
     if (!node) {
-      ErrorToast({
-        title: "Share error",
-        descriptions: ["Something went wrong while trying to share ticket"],
+      toast.error("Something went wrong while trying to share ticket", {
+        id: loadingToastId,
       });
+      setshareProcessing(false);
       return;
     }
     const ticketImage = await toPng(node);
@@ -90,10 +29,10 @@ export default function ShareTicketButton({
       const blob = await fetch(ticketImage).then((res) => res.blob());
 
       if (!blob) {
-        ErrorToast({
-          title: "Share Error",
-          descriptions: ["Unable to generate ticket to share"],
+        toast.error("Unable to generate ticket to share", {
+          id: loadingToastId,
         });
+        setshareProcessing(false);
         return;
       }
       const file = new File([blob], "ticket.png", { type: "image/png" });
@@ -107,30 +46,30 @@ export default function ShareTicketButton({
           files: [file],
         })
       ) {
-        return ErrorToast({
-          title: "Share Error",
-          descriptions: ["Share format not supported"],
+        setshareProcessing(false);
+        return toast.error("Share format not supported", {
+          id: loadingToastId,
         });
       }
 
       try {
         await navigator.share(shareData);
+        toast.success("Sharing processed successfully", { id: loadingToastId });
       } catch (error) {
-        ErrorToast({
-          title: "Share error",
-          descriptions: ["Something went wrong while trying to share ticket"],
+        toast.error("Something went wrong while trying to share ticket", {
+          id: loadingToastId,
         });
+      } finally {
+        setshareProcessing(false);
       }
     } else {
-      ErrorToast({
-        title: "Share error",
-        descriptions: ["Sharing not supported"],
-      });
+      toast.error("Sharing not supported", { id: loadingToastId });
     }
   };
 
   return (
     <button
+      disabled={shareProcessing}
       className="bg-[#14171A] size-12 grid place-items-center rounded-full text-2xl"
       onClick={shareTicket}
     >
