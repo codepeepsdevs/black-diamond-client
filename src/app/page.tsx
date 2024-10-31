@@ -13,24 +13,19 @@ import {
 } from "@/components";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import EventCard from "@/components/shared/EventCard";
-import { ScrollMenu } from "react-horizontal-scrolling-menu";
-import "react-horizontal-scrolling-menu/dist/styles.css";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import TypeWriter from "typewriter-effect";
 import { useRouter } from "next/navigation";
 import { useNewsletterSubscribe } from "@/api/newsletter/newsletter.queries";
-import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { scaleVariants } from "@/utils/hoc/motion";
 import { useGetEvents } from "@/api/events/events.queries";
-import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import Slider from "react-slick";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // Import Swiper React componentssss
 
 import { Swiper, SwiperSlide } from "swiper/react";

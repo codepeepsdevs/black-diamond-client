@@ -11,7 +11,7 @@ export default function DownloadTicketButton({
   ticketName,
   ...props
 }: ComponentProps<"button"> & { nodeId: string; ticketName: string }) {
-  const onDownload = useCallback(() => {
+  const onDownload = () => {
     const loadingToastId = toast.loading(
       "Preparing your ticket.. please wait.."
     );
@@ -64,7 +64,7 @@ export default function DownloadTicketButton({
       .finally(() => {
         toast.success("Ticket successfully generated", { id: loadingToastId });
       });
-  }, [nodeId, ticketName]);
+  };
 
   return (
     <button

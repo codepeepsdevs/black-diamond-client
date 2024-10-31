@@ -11,6 +11,7 @@ export default function ShareTicketButton({
   const shareTicket = async () => {
     alert("starting sharing");
     const node = document.getElementById(nodeId);
+    alert("node gotten" + node?.className);
     if (!node) {
       ErrorToast({
         title: "Share error",
@@ -19,11 +20,24 @@ export default function ShareTicketButton({
       return;
     }
     const canvas = await html2canvas(node);
-    const imgData = canvas.toDataURL("image/png");
+    // const imgData = canvas.toDataURL("image/png");
+    alert("canvas and image data instantiated with canvas");
 
     if (navigator.share) {
       alert("Device can share");
-      const blob = await fetch(imgData).then((res) => res.blob());
+      // Step 2: Convert the canvas to a Blob
+      const blob: Blob | null = await new Promise((resolve) =>
+        canvas.toBlob(resolve, "image/png")
+      );
+
+      if (!blob) {
+        alert("Could not create an image from the HTML element.");
+        ErrorToast({
+          title: "Share Error",
+          descriptions: ["Unable to generate ticket to share"],
+        });
+        return;
+      }
       const file = new File([blob], "ticket.png", { type: "image/png" });
 
       const shareData: ShareData = {

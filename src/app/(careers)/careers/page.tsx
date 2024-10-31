@@ -1,8 +1,7 @@
 "use client";
 
-import { CareersHero, PromoterSection } from "@/components";
+import { PromoterSection } from "@/components";
 import CareersIntro from "@/components/careersPage/CareersIntro";
-import WhatToDoSection from "@/components/careersPage/WhatToDoSection";
 import React, { useState } from "react";
 
 const Careers = () => {
