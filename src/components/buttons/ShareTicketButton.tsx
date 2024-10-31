@@ -75,9 +75,7 @@ export default function ShareTicketButton({
   //   }
   // };
   const shareTicket = async () => {
-    alert("starting sharing");
     const node = document.getElementById(nodeId);
-    alert("node gotten" + node?.className);
     if (!node) {
       ErrorToast({
         title: "Share error",
@@ -86,8 +84,6 @@ export default function ShareTicketButton({
       return;
     }
     const ticketImage = await toPng(node);
-    // const imgData = canvas.toDataURL("image/png");
-    alert("canvas instantiated from node");
 
     if (navigator.share) {
       alert("Device can share");
@@ -95,7 +91,6 @@ export default function ShareTicketButton({
       const blob = await fetch(ticketImage).then((res) => res.blob());
 
       if (!blob) {
-        alert("Could not create an image from the HTML element.");
         ErrorToast({
           title: "Share Error",
           descriptions: ["Unable to generate ticket to share"],
@@ -113,7 +108,6 @@ export default function ShareTicketButton({
           files: [file],
         })
       ) {
-        alert("Device cannot share file");
         return ErrorToast({
           title: "Share Error",
           descriptions: ["Share format not supported"],
@@ -121,10 +115,8 @@ export default function ShareTicketButton({
       }
 
       try {
-        alert("Device can share this file, sharing now");
         await navigator.share(shareData);
       } catch (error) {
-        alert("something went wrong while sharing");
         ErrorToast({
           title: "Share error",
           descriptions: ["Something went wrong while trying to share ticket"],
