@@ -86,7 +86,6 @@ export default function ShareTicketButton({
     const ticketImage = await toPng(node);
 
     if (navigator.share) {
-      alert("Device can share");
       // Step 2: Convert the canvas to a Blob
       const blob = await fetch(ticketImage).then((res) => res.blob());
 
