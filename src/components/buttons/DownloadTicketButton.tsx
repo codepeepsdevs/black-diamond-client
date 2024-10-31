@@ -22,63 +22,33 @@ export default function DownloadTicketButton({
       return;
     }
 
-    // const ticketImage = await toPng(node);
-    // const newTab = window.open();
-    // if (newTab) {
-    //   newTab.document.write(`
-    //         <style>
-    //           body, html {
-    //             height: 100%;
-    //             margin: 0;
-    //             display: flex;
-    //             justify-content: center;
-    //             align-items: center;
-    //             background-color: #f5f5f5;
-    //           }
-    //         </style>
-    //         <img src="${ticketImage}" alt="Ticket" style="max-width: 100%; max-height: 100%;" />
-    //       `);
-    // } else {
-    //   toast.error("Unable to open ticket in new tab", { id: loadingToastId });
-    // }
     toPng(node)
       .then((ticketImage) => {
         const link = document.createElement("a");
 
-        // Safari iOS workaround to open the image in a new tab
-        // if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
-        const newTab = window.open();
-        if (newTab) {
-          newTab.document.write(`
-            <style>
-              body, html {
-                height: 100%;
-                margin: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: #f5f5f5;
-              }
-            </style>
-            <img src="${ticketImage}" alt="Ticket" style="max-width: 100%; max-height: 100%;" />
-          `);
-        } else {
-          ErrorToast({
-            title: "Error",
-            descriptions: ["Unable to open ticket in new tab"],
-          });
-        }
-        // } else {
-        //   link.href = data;
-        //   link.download = ticketName || "ticket";
+        link.href = ticketImage;
+        link.download = ticketName || "ticket";
 
-        //   document.body.appendChild(link);
-        //   link.click();
-        //   document.body.removeChild(link);
-        // }
+        // For non-iOS Safari, open in a new tab
+        const isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+          /Safari/.test(navigator.userAgent) &&
+          !/Chrome/.test(navigator.userAgent);
+        if (!isIOS) {
+          link.target = "_blank";
+        }
+
+        // Simulate a click on the link
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Ticket successfully generated", { id: loadingToastId });
+      })
+      .catch((e) => {
+        toast.error("Error downloading ticket", { id: loadingToastId });
       })
       .finally(() => {
-        toast.success("Ticket successfully generated", { id: loadingToastId });
+        toast.dismiss(loadingToastId);
       });
   };
 
