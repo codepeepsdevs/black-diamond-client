@@ -25,6 +25,7 @@ import {
   AddOn,
   ErrorResponse,
   Event,
+  EventStatus,
   OptionProps,
   PromoCode,
   TicketType,
@@ -60,11 +61,11 @@ import toast from "react-hot-toast";
 //   });
 // };
 
-type ExtendedEvents = (Event & {
+export type ExtendedEvents = (Event & {
   gross: number;
   totalSales: number;
   totalTickets: number;
-})[];
+} & EventStatus)[];
 
 export const useGetEvents = (options: OptionProps) => {
   return useQuery<AxiosResponse<ExtendedEvents>>({

@@ -4,7 +4,7 @@ import { useGetEvents } from "@/api/events/events.queries";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
-import { Event, OptionProps } from "@/constants/types";
+import { Event, EventStatus, OptionProps } from "@/constants/types";
 import { cn } from "@/utils/cn";
 // import { formatEventDate } from "@/utils/date-formatter";
 import Image from "next/image";
@@ -31,7 +31,7 @@ export default function AdminEventsPage() {
   function handleAction(
     action: (typeof actions)[number],
     eventId: string,
-    eventStatus?: Event["eventStatus"]
+    eventStatus?: EventStatus["eventStatus"]
   ) {
     switch (action) {
       case "view":
@@ -188,7 +188,7 @@ export default function AdminEventsPage() {
 
                         {/* STATUS */}
                         <td className="capitalize">
-                          {event.eventStatus.toLowerCase()}
+                          {event.eventStatus?.toLowerCase()}
                         </td>
                         {/* END STATUS */}
 
@@ -320,11 +320,11 @@ function ActionDropDown({
   handleAction,
 }: {
   eventId: string;
-  eventStatus: Event["eventStatus"];
+  eventStatus: EventStatus["eventStatus"];
   handleAction: (
     action: (typeof actions)[number],
     eventId: string,
-    eventStatus: Event["eventStatus"]
+    eventStatus: EventStatus["eventStatus"]
   ) => void;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);

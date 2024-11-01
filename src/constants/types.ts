@@ -65,7 +65,7 @@ interface BillingInfo {
 
 export type Order = {
   id: string;
-  event: Event;
+  event: Event & EventStatus;
   user?: User;
   status: "PENDING" | "COMPLETED" | "CANCELLED";
   paymentStatus: "PENDING" | "SUCCESSFUL" | "FAILED" | "CANCELLED";
@@ -79,6 +79,11 @@ export type Order = {
   createdAt: string;
   sessionId?: string;
 };
+
+export type EventStatus = {
+  eventStatus?: "UPCOMING" | "PAST";
+};
+
 interface BillingInfo {
   id: string;
   phone: string | null;
@@ -124,7 +129,7 @@ export type Event = {
   endTime: string; // ISO string (Date)
   summary: string;
   isPublished: boolean;
-  eventStatus: "UPCOMING" | "ONGOING" | "PAST"; // Enum-like status
+  // eventStatus: "UPCOMING" | "ONGOING" | "PAST"; // Enum-like status
   locationType: "VENUE" | "ONLINE_EVENT" | "TO_BE_ANNOUNCED";
   ticketSalesEndMessage: string | null;
   displayTicketsRemainder: boolean;
