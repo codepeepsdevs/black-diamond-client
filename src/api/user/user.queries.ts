@@ -15,7 +15,7 @@ export const useGetUser = () => {
     queryFn: getUser,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    refetchInterval: 10000,
+    // refetchInterval: 10000,
   });
 };
 
