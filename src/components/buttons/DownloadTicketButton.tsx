@@ -1,8 +1,6 @@
 import { cn } from "@/utils/cn";
 import React, { ComponentProps, useCallback } from "react";
 import { FiDownload } from "react-icons/fi";
-import ErrorToast from "../toast/ErrorToast";
-import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
 import { toPng } from "html-to-image";
 

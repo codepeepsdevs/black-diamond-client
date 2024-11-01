@@ -2,8 +2,6 @@ import { getEventDateAndTime } from "@/utils/date-formatter";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useParams } from "next/navigation";
 import { ComponentProps, useCallback } from "react";
-import ErrorToast from "../toast/ErrorToast";
-import html2canvas from "html2canvas";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 import { Swiper, SwiperSlide } from "swiper/react";

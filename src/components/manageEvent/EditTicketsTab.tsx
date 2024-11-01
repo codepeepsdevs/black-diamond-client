@@ -175,7 +175,9 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                     </div>
                   </div>
                   <div>Sold: </div>
-                  <div>0/24</div>
+                  <div>
+                    {ticketType._count.tickets}/{ticketType.quantity}
+                  </div>
                   <div>${ticketType.price.toFixed(2)}</div>
 
                   <ActionDropDown

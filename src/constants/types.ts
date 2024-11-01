@@ -251,3 +251,9 @@ export type CalendarEvent = {
   details: string;
   location: string;
 };
+
+export type TicketCount = {
+  _count: {
+    tickets: number;
+  };
+};

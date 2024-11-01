@@ -17,7 +17,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     setIsPending(isPending);
-  }, [isPending]);
+  }, [isPending, setIsPending]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

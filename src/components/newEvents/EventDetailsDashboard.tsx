@@ -41,7 +41,7 @@ export default function EventDetailsDashboard({
     ? getLowestTicket(event?.ticketTypes)?.price || 0
     : 0;
 
-  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
+  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
   const differenceInDays = dateFns.differenceInDays(
     new Date(event?.endTime || Date.now()),

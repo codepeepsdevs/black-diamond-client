@@ -29,7 +29,7 @@ export type GetRevenueResponse = {
 
 export type TicketTypeSalesResponse = (TicketType & {
   _count: {
-    tickets: true;
+    tickets: number;
   };
 })[];
 

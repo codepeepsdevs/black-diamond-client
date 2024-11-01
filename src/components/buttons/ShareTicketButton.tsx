@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import ErrorToast from "../toast/ErrorToast";
-import html2canvas from "html2canvas";
 import { toPng } from "html-to-image";
 import toast from "react-hot-toast";
 

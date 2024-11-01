@@ -13,7 +13,7 @@ import {
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { useParams } from "next/navigation";
-import { useGetEvent } from "@/api/events/events.queries";
+import { useGetEvent, useGetEventRevenue } from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
 import { getLowestTicket } from "@/utils/utilityFunctions";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
@@ -35,8 +35,14 @@ export default function EditEventDetailsDashboard({
   const totalTickets = event?.ticketTypes.reduce((accValue, ticketType) => {
     return (accValue += ticketType.quantity);
   }, 0);
+  const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
+    return (accValue += ticket._count.tickets);
+  }, 0);
 
-  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
+  const eventRevenueQuery = useGetEventRevenue(eventId);
+  const eventRevenue = eventRevenueQuery.data?.data;
+
+  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // const eventLink = `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
   const differenceInDays = dateFns.differenceInDays(
     new Date(event?.endTime || Date.now()),
@@ -70,7 +76,7 @@ export default function EditEventDetailsDashboard({
             alt="Cover image"
             width={180}
             height={180}
-            className="size-24 object-cover"
+            className="size-24 object-cover shrink-0"
           />
           <div className="space-y-2 flex-1">
             <div>{event?.name}</div>
@@ -101,7 +107,9 @@ export default function EditEventDetailsDashboard({
           </div>
 
           <p className="text-[#34C759] font-medium text-xl self-end pl-32">
-            Your event is in {differenceInDays} day(s)!
+            {differenceInDays > 0
+              ? `Your event is in ${differenceInDays} day(s)!`
+              : `This event was ${Math.abs(differenceInDays)} day(s) ago!`}
           </p>
         </div>
       </div>
@@ -115,7 +123,9 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0/250</div>
+            <div className="text-white font-semibold text-6xl">
+              {totalTicketsSold}/{totalTickets}
+            </div>
           </div>
           {/* END TICKETS SOLD */}
 
@@ -125,7 +135,9 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Revenue</span>
             </div>
-            <div className="text-white font-semibold text-6xl">$0.00</div>
+            <div className="text-white font-semibold text-6xl">
+              ${Number(eventRevenue?.revenue).toFixed(2)}
+            </div>
           </div>
           {/* END REVENUE */}
 

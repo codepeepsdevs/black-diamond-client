@@ -17,10 +17,7 @@ import EditEventAddOnTab from "@/components/manageEvent/EditEventAddOnTab";
 import EditEventDetailsDashboard from "@/components/manageEvent/EditEventDetailsDashboard";
 import * as Yup from "yup";
 import { editEventDetailsSchema } from "@/api/events/events.schemas";
-import DetailsTab from "@/components/newEvents/DetailsTab";
-import TicketsTab from "@/components/newEvents/TicketsTab";
-import PromoCodeTab from "@/components/newEvents/PromoCodeTab";
-import EventAddOnTab from "@/components/newEvents/EventAddOnTab";
+import Link from "next/link";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
@@ -34,7 +31,6 @@ type Tabs = (typeof tabsList)[number]["id"];
 
 export default function ManageEventPage() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
   const [notFoundDialogOpen, setNotFoundDialogOpen] = useState(false);
   const [currentTab, setCurrentTab] = useQueryState(
     "tab",
@@ -89,7 +85,12 @@ export default function ManageEventPage() {
         <div className="mx-8 mt-20 pt-10">
           {/* TOP BREADCRUMB */}
           <h1 className="text-3xl font-semibold text-white flex items-center gap-x-4">
-            <span className="text-[#A3A7AA]">Events</span>{" "}
+            <Link
+              href={"/admin/events"}
+              className="text-[#A3A7AA] hover:opacity-80"
+            >
+              Events
+            </Link>
             <FaChevronRight className="size-4" />
             <span>Manage Event</span>
           </h1>

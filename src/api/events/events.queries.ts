@@ -28,6 +28,7 @@ import {
   EventStatus,
   OptionProps,
   PromoCode,
+  TicketCount,
   TicketType,
 } from "@/constants/types";
 import {
@@ -78,7 +79,7 @@ export const useGetEvents = (options: OptionProps) => {
 };
 
 export const useGetEvent = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<Event>>({
+  return useQuery<AxiosResponse<Event & EventStatus>>({
     queryKey: ["get-event", eventId],
     queryFn: () => getEvent(eventId),
     // enabled: false,
@@ -87,7 +88,10 @@ export const useGetEvent = (eventId: Event["id"]) => {
 };
 
 export const useGetEventTicketTypes = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<TicketType[]>, AxiosError<ErrorResponse>>({
+  return useQuery<
+    AxiosResponse<(TicketType & TicketCount)[]>,
+    AxiosError<ErrorResponse>
+  >({
     queryKey: ["get-event-ticket-types", eventId],
     queryFn: () => getEventTicketTypes(eventId),
     // enabled: false,

@@ -10,7 +10,13 @@ import {
   TicketTypeSalesResponse,
   GetUserOrders,
 } from "./order.types";
-import { DateRangeData, Event, OptionProps, PageData } from "@/constants/types";
+import {
+  DateRangeData,
+  Event,
+  OptionProps,
+  Order,
+  PageData,
+} from "@/constants/types";
 import { AxiosResponse } from "axios";
 
 export const getOrderDetails = async (orderId: string) => {
@@ -21,7 +27,7 @@ export const getOrderDetails = async (orderId: string) => {
 };
 
 export const fillTicketDetails = async (formData: FillTicketDetailsData) => {
-  return await request({
+  return await request<Order>({
     url: `/orders/fill-ticket-details`,
     method: "post",
     data: formData,

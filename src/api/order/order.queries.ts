@@ -42,11 +42,15 @@ export const useOrderDetails = (orderId: string) => {
 };
 
 export const useFillTicketDetails = (
-  onError: (error: Error) => void,
+  onError: (error: AxiosError<Error>) => void,
   onSuccess: (data: AxiosResponse<Order>) => void
 ) => {
   const queryClient = useQueryClient();
-  return useMutation<AxiosResponse<Order>, Error, FillTicketDetailsData>({
+  return useMutation<
+    AxiosResponse<Order>,
+    AxiosError<Error>,
+    FillTicketDetailsData
+  >({
     mutationFn: fillTicketDetails,
     onError,
     onSuccess: (data) => {

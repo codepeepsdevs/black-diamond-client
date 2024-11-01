@@ -27,7 +27,7 @@ import toast from "react-hot-toast";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "@/app/loading";
-import { getPDTDate } from "@/utils/utilityFunctions";
+import { getApiErrorMessage, getPDTDate } from "@/utils/utilityFunctions";
 
 const ticketFormSchema = Yup.object().shape({
   tickets: Yup.array().of(
@@ -100,7 +100,14 @@ export default function FillTicketDetailsPage() {
     isError: fillTicketDetailsError,
   } = useFillTicketDetails(
     (e) => {
-      toast.error("An error occurred while filling ticket details");
+      const errorMessage = getApiErrorMessage(
+        e,
+        "An error occurred while filling ticket details"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
     },
     (data) => {
       setOrderCompleteDialogOpen(true);

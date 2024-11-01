@@ -1,9 +1,11 @@
 import {
   AddOn,
   Event,
+  EventStatus,
   OptionProps,
   // PageData,
   PromoCode,
+  TicketCount,
   TicketType,
 } from "@/constants/types";
 import { request } from "@/utils/axios-utils";
@@ -52,7 +54,7 @@ export const getEvents = async (options: OptionProps) => {
 };
 
 export const getEvent = async (eventId: Event["id"]) => {
-  return await request({
+  return await request<Event & EventStatus>({
     url: `/events/get-event/${eventId}`,
     method: "get",
   });
@@ -65,7 +67,7 @@ export const getEventTicketTypes = async (eventId: Event["id"]) => {
   return (await request({
     url: `/events/${eventId}/get-ticket-types`,
     method: "get",
-  })) as AxiosResponse<TicketType[]>;
+  })) as AxiosResponse<(TicketType & TicketCount)[]>;
 };
 
 export const getEventPromocodes = async (eventId: Event["id"]) => {
