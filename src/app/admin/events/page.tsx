@@ -109,7 +109,7 @@ export default function AdminEventsPage() {
                 {eventsQuery.data?.data || !eventsQuery.isError ? (
                   eventsQuery.data.data.map((event) => {
                     return (
-                      <tr>
+                      <tr key={event.id}>
                         <td className="py-6">
                           <div className="flex items-start gap-x-6">
                             {/* MONTH AND DAY */}
@@ -297,6 +297,7 @@ function FilterSelect({
         {items.map((item) => {
           return (
             <button
+              key={item.value}
               onClick={() => {
                 setSelectValue(item.value);
                 onSelect(item.value);
@@ -344,6 +345,7 @@ function ActionDropDown({
         {actions.map((item) => {
           return (
             <button
+              key={item}
               onClick={() => {
                 handleAction(item, eventId, eventStatus);
                 setDropdownOpen(false);
