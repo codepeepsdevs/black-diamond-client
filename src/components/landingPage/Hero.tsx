@@ -20,6 +20,7 @@ const Hero = ({
         playsInline
         onCanPlay={handleVideoCanPlay}
         onPlaying={handleVideoCanPlay}
+        poster={"/videos/heroVideoPoster.jpg"}
       >
         <source src="videos/heroVideo.mp4" type="video/mp4" />
         Your browser does not support the video tag.

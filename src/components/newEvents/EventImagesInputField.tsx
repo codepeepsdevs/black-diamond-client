@@ -7,7 +7,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { cn } from "@/utils/cn";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 
 const EventImagesInputField: React.FC<{
@@ -61,11 +61,12 @@ const EventImagesInputField: React.FC<{
       {/* IMAGE PREVIEW */}
       {imagesPreview && (
         <Swiper
-          modules={[Autoplay]}
+          modules={[Autoplay, Pagination]}
           autoplay={{
             disableOnInteraction: false,
             delay: 1000,
           }}
+          pagination={{ clickable: true }}
           loop={true}
           className="absolute inset-0 w-full h-full [&>.swiper-wrapper]:h-full opacity-25"
         >

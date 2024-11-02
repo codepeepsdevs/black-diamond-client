@@ -25,7 +25,6 @@ import { useParams } from "next/navigation";
 import { SearchQueryState } from "@/constants/types";
 import { Tabs } from "@/app/admin/events/new-event/page";
 import EditEventCoverImageInput from "./EditEventCoverImageInput";
-import EventImagesInputField from "./EventImagesInputField";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 
@@ -173,7 +172,7 @@ export default function EditDetailsTab({
             <label htmlFor="event-summary">Event Summary</label>
             <textarea
               rows={8}
-              className="w-full text-black text-xs lg:text-base p-4 border border-input-border"
+              className="w-full text-black p-4 border border-input-border"
               {...register("summary")}
             />
             <FormError error={errors.summary} />

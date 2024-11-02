@@ -253,6 +253,16 @@ input:-webkit-autofill:focus {
   width: 100%;
   height: 100%;
 }
+.event-details-file-input .swiper-pagination-bullet {
+  background-color: #c0c0c0; /* Changes color of pagination bullets */
+  width: 50px;
+  border-radius: 0px;
+  opacity: 1; /* Ensures full opacity */
+}
+
+.event-details-file-input .swiper-pagination-bullet-active {
+  background-color: black; /* Color of active bullet */
+}
 
 /* Hide the icon in the date input */
 /* input[type="date"]::-webkit-calendar-picker-indicator {

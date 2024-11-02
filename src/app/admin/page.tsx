@@ -38,7 +38,6 @@ export default function AdminHomePage() {
   });
   const revenueData = revenueQuery.data?.data;
 
-  // TODO: Make a dedicated api controller for these card data..
   const ticketsSoldQuery = useGetTicketsSoldStats();
   const ticketsSoldData = ticketsSoldQuery.data?.data;
 
@@ -54,7 +53,6 @@ export default function AdminHomePage() {
         <h1 className="text-3xl font-semibold text-white">Dashboard</h1>
         <p className="text-sm text-[#A3A7AA] mb-5">Welcome Liam</p>
 
-        {/* TODO: Complete date range picker make the selections colour work */}
         <div className="flex justify-end">
           <DatePickerWithRange
             selected={date}
@@ -76,7 +74,6 @@ export default function AdminHomePage() {
                 )}
                 <span>Tickets sold</span>
               </div>
-              {/* TODO: Compute new users or remove this field, may need a reference date to compute */}
               <div className="text-white font-semibold text-6xl">
                 {ticketsSoldData?.ticketsSold || 0}
               </div>
