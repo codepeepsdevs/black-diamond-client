@@ -11,6 +11,7 @@ import {
 import { request } from "@/utils/axios-utils";
 import axios, { AxiosResponse } from "axios";
 import {
+  AdminGetEvents,
   CreateEventAddonData,
   CreateEventAddonResponse,
   CreateEventDetailsData,
@@ -20,6 +21,8 @@ import {
   CreateEventTicketTypeData,
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
+  RemoveSlideData,
+  RemoveSlideResponse,
   UpdateEventDetailsData,
   UpdateEventDetailsResponse,
   UpdateTicketTypeData,
@@ -49,6 +52,13 @@ import * as dateFns from "date-fns";
 export const getEvents = async (options: OptionProps) => {
   return await request({
     url: `/events/get-events?eventStatus=${options.eventStatus || ""}&search=${options.search || ""}&page=${options.page || ""}&limit=${options.limit || ""}`,
+    method: "get",
+  });
+};
+
+export const adminGetEvents = async (options: OptionProps) => {
+  return await request<AdminGetEvents>({
+    url: `/events/admin-get-events?eventStatus=${options.eventStatus || ""}&search=${options.search || ""}&page=${options.page || ""}&limit=${options.limit || ""}`,
     method: "get",
   });
 };
@@ -114,7 +124,6 @@ export const createEventDetails = async ({
 }: CreateEventDetailsData) => {
   const formData = new FormData();
   Object.entries(data).map(([key, value]) => {
-    console.log(key, value);
     formData.append(key, value);
   });
 
@@ -170,7 +179,6 @@ export const createEventAddon = async ({
       .toISOString(),
   };
   Object.entries(extendedData).map(([key, value]) => {
-    console.log(key, value);
     formData.append(key, value);
   });
 
@@ -219,13 +227,26 @@ export const createEventPromocode = async ({
 
 export const updateEventDetails = async ({
   eventId,
+  images,
+  coverImage,
   ...data
 }: UpdateEventDetailsData) => {
-  // const formData = jsonToFormData(data);
+  const formData = new FormData();
+  Object.entries(data).map(([key, value]) => {
+    formData.append(key, value);
+  });
+
+  if (coverImage) {
+    formData.append("coverImage", coverImage);
+  }
+
+  if (images && images.length > 0) {
+    images.forEach((image: File) => formData.append("images", image));
+  }
   return (await request({
     url: `/events/update-event/${eventId}`,
     method: "put",
-    data: data,
+    data: formData,
   })) as AxiosResponse<UpdateEventDetailsResponse>;
 };
 
@@ -249,4 +270,14 @@ export const getEventRevenue = async (eventId: Event["id"]) => {
     url: `/events/get-revenue/${eventId}`,
     method: "get",
   })) as AxiosResponse<GetEventRevenueResponse>;
+};
+
+export const removeImageFromSlide = async (data: RemoveSlideData) => {
+  return request<RemoveSlideResponse>({
+    url: `/events/remove-image/${data.eventId}`,
+    method: "delete",
+    data: {
+      image: data.image,
+    },
+  });
 };

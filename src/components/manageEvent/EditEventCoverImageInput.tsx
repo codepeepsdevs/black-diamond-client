@@ -10,11 +10,9 @@ import { Next, Prev } from "../../../public/icons";
 
 const EditEventCoverImageInput: React.FC<{
   onSelectFile: (file: File) => void;
-  prevCoverImage?: string;
-}> = ({ onSelectFile, prevCoverImage = null }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    prevCoverImage
-  );
+  oldCoverImage: string | undefined;
+}> = ({ onSelectFile, oldCoverImage }) => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Handle the dropped files
@@ -39,7 +37,7 @@ const EditEventCoverImageInput: React.FC<{
     <div
       {...getRootProps()}
       className={cn(
-        "event-details-file-input bg-[#757575] p-[20px] h-96 text-center cursor-pointer mt-5 flex justify-center items-center relative"
+        "event-details-file-input bg-[#757575] p-[20px] h-96 text-center cursor-pointer flex justify-center items-center relative"
       )}
     >
       <input {...getInputProps()} />
@@ -51,7 +49,7 @@ const EditEventCoverImageInput: React.FC<{
           {isDragActive ? (
             <p>Drop the file here...</p>
           ) : imagePreview ? (
-            <p>Change uploaded cover image</p>
+            <p>Change selected photo</p>
           ) : (
             <p>Upload photo</p>
           )}
@@ -59,11 +57,15 @@ const EditEventCoverImageInput: React.FC<{
       </div>
 
       {/* IMAGE PREVIEW */}
-      {imagePreview && (
-        <div className="absolute inset-0 opacity-50">
+      <div className="absolute inset-0 opacity-25">
+        {imagePreview ? (
           <Image src={imagePreview} alt="" fill className="object-cover" />
-        </div>
-      )}
+        ) : (
+          oldCoverImage && (
+            <Image src={oldCoverImage} alt="" fill className="object-cover" />
+          )
+        )}
+      </div>
       {/* END IMAGE PREVIEW */}
     </div>
   );

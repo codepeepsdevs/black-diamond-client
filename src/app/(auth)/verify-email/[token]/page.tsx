@@ -12,7 +12,6 @@ const VerifyEmail = () => {
   const { data, refetch, status, error } = useConfirmEmail(params.token);
 
   useEffect(() => {
-    console.log(error);
     const verify = async () => {
       await refetch();
       if (error) {

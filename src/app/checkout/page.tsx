@@ -141,7 +141,6 @@ function CheckoutForm() {
   };
 
   const onCheckoutError = (e: AxiosError<ErrorResponse>) => {
-    console.log("checkout error");
     const errorMessage = getApiErrorMessage(e, "Error placing order");
     ErrorToast({
       title: "Error",

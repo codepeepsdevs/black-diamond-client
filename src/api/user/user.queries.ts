@@ -4,10 +4,26 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { getUser, getUsers, updateUserRequest, usersStats } from "./user.apis";
+import {
+  adminUsersStats,
+  downloadUsers,
+  getUser,
+  getUsers,
+  newUsersTodayStats,
+  updateUserRequest,
+  usersStats,
+} from "./user.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import { ErrorResponse, PageData, User } from "@/constants/types";
-import { UsersStatsData, UsersStatsResponse } from "./user.types";
+import {
+  AdminUsersStats,
+  DownloadUsersData,
+  GetUserData,
+  NewUsersTodayStats,
+  UsersStatsData,
+  UsersStatsResponse,
+} from "./user.types";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
 
 export const useGetUser = () => {
   return useQuery({
@@ -20,7 +36,7 @@ export const useGetUser = () => {
 };
 
 export const useGetUsers = (page?: PageData) => {
-  return useQuery<AxiosResponse<User[]>, AxiosError<ErrorResponse>>({
+  return useQuery<AxiosResponse<GetUserData>, AxiosError<ErrorResponse>>({
     queryKey: ["users", page],
     queryFn: () => getUsers(page),
     placeholderData: keepPreviousData,
@@ -53,4 +69,31 @@ export const useUsersStats = (range?: UsersStatsData) => {
       queryKey: ["users-stats", range],
     }
   );
+};
+
+export const useNewUsersTodayStats = () => {
+  return useQuery<AxiosResponse<NewUsersTodayStats>, AxiosError<ErrorResponse>>(
+    {
+      queryFn: newUsersTodayStats,
+      queryKey: ["new-users-today-stats"],
+    }
+  );
+};
+
+export const useAdminUsersStats = () => {
+  return useQuery<AxiosResponse<AdminUsersStats>, AxiosError<ErrorResponse>>({
+    queryFn: adminUsersStats,
+    queryKey: ["admin-users-stats"],
+  });
+};
+
+export const useDownloadUsers = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: () => void
+) => {
+  return useMutation({
+    mutationFn: downloadUsers,
+    onError,
+    onSuccess,
+  });
 };

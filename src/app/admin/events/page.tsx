@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetEvents } from "@/api/events/events.queries";
+import { useAdminGetEvents, useGetEvents } from "@/api/events/events.queries";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
@@ -25,8 +25,15 @@ export default function AdminEventsPage() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [eventStatus, setEventStatus] =
     useState<OptionProps["eventStatus"]>("all");
-  const eventsQuery = useGetEvents({ page, eventStatus });
+  const eventsQuery = useAdminGetEvents({ page, eventStatus });
+  const eventsData = eventsQuery.data?.data;
   const router = useRouter();
+
+  const isLast = eventsData?.eventsCount
+    ? page * 10 >= eventsData.eventsCount
+      ? true
+      : false
+    : true;
 
   function handleAction(
     action: (typeof actions)[number],
@@ -103,11 +110,17 @@ export default function AdminEventsPage() {
             {/* END LIST HEAEDER */}
             {/* LIST BODY */}
             {eventsQuery.isPending ? (
-              <LoadingMessage>Loading events..</LoadingMessage>
+              <tbody>
+                <tr>
+                  <td colSpan={4}>
+                    <LoadingMessage>Loading events..</LoadingMessage>
+                  </td>
+                </tr>
+              </tbody>
             ) : (
               <tbody className="text-text-color [&>tr>td]:px-4">
                 {eventsQuery.data?.data || !eventsQuery.isError ? (
-                  eventsQuery.data.data.map((event) => {
+                  eventsData?.events.map((event) => {
                     return (
                       <tr key={event.id}>
                         <td className="py-6">
@@ -219,40 +232,45 @@ export default function AdminEventsPage() {
           {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
           {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
           {/* TODO: implement loading indicator  */}
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
-                  }
-                  return prev - 1;
-                })
-              }
-              disabled={page == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {page}
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="space-x-2 flex items-center">
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() =>
+                  setPage((prev) => {
+                    if (prev <= 1) {
+                      return 1;
+                    }
+                    return prev - 1;
+                  })
+                }
+                disabled={page == 1}
+              >
+                <FiChevronsLeft />
+              </button>
+              <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                {page}
+              </div>
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={isLast}
+              >
+                <FiChevronsRight />
+              </button>
             </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setPage((prev) => prev + 1)}
-              //   disabled={!table.getCanNextPage()}
-            >
-              <FiChevronsRight />
-            </button>
           </div>
         </div>
-        {/* TODO: Implement showing from total rows */}
-        <div>
+        <div className="text-white">
           {eventsQuery.isFetching ? (
-            <LoadingMessage>Loading data</LoadingMessage>
-          ) : (
-            <div>Showing 1-10 of 1,253</div>
-          )}
+            <LoadingMessage>Loading events..</LoadingMessage>
+          ) : page && eventsData?.eventsCount ? (
+            <div>
+              Showing {page * 10 - 9}-
+              {isLast ? eventsData.eventsCount : page * 10} of{" "}
+              {eventsData.eventsCount}
+            </div>
+          ) : null}
         </div>
         {/* END TABLE PAGINATION */}
       </div>

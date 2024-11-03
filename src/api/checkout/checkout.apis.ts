@@ -21,12 +21,10 @@ export const createPaymentIntent = async ({
   promotionalEmails,
   ...formdata
 }: CheckoutData) => {
-  console.log(formdata);
   const response = await request({
     url: "/stripe/create-payment-intent",
     method: "post",
     data: formdata,
   });
-  console.log(response);
   return response as AxiosResponse<CreateIntentResponse>;
 };

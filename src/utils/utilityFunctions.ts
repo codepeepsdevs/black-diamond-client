@@ -63,12 +63,6 @@ const formatDateForCalendar = (date: Date) => {
 
 export const createICSFile = (event: CalendarEvent) => {
   const { title, startDate, endDate, details, location } = event;
-  console.log(
-    "start date - ",
-    startDate.toLocaleTimeString(),
-    "end date -",
-    endDate.toLocaleTimeString()
-  );
   const formattedStartDate = formatDateForCalendar(startDate);
   const formattedEndDate = formatDateForCalendar(endDate);
 
@@ -96,12 +90,6 @@ END:VCALENDAR`;
 
 export const createGoogleCalendarLink = (event: CalendarEvent) => {
   const { title, startDate, endDate, details, location } = event;
-  console.log(
-    "start date - ",
-    startDate.toLocaleTimeString(),
-    "end date -",
-    endDate.toLocaleTimeString()
-  );
   const formattedStartDate = formatDateForCalendar(startDate);
   const formattedEndDate = formatDateForCalendar(endDate);
 

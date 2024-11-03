@@ -54,8 +54,6 @@ const CareersFormSection = () => {
   } = form;
 
   const onSuccess = (data: any) => {
-    console.log("onSuccess", data);
-
     SuccessToast({
       title: "Request Successful",
       description: "You have successfully join us as a promoter",

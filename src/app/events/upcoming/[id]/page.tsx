@@ -52,8 +52,6 @@ const UpComingEventDetailPage = () => {
 
   useEffect(() => {
     if (eventQuery.isSuccess && eventAddonsQuery.isSuccess) {
-      console.log("event", eventQuery);
-      console.log("addon", eventAddonsQuery);
       if (!eventQuery.data?.data) {
         router.replace("/events");
         return;
@@ -115,7 +113,6 @@ const UpComingEventDetailPage = () => {
 
   // update total discount anytime promocode or order is updated
   useEffect(() => {
-    console.log("computing promocode");
     order.updateDiscount();
   }, [order.promocode, order.ticketOrders]);
 

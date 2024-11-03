@@ -1,4 +1,10 @@
-import { EventAddon, Event, TicketType, PromoCode } from "@/constants/types";
+import {
+  EventAddon,
+  Event,
+  TicketType,
+  PromoCode,
+  EventStatus,
+} from "@/constants/types";
 import {
   editEventDetailsSchema,
   newAddOnSchema,
@@ -56,4 +62,33 @@ export type UpdateTicketTypeData = Omit<
 
 export type GetEventRevenueResponse = {
   revenue: string;
+};
+
+export type GetEvents = {
+  events: (Event & EventStatus)[];
+  eventsCount: number;
+};
+
+export type AdminExtendedEvent = Event &
+  EventStatus & {
+    gross: number;
+    totalTickets: number;
+    totalSales: number;
+  };
+
+export type AdminGetEvents = {
+  events: AdminExtendedEvent[];
+  gross: number;
+  totalSales: number;
+  eventsCount: number;
+};
+
+export type RemoveSlideResponse = {
+  message: string;
+  eventId: string;
+};
+
+export type RemoveSlideData = {
+  eventId: string;
+  image: string;
 };

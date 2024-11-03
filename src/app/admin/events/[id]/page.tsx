@@ -39,6 +39,13 @@ export default function ManageEventPage() {
   const [detailsDefault, setDetailsDefault] = useState<Yup.InferType<
     typeof editEventDetailsSchema
   > | null>(null);
+  const [defaultMedia, setDefaultMedia] = useState<{
+    images: string[];
+    coverImage: string | undefined;
+  }>({
+    images: [],
+    coverImage: "",
+  });
 
   const eventId = params.id;
 
@@ -76,8 +83,12 @@ export default function ManageEventPage() {
         // coverImage: event?.coverImage,
         // images: event?.coverImage,
       });
+      setDefaultMedia({
+        coverImage: event?.coverImage,
+        images: event?.images || [],
+      });
     }
-  }, [eventQuery.isSuccess]);
+  }, [eventQuery.isSuccess, eventQuery.data?.data]);
 
   return (
     <>
@@ -130,6 +141,7 @@ export default function ManageEventPage() {
           {currentTab === "details" && detailsDefault !== null && (
             <EditDetailsTab
               defaultValues={detailsDefault}
+              defaultMedia={defaultMedia}
               isActive={currentTab === "details"}
             />
           )}

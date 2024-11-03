@@ -14,7 +14,10 @@ import {
   editEventDetailsSchema,
   newEventSchema,
 } from "@/api/events/events.schemas";
-import { useUpdateEventDetails } from "@/api/events/events.queries";
+import {
+  useRemoveImageFromSlide,
+  useUpdateEventDetails,
+} from "@/api/events/events.queries";
 import { AxiosError, AxiosResponse } from "axios";
 import * as dateFns from "date-fns";
 import { parseAsString, useQueryState } from "nuqs";
@@ -26,14 +29,23 @@ import { SearchQueryState } from "@/constants/types";
 import { Tabs } from "@/app/admin/events/new-event/page";
 import EditEventCoverImageInput from "./EditEventCoverImageInput";
 import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import Image from "next/image";
+import EditEventImagesInputField from "./EditEventImagesInputField";
+import { FiTrash2 } from "react-icons/fi";
+import LoadingSvg from "../shared/Loader/LoadingSvg";
 
 export default function EditDetailsTab({
   isActive,
   defaultValues,
+  defaultMedia,
 }: {
   isActive: boolean;
   defaultValues: Yup.InferType<typeof editEventDetailsSchema>;
+  defaultMedia: {
+    images: string[] | undefined;
+    coverImage: string | undefined;
+  };
 }) {
   const {
     register,
@@ -54,7 +66,12 @@ export default function EditDetailsTab({
     parseAsString.withDefault("details")
   ) as SearchQueryState<Tabs>;
 
+  const [imagesPreview, setImagesPreview] = useState<string[] | null>([]);
+
   function onEditDetailsSuccess(data: AxiosResponse<any>) {
+    // Clear file input and image preview on success
+    setValue("images", undefined);
+    setImagesPreview(null);
     SuccessToast({
       title: "Update success",
       description: "Event details updated successfully",
@@ -103,8 +120,13 @@ export default function EditDetailsTab({
         .toISOString(),
       eventId: eventId,
       locationType: values.locationType,
+      images: values.images,
+      coverImage: values.coverImage,
     });
   }
+
+  const { mutate: removeImage, isPending: removeImagePending } =
+    useRemoveImageFromSlide();
 
   const watchedDate = watch("date");
   useEffect(() => {
@@ -120,40 +142,69 @@ export default function EditDetailsTab({
         onSubmit={handleSubmit(onSubmit)}
       >
         {/* UPLOAD COVER IMAGES SECTION */}
-        {/* <div>
+        <div>
           <label htmlFor="cover=image">Cover image</label>
           <EditEventCoverImageInput
-            prevCoverImage={defaultValues.coverImage}
             onSelectFile={(file) => {
               setValue("coverImage", file);
             }}
+            oldCoverImage={defaultMedia.coverImage}
           />
-        </div> */}
+        </div>
         {/* END UPLOAD COVER IMAGES SECTION */}
 
         {/* UPLOAD IMAGES SECTION */}
-        {/* <div>
+        <div>
           <label htmlFor="image-slides">Event slides</label>
-          <EventImagesInputField
+          <EditEventImagesInputField
             onSelectFile={(files) => {
               setValue("images", files);
             }}
+            imagesPreview={imagesPreview}
+            setImagesPreview={setImagesPreview}
           />
-          <Swiper>
-            {defaultValues.images.map((image: string) => {
+          <Swiper
+            slidesPerView={"auto"}
+            spaceBetween={10}
+            className="[&_.swiper-slide]:w-28 mt-5 border border-[#121212]"
+          >
+            {defaultMedia.images?.map((image: string) => {
               return (
-                <SwiperSlide>
-                  <Image
-                    src={image}
-                    width={250}
-                    height={250}
-                    alt="Slide Image"
-                  />
+                <SwiperSlide key={image}>
+                  <div className="relative">
+                    <Image
+                      src={image}
+                      width={150}
+                      height={150}
+                      alt="Slide Image"
+                      sizes=""
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+                      onClick={() =>
+                        removeImage({
+                          eventId: eventId,
+                          image: image,
+                        })
+                      }
+                    >
+                      <FiTrash2 />
+                    </button>
+
+                    {/* LOADING OVERLAY */}
+                    {removeImagePending && (
+                      <div className="absolute inset-0 bg-black opacity-70 grid place-items-center">
+                        <LoadingSvg />
+                      </div>
+                    )}
+                    {/* END LOADING OVERLAY */}
+                  </div>
                 </SwiperSlide>
               );
             })}
           </Swiper>
-        </div> */}
+        </div>
         {/* END UPLOAD IMAGES SECTION */}
 
         {/* EVENT OVERVIEW */}

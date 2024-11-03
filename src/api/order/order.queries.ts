@@ -1,4 +1,10 @@
-import { DateRangeData, OptionProps, Order, PageData } from "@/constants/types";
+import {
+  DateRangeData,
+  ErrorResponse,
+  OptionProps,
+  Order,
+  PageData,
+} from "@/constants/types";
 import {
   keepPreviousData,
   useMutation,
@@ -10,6 +16,7 @@ import {
   assignGuestOrder,
   checkPaymentStatus,
   fillTicketDetails,
+  generateOrderReport,
   getOrderDetails,
   getOrders,
   getRevenue,
@@ -22,6 +29,7 @@ import { FillTicketDetailsData } from "@/app/tickets/[ticketId]/fill-details/pag
 import {
   AssignGuestOrderData,
   AssignGuestOrderResponse,
+  GetOrders,
   GetRevenueData,
   GetRevenueResponse,
   GetTicketSoldStatsResponse,
@@ -77,7 +85,7 @@ export type ExtendedOrder = Order & {
 };
 
 export const useGetOrders = (options?: OptionProps & DateRangeData) => {
-  return useQuery<AxiosResponse<ExtendedOrder[]>>({
+  return useQuery<AxiosResponse<GetOrders>>({
     queryKey: ["get-orders", options],
     queryFn: () => getOrders(options),
     placeholderData: keepPreviousData,
@@ -138,4 +146,16 @@ export const useGetTicketsSoldStats = (range?: DateRangeData) => {
       queryFn: () => getTicketsSoldStats(range),
     }
   );
+};
+
+export const useGenerateOrderReport = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: () => void
+) => {
+  return useMutation<void, AxiosError<Error>, DateRangeData>({
+    mutationKey: [`generate-order-report`],
+    mutationFn: generateOrderReport,
+    onError,
+    onSuccess,
+  });
 };

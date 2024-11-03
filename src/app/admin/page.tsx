@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetEvents } from "@/api/events/events.queries";
+import { useAdminGetEvents, useGetEvents } from "@/api/events/events.queries";
 import {
   useGetOrders,
   useGetRevenue,
@@ -23,7 +23,7 @@ export default function AdminHomePage() {
 
   // const usersQuery = useGetUsers();
   // const users = usersQuery.data?.data;
-  const upcomingEventsQuery = useGetEvents({
+  const upcomingEventsQuery = useAdminGetEvents({
     eventStatus: "upcoming",
   });
   const upcomingEvents = upcomingEventsQuery.data?.data;
@@ -119,7 +119,7 @@ export default function AdminHomePage() {
                 <span>Upcoming Events</span>
               </div>
               <div className="text-white font-semibold text-6xl">
-                {upcomingEvents?.length || 0}
+                {upcomingEvents?.eventsCount || 0}
               </div>
             </div>
             {/* END UPCOMING EVENTS */}

@@ -99,3 +99,45 @@ export const getTicketsSoldStats = async (range?: GetRevenueData) => {
     method: "get",
   });
 };
+
+export const generateOrderReport = async (range?: DateRangeData) => {
+  const response = await request({
+    url: `/orders/generate-order-report?startDate=${range?.startDate?.toISOString() || ""}&endDate=${range?.endDate?.toISOString() || ""}`,
+    method: "get",
+    headers: {
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    },
+    responseType: "blob",
+  });
+
+  // Extract the filename from the Content-Disposition header
+  const disposition = response.headers["content-disposition"];
+  let filename = "Order_Report"; // Fallback filename
+
+  if (disposition && disposition.includes("filename=")) {
+    const matches = disposition.match(/filename="?([^"]+)"?/);
+    if (matches && matches[1]) {
+      filename = matches[1];
+    }
+  }
+
+  // Step 1: Create a blob from the response
+  const blob = new Blob([response.data], { type: response.data.type });
+
+  // Step 2: Create a download URL for the blob
+  const downloadUrl = window.URL.createObjectURL(blob);
+
+  // Step 3: Create a temporary link element
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = filename;
+
+  // Step 4: Trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Step 5: Clean up
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(downloadUrl);
+};

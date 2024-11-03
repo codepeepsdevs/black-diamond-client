@@ -165,7 +165,6 @@ export default function FillTicketDetailsPage() {
   async function handleRedirect() {
     // if order details is empty of payment status is not fetched, don't do anything
     if (!orderDetails || !checkPaymentStatusFetched) {
-      console.log("no order details or payment status has not been fetched");
       return;
     }
     const stripe = await stripePromise;
@@ -187,7 +186,6 @@ export default function FillTicketDetailsPage() {
         title: "Order error",
         descriptions: ["Order has not been paid for, redirecting to gateway"],
       });
-      console.log("order has not been paid and it has not been cancelled");
       if (!stripe || !orderDetails.sessionId) {
         ErrorToast({
           title: "Error",
@@ -207,7 +205,6 @@ export default function FillTicketDetailsPage() {
         router.push("/tickets");
       }
     } else {
-      console.log("entering switch block");
       // if order has been paid for or the user has cancelled the order, this section runs
       switch (orderDetails.status) {
         case "PENDING":

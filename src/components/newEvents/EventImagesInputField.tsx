@@ -3,7 +3,6 @@ import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CgSoftwareUpload } from "react-icons/cg";
-import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { cn } from "@/utils/cn";
 import { Swiper, SwiperSlide } from "swiper/react";

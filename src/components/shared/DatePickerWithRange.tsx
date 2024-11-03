@@ -29,7 +29,7 @@ export function DatePickerWithRange({
         <PopoverTrigger asChild>
           <button
             className={cn(
-              "w-full sm:w-[300px] flex items-center text-left font-normal py-3 px-2 bg-[#151515]"
+              "w-full sm:w-[300px] text-[#A3A7AA] flex items-center text-left font-normal py-3 px-2 bg-[#151515]"
             )}
           >
             <FaCalendar className="mr-2 size-7" />

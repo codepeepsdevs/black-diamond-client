@@ -40,10 +40,11 @@ export default function LandingPage() {
   const [videoCanPlay, setVideoCanPlay] = useState(false);
   const router = useRouter();
 
-  const upcomingEvents = useGetEvents({
+  const upcomingEventsQuery = useGetEvents({
     eventStatus: "upcoming",
     search: "",
   });
+  const upcomingEventsData = upcomingEventsQuery.data?.data;
 
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -179,7 +180,7 @@ export default function LandingPage() {
 
         <HighLights />
 
-        {upcomingEvents.isError ? null : (
+        {upcomingEventsQuery.isError ? null : (
           <motion.div
             whileInView={{ opacity: [0, 1] }}
             transition={{ duration: 0.5, type: "tween" }}
@@ -190,7 +191,7 @@ export default function LandingPage() {
             </h2>
 
             <Swiper autoplay={true} draggable={true} className="w-full">
-              {upcomingEvents.isPending && !upcomingEvents.isError ? (
+              {upcomingEventsQuery.isPending && !upcomingEventsQuery.isError ? (
                 <>
                   {new Array(3).fill(0).map((_, index) => {
                     return (
@@ -222,7 +223,7 @@ export default function LandingPage() {
                 },
               }}
             >
-              {upcomingEvents.data?.data.map((event, index) => {
+              {upcomingEventsData?.events.map((event, index) => {
                 return (
                   <SwiperSlide key={event.id}>
                     <EventCard

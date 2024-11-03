@@ -19,6 +19,7 @@ export default function Loading() {
         Your browser does not support the video tag.
       </video> */}
       <Image
+        priority
         src={Preloader}
         alt=""
         className="w-[70%] xs:w-[60%] sm:w-[50%] md:w-[40%] lg:w-[30%] object-cover"
