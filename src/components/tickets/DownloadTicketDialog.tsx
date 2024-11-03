@@ -192,7 +192,6 @@ export function DownloadTicketDialog({
                       {/* TICKET ACTIONS */}
                       <div className="text-[#C0C0C0] flex items-center gap-x-6 justify-center">
                         {/* SHARE BUTTON */}
-                        {/* TODO: Fix the content passed to the props */}
                         <ShareTicketButton nodeId={ticket.id || ""} />
                         {/* END SHARE BUTTON */}
 

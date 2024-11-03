@@ -26,6 +26,7 @@ import { cn } from "@/utils/cn";
 
 const RecentOrdersTable = () => {
   const orderListQuery = useGetOrders();
+  const orderListData = orderListQuery.data?.data;
 
   const columns: ColumnDef<ExtendedOrder>[] = React.useMemo(
     () => [
@@ -184,7 +185,7 @@ const RecentOrdersTable = () => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: orderListQuery.data?.data || [],
+    data: orderListData?.orders || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,

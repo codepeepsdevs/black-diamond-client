@@ -132,7 +132,7 @@ const UserListTable = () => {
         ),
         id: "amount-spent",
         cell: ({ row }) => (
-          <div className="">{row.original.amountSpent || "N/A"}</div> // TODO: compute or remove this field
+          <div className="">{row.original.amountSpent || "N/A"}</div>
         ),
       },
       {
@@ -216,8 +216,6 @@ const UserListTable = () => {
 
   return (
     <div className="text-[#A3A7AA]">
-      {/* TODO: Bring the table action buttons here */}
-
       {/* INFO CARDS */}
       <div className="overflow-x-auto">
         <div className="flex gap-x-8 justify-between whitespace-nowrap mt-12">
@@ -231,7 +229,6 @@ const UserListTable = () => {
               )}
               <span>New Users</span>
             </div>
-            {/* TODO: Compute new users or remove this field, may need a reference date to compute */}
             <div className="text-white font-semibold text-6xl">
               {newUsersTodayStats?.newUsersCount}
             </div>

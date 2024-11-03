@@ -22,10 +22,11 @@ const EventsPage = () => {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
   const [filterString, setFilterString] = useState<string>("");
 
-  const events = useGetEvents({
+  const eventsQuery = useGetEvents({
     eventStatus: activeTab,
     search: filterString,
   });
+  const eventsData = eventsQuery.data?.data;
 
   const handleSearch: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
@@ -65,9 +66,9 @@ const EventsPage = () => {
       </div>
 
       <Events
-        events={events.data?.data || []}
-        isPending={events.isPending}
-        isError={events.isError}
+        events={eventsData?.events || []}
+        isPending={eventsQuery.isPending}
+        isError={eventsQuery.isError}
         tab={activeTab}
       />
     </div>

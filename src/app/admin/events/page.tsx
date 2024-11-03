@@ -229,9 +229,6 @@ export default function AdminEventsPage() {
 
         {/* TABLE PAGINATION */}
         <div className="flex items-center justify-end space-x-2 py-4">
-          {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
-          {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
-          {/* TODO: implement loading indicator  */}
           <div className="flex items-center justify-end space-x-2 py-4">
             <div className="space-x-2 flex items-center">
               <button
