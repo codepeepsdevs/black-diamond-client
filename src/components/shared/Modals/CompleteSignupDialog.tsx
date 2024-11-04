@@ -1,15 +1,14 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { ComponentProps } from "react";
-import { FaRegClock } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-import useAuthEmailStore from "@/store/authEmail.store";
 
-export default function DialogComponent({
+export default function CompleteSignupDialog({
+  email,
   ...props
-}: ComponentProps<typeof Dialog.Root>) {
-  const authEmail = useAuthEmailStore((state) => state.authEmail);
-
+}: ComponentProps<typeof Dialog.Root> & {
+  email: string;
+}) {
   return (
     <Dialog.Root {...props}>
       <Dialog.Portal>
@@ -26,16 +25,16 @@ export default function DialogComponent({
             </div>
 
             <h2 className="text-white text-2xl lg:text-4xl font-medium text-center mt-8 sm:mt-12">
-              Let's verify your account{" "}
+              Please complete your account signup
             </h2>
 
             <div className="flex flex-col justify-center items-center gap-2 sm:gap-3 mt-6">
               <p className="text-[#C0C0C0] text-sm sm:text-base text-center lg:text-xl">
-                We sent a link to {authEmail} to activate your account and get
-                your tickets.{" "}
+                Please complete your signup process by resetting your account
+                password using the link sent in your mailbox for {email}
               </p>
               <p className="text-[#C0C0C0] text-sm sm:text-base text-center lg:text-xl">
-                For your security, the link expires in 15 minutes.
+                For your security, the link expires in 2 hours.
               </p>
             </div>
           </Dialog.Content>

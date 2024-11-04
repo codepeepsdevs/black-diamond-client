@@ -347,12 +347,14 @@ const OrderListTable = ({
         <div className="text-white">
           {orderListQuery.isFetching ? (
             <LoadingMessage>Loading order list..</LoadingMessage>
-          ) : page && orderListData?.ordersCount ? (
-            <div>
-              Showing {page * 10 - 9}-
-              {isLast ? orderListData.ordersCount : page * 10} of{" "}
-              {orderListData.ordersCount}
-            </div>
+          ) : page ? (
+            orderListData?.ordersCount ? (
+              <div>
+                Showing {page * 10 - 9}-
+                {isLast ? orderListData.ordersCount : page * 10} of{" "}
+                {orderListData.ordersCount}
+              </div>
+            ) : null
           ) : null}
         </div>
       </div>

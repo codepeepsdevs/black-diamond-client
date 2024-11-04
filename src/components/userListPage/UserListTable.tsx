@@ -359,11 +359,14 @@ const UserListTable = () => {
       <div className="text-white">
         {usersQuery.isFetching ? (
           <LoadingMessage>Loading users..</LoadingMessage>
-        ) : page && usersData?.usersCount ? (
-          <div>
-            Showing {page * 10 - 9}-{isLast ? usersData.usersCount : page * 10}{" "}
-            of {usersData.usersCount}
-          </div>
+        ) : page ? (
+          usersData?.usersCount ? (
+            <div>
+              Showing {page * 10 - 9}-
+              {isLast ? usersData.usersCount : page * 10} of{" "}
+              {usersData.usersCount}
+            </div>
+          ) : null
         ) : null}
       </div>
       {/* END TABLE PAGINATION */}

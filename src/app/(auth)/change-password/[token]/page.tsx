@@ -10,7 +10,7 @@ import { useResetPassword } from "@/api/auth/auth.queries";
 import ErrorToast from "@/components/toast/ErrorToast";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import SuccessToast from "@/components/toast/SuccessToast";
-import DialogComponent from "@/components/shared/Dialog";
+import VerifyAccountDialog from "@/components/shared/Modals/VerifyAccountDialog";
 import useAuthEmailStore from "@/store/authEmail.store";
 import { useParams, useRouter } from "next/navigation";
 
@@ -139,7 +139,7 @@ const ChangePassword = () => {
           </form>
         </div>
       </section>
-      <DialogComponent
+      <VerifyAccountDialog
         open={showDialog}
         onOpenChange={() => {
           setShowDialog(false);

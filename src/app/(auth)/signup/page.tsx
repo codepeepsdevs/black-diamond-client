@@ -17,7 +17,7 @@ import Link from "next/link";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { useLogin, useRegister } from "@/api/auth/auth.queries";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
-import DialogComponent from "@/components/shared/Dialog";
+import VerifyAccountDialog from "@/components/shared/Modals/VerifyAccountDialog";
 import useAuthEmailStore from "@/store/authEmail.store";
 
 // Schema for form validation
@@ -252,7 +252,7 @@ const Signup = () => {
           </form>
         </div>
       </section>
-      <DialogComponent
+      <VerifyAccountDialog
         open={showDialog}
         // defaultOpen={true}
         onOpenChange={() => {
