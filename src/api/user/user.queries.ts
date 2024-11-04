@@ -23,7 +23,6 @@ import {
   UsersStatsData,
   UsersStatsResponse,
 } from "./user.types";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
 
 export const useGetUser = () => {
   return useQuery({

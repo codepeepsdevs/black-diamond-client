@@ -2,7 +2,7 @@ import Link from "next/link";
 import { mobileNavItems } from "./data";
 import { usePathname } from "next/navigation";
 import { TfiClose } from "react-icons/tfi";
-import useUserStore from "@/store/user.store";
+import { useGetUser } from "@/api/user/user.queries";
 
 type MenuModalProps = {
   isOpen: boolean;
@@ -11,7 +11,8 @@ type MenuModalProps = {
 
 const Menu = ({ isOpen, onClose }: MenuModalProps) => {
   const pathname = usePathname();
-  const user = useUserStore((state) => state.user);
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
 
   return (
     <div
@@ -41,7 +42,7 @@ const Menu = ({ isOpen, onClose }: MenuModalProps) => {
               key={index}
               href={item.url}
               onClick={onClose}
-              className={`${isLogin && user ? "hidden" : ""} ${isTickets && !user ? "hidden" : ""} ${isLogout && !user ? "hidden" : ""} hover:opacity-70 block px-4 py-3 text-sm"
+              className={`${isLogin && userData ? "hidden" : ""} ${isTickets && !userData ? "hidden" : ""} ${isLogout && !userData ? "hidden" : ""} hover:opacity-70 block px-4 py-3 text-sm"
               id="menu-item-2 ${isActive ? "text-white" : "text-text-color"}`}
             >
               {item.name}

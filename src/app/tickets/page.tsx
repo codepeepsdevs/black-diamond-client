@@ -128,12 +128,14 @@ export default function MyOrdersPage() {
         <div className="text-white">
           {upcomingData.isFetching ? (
             <LoadingMessage>Loading upcoming events tickets</LoadingMessage>
-          ) : upage && upcomingEventOrders?.orderCount ? (
-            <div>
-              Showing {upage * 10 - 9}-
-              {isUlast ? upcomingEventOrders.orderCount : upage * 10} of{" "}
-              {upcomingEventOrders.orderCount}
-            </div>
+          ) : upage ? (
+            upcomingEventOrders?.orderCount ? (
+              <div>
+                Showing {upage * 10 - 9}-
+                {isUlast ? upcomingEventOrders.orderCount : upage * 10} of{" "}
+                {upcomingEventOrders.orderCount}
+              </div>
+            ) : null
           ) : null}
         </div>
         {/* END UPCOMING TICKETS PAGINATION */}
@@ -193,12 +195,14 @@ export default function MyOrdersPage() {
         <div className="text-white">
           {pastData.isFetching ? (
             <LoadingMessage>Loading past event tickets</LoadingMessage>
-          ) : ppage && pastEventOrders?.orderCount ? (
-            <div>
-              Showing {ppage * 10 - 9}-
-              {isPlast ? pastEventOrders.orderCount : ppage * 10} of{" "}
-              {pastEventOrders.orderCount}
-            </div>
+          ) : ppage ? (
+            pastEventOrders?.orderCount ? (
+              <div>
+                Showing {ppage * 10 - 9}-
+                {isPlast ? pastEventOrders.orderCount : ppage * 10} of{" "}
+                {pastEventOrders.orderCount}
+              </div>
+            ) : null
           ) : null}
         </div>
         {/* END PAST TICKETS PAGINATION */}

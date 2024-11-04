@@ -1,4 +1,4 @@
-import useUserStore from "@/store/user.store";
+import { useGetUser } from "@/api/user/user.queries";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 import { TfiClose } from "react-icons/tfi";
@@ -9,7 +9,8 @@ type ProfileModalProps = {
 };
 
 const Profile = ({ isOpen, onClose }: ProfileModalProps) => {
-  const user = useUserStore((state) => state.user);
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
 
   return (
     <div
@@ -25,14 +26,14 @@ const Profile = ({ isOpen, onClose }: ProfileModalProps) => {
       </div>{" "}
       <div className="py-1 flex flex-col gap-1">
         <p className="relative text-white block px-4 py-2 text-sm">
-          Signed in as <span className="">{user?.email}</span>
+          Signed in as <span className="">{userData?.email}</span>
           <span
             className={cn(
               "bg-[#333333] py-0.5 px-1 text-xs absolute right-0",
-              user?.role !== "admin" && "hidden"
+              userData?.role !== "admin" && "hidden"
             )}
           >
-            {user?.role}
+            {userData?.role}
           </span>
         </p>
       </div>
@@ -54,7 +55,7 @@ const Profile = ({ isOpen, onClose }: ProfileModalProps) => {
         >
           Account Settings
         </Link>
-        {user?.role === "admin" && (
+        {userData?.role === "admin" && (
           <Link
             href="/admin"
             onClick={onClose}
