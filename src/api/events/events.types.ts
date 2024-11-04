@@ -92,3 +92,7 @@ export type RemoveSlideData = {
   eventId: string;
   image: string;
 };
+
+export type PublishEventResponse = Event;
+
+export type UnpublishEventResponse = Event;

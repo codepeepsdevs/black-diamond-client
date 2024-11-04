@@ -1,22 +1,22 @@
 import Image from "next/image";
 import React from "react";
 import TicketsIcon from "./TicketIcon";
-import { FiUser } from "react-icons/fi";
+import { FiDownload, FiUpload, FiUser } from "react-icons/fi";
 import { VscTriangleDown } from "react-icons/vsc";
-import { FaYoutube } from "react-icons/fa";
-import {
-  FaFacebook,
-  FaFacebookF,
-  FaInstagram,
-  FaTwitter,
-} from "react-icons/fa6";
+import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { useParams } from "next/navigation";
-import { useGetEvent, useGetEventRevenue } from "@/api/events/events.queries";
+import {
+  useGetEvent,
+  useGetEventRevenue,
+  usePublishEvent,
+  useUnpublishEvent,
+} from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
 import { getLowestTicket } from "@/utils/utilityFunctions";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import AdminButton from "../buttons/AdminButton";
 
 export default function EditEventDetailsDashboard({
   isActive,
@@ -25,6 +25,11 @@ export default function EditEventDetailsDashboard({
 }) {
   const params = useParams<{ id: string }>();
   const eventId = params.id;
+
+  const { mutate: publishEvent, isPending: publishEventPending } =
+    usePublishEvent(eventId);
+  const { mutate: unpublishEvent, isPending: unpublishEventPending } =
+    useUnpublishEvent(eventId);
 
   const eventQuery = useGetEvent(eventId);
   const event = eventQuery.data?.data;
@@ -69,6 +74,29 @@ export default function EditEventDetailsDashboard({
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
+      {/* ACTION BUTTONS */}
+      <div className="flex items-center justify-end mt-12">
+        {event?.isPublished ? (
+          <AdminButton
+            disabled={unpublishEventPending}
+            onClick={() => unpublishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+          >
+            <FiDownload /> <span>Unpublish</span>
+          </AdminButton>
+        ) : (
+          <AdminButton
+            disabled={publishEventPending}
+            onClick={() => publishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 disabled:opacity-50"
+          >
+            <FiUpload /> <span>Publish</span>
+          </AdminButton>
+        )}
+      </div>
+      {/* END ACTION BUTTONS */}
       <div className="bg-[#151515] overflow-y-auto mt-12">
         <div className="p-6 flex items-center w-full gap-x-6 whitespace-nowrap">
           <Image

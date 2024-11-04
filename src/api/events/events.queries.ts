@@ -20,6 +20,8 @@ import {
   getEventRevenue,
   adminGetEvents,
   removeImageFromSlide,
+  publishEvent,
+  unpublishEvent,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -40,8 +42,10 @@ import {
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
+  PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
+  UnpublishEventResponse,
   UpdateEventDetailsResponse,
   UpdateTicketTypeResponse,
 } from "./events.types";
@@ -248,6 +252,70 @@ export const useGetEventRevenue = (eventId: Event["id"]) => {
   >({
     queryKey: ["get-revenue", eventId],
     queryFn: () => getEventRevenue(eventId),
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
+export const usePublishEvent = (eventId: Event["id"]) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<PublishEventResponse>,
+    AxiosError<ErrorResponse>,
+    string
+  >({
+    mutationKey: ["publish-event", eventId],
+    mutationFn: publishEvent,
+    onError: (e) => {
+      const errorMessage = getApiErrorMessage(
+        e,
+        "Something went wrong while publishing event"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      SuccessToast({
+        title: "Success",
+        description: "Event successfully published",
+      });
+    },
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
+export const useUnpublishEvent = (eventId: Event["id"]) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<UnpublishEventResponse>,
+    AxiosError<ErrorResponse>,
+    string
+  >({
+    mutationKey: ["unpublish-event", eventId],
+    mutationFn: unpublishEvent,
+    onError: (e) => {
+      const errorMessage = getApiErrorMessage(
+        e,
+        "Something went wrong while unpublishing event"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      SuccessToast({
+        title: "Success",
+        description: "Event successfully unpublished",
+      });
+    },
     // enabled: false,
     // refetchInterval: 0,
   });

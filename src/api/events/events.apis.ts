@@ -21,8 +21,10 @@ import {
   CreateEventTicketTypeData,
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
+  PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
+  UnpublishEventResponse,
   UpdateEventDetailsData,
   UpdateEventDetailsResponse,
   UpdateTicketTypeData,
@@ -270,6 +272,26 @@ export const getEventRevenue = async (eventId: Event["id"]) => {
     url: `/events/get-revenue/${eventId}`,
     method: "get",
   })) as AxiosResponse<GetEventRevenueResponse>;
+};
+
+export const publishEvent = async (eventId: Event["id"]) => {
+  if (!eventId) {
+    throw new Error("Please select event to publish");
+  }
+  return (await request({
+    url: `/events/publish-event/${eventId}`,
+    method: "put",
+  })) as AxiosResponse<PublishEventResponse>;
+};
+
+export const unpublishEvent = async (eventId: Event["id"]) => {
+  if (!eventId) {
+    throw new Error("Please select event to publish");
+  }
+  return (await request({
+    url: `/events/unpublish-event/${eventId}`,
+    method: "put",
+  })) as AxiosResponse<UnpublishEventResponse>;
 };
 
 export const removeImageFromSlide = async (data: RemoveSlideData) => {
