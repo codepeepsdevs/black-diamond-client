@@ -134,11 +134,15 @@ export default function EditEventDetailsDashboard({
             </div>
           </div>
 
-          <p className="text-[#34C759] font-medium text-xl self-end pl-32">
-            {differenceInDays > 0
-              ? `Your event is in ${differenceInDays} day(s)!`
-              : `This event was ${Math.abs(differenceInDays)} day(s) ago!`}
-          </p>
+          {differenceInDays > 0 ? (
+            <p className="text-[#34C759] font-medium text-xl self-end pl-32">
+              Your event is in {differenceInDays} day(s)!
+            </p>
+          ) : (
+            <p className="text-red-500 font-medium text-xl self-end pl-32">
+              This event was {Math.abs(differenceInDays)} day(s) ago!
+            </p>
+          )}
         </div>
       </div>
 
