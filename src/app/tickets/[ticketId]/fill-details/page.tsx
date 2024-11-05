@@ -116,8 +116,8 @@ export default function FillTicketDetailsPage() {
 
   // Filling in the details if it has been filled before
   useEffect(() => {
-    if (orderDetailsisFetched) {
-      const defaultValues = orderDetails!.tickets.map((ticket) => {
+    if (orderDetails && orderDetailsisFetched) {
+      const defaultValues = orderDetails.tickets.map((ticket) => {
         return {
           ticketId: ticket.id!,
           firstName: ticket.firstName || "",
@@ -132,12 +132,6 @@ export default function FillTicketDetailsPage() {
     }
   }, [orderDetailsisFetched, orderDetails]);
 
-  useEffect(() => {
-    if (orderDetailsisFetched && orderDetails?.paymentStatus !== "SUCCESSFUL") {
-      // TODO: Inform the user that they haven't completed payment
-    }
-  }, []);
-
   const { fields } = useFieldArray({
     control: control,
     name: "tickets",
@@ -147,82 +141,56 @@ export default function FillTicketDetailsPage() {
     fillTicketDetails({ ...values, orderId: params.ticketId });
   }
 
-  useEffect(() => {
-    // If order details have been fetched and there is no data, show error and redirect
-    if (orderDetailsisFetched && !orderDetails) {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Could not fetch order details"],
-      });
-      router.push("/tickets");
-    }
-  }, [orderDetailsisFetched, orderDetails]);
+  // useEffect(() => {
+  //   // If order details have been fetched and there is no data, show error and redirect
+  //   if (orderDetailsisFetched && !orderDetails) {
+  //     ErrorToast({
+  //       title: "Error",
+  //       descriptions: ["Could not fetch order details"],
+  //     });
+  //     router.push("/tickets");
+  //   }
+  // }, [orderDetailsisFetched, orderDetails]);
 
-  useEffect(() => {
-    handleRedirect();
-  }, [orderDetailsisFetched, orderDetails, checkPaymentStatusFetched]);
-
-  async function handleRedirect() {
+  const handleRedirect: () =>
+    | { redirect: false }
+    | { redirect: true; to: string } = () => {
     // if order details is empty of payment status is not fetched, don't do anything
     if (!orderDetails || !checkPaymentStatusFetched) {
-      return;
+      return { redirect: false };
     }
-    const stripe = await stripePromise;
+    // const stripe = await stripePromise;
     // cannot edit ticket details if event is in the past so just show an error and redirect the user
-    if (orderDetails?.event.eventStatus === "PAST") {
+    if (orderDetails.event.eventStatus === "PAST") {
       ErrorToast({
         title: "Error",
         descriptions: [
           "Event is in the past, cannot fill ticket details for a past event",
         ],
       });
-      return;
+      return { redirect: true, to: "/tickets" };
     }
 
-    // if the order has not been paid for and the order has not been cancelled,
-    // allow payment for the order
-    if (!paymentStatus?.data.paid && orderDetails.status !== "CANCELLED") {
+    // if order has been paid for or the user has cancelled the order, this section runs
+    // if(orderDetails.status === "PENDING") {
+    //     return {redirect: true, to: `/tickets/${orderDetails.id}/fill-details`};
+    // } else
+    if (orderDetails.status === "COMPLETED") {
+      return {
+        redirect: true,
+        to: `/tickets/${orderDetails.id}/view-details`,
+      };
+    } else if (orderDetails.status === "CANCELLED") {
       ErrorToast({
-        title: "Order error",
-        descriptions: ["Order has not been paid for, redirecting to gateway"],
+        title: "Error",
+        descriptions: ["This order has been cancelled"],
       });
-      if (!stripe || !orderDetails.sessionId) {
-        ErrorToast({
-          title: "Error",
-          descriptions: ["Something went wrong."],
-        });
-        return;
-      }
-      const result = await stripe.redirectToCheckout({
-        sessionId: orderDetails.sessionId, // This is the session ID you got from the server
-      });
-
-      if (result.error) {
-        ErrorToast({
-          title: "Payment Error",
-          descriptions: [result.error.message || "Something went wrong"],
-        });
-        router.push("/tickets");
-      }
+      return { redirect: true, to: `/tickets` };
     } else {
-      // if order has been paid for or the user has cancelled the order, this section runs
-      switch (orderDetails.status) {
-        case "PENDING":
-          router.push(`/tickets/${orderDetails.id}/fill-details`);
-          break;
-        case "COMPLETED":
-          router.push(`/tickets/${orderDetails.id}/view-details`);
-          break;
-        case "CANCELLED":
-          ErrorToast({
-            title: "Error",
-            descriptions: ["This order has been cancelled"],
-          });
-          router.push(`/tickets`);
-          break;
-      }
+      // if the order is pending i.e ticket details has not been filled
+      return { redirect: false };
     }
-  }
+  };
 
   function toggleCopyBuyersInfo(index: number) {
     const toggleHandler: React.MouseEventHandler<HTMLInputElement> = (e) => {
@@ -250,8 +218,20 @@ export default function FillTicketDetailsPage() {
     return toggleHandler;
   }
 
-  if (orderDetailsIsPending || checkPaymentStatusPending) {
+  const shouldRedirect = handleRedirect();
+
+  if (orderDetailsIsPending || checkPaymentStatusPending || !orderDetails) {
     return <Loading />;
+  } // If order details have been fetched and there is no data, show error and redirect
+  else if (orderDetailsisFetched && !orderDetails) {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Could not fetch order details"],
+    });
+    router.push("/tickets");
+    return;
+  } else if (shouldRedirect.redirect) {
+    return router.push(shouldRedirect.to);
   }
 
   return (

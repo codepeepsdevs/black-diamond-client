@@ -220,38 +220,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
 
   const handleLink: React.MouseEventHandler<HTMLAnchorElement> = async (e) => {
     e.preventDefault();
-    const stripe = await stripePromise;
-    // if (order.paymentStatus !== "SUCCESSFUL" && order.status !== "CANCELLED") {
-    //   if (!order.sessionId) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: ["No payment session found to complete the payment."],
-    //     });
-    //     return;
-    //   }
-    //   if (!stripe) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: ["Something went wrong."],
-    //     });
-    //     return;
-    //   }
 
-    //   const result = await stripe.redirectToCheckout({
-    //     sessionId: order.sessionId, // This is the session ID you got from the server
-    //   });
-    //   ErrorToast({
-    //     title: "Redirecting to checkout",
-    //     descriptions: [order.sessionId, order.paymentStatus, order.status],
-    //   });
-    //   if (result.error) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: [result.error.message || "Something went wrong"],
-    //     });
-    //     return;
-    //   }
-    // } else {
     switch (order.status) {
       case "PENDING":
         router.push(`/tickets/${order.id}/fill-details`);
@@ -287,7 +256,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>
@@ -365,7 +334,7 @@ function PastOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>

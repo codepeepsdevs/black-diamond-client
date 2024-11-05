@@ -61,8 +61,8 @@ export const useFillTicketDetails = (
   >({
     mutationFn: fillTicketDetails,
     onError,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
         queryKey: ["order-details", data.data.id],
       });
       onSuccess(data);

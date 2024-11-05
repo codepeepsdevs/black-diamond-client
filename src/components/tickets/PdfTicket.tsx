@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Calander, Clock, Logo } from "../../../public/icons";
 import { getEventDateAndTime } from "@/utils/date-formatter";
 import { Ticket } from "@/constants/types";
 import React from "react";

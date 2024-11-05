@@ -1,40 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
-import ErrorToast from "../toast/ErrorToast";
 import { toPng } from "html-to-image";
 import toast from "react-hot-toast";
+import LoadingSvg from "../shared/Loader/LoadingSvg";
+import { cn } from "@/utils/cn";
 
 export default function ShareTicketButton({
   nodeId,
 }: {
   nodeId: string /** Nodeid is the id of the printable ticket component */;
 }) {
-  const [shareProcessing, setshareProcessing] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const blob = useRef<Blob | null>(null);
+
+  useEffect(() => {
+    const convertToBlob = async () => {
+      setProcessing(true);
+      const node = document.getElementById(nodeId);
+      if (node) {
+        const ticketImage = await toPng(node);
+        // Step 2: Convert the canvas to a Blob
+        blob.current = await fetch(ticketImage).then((res) => res.blob());
+      }
+      setProcessing(false);
+    };
+
+    convertToBlob();
+  }, [nodeId]);
+
   const shareTicket = async () => {
-    setshareProcessing(true);
-    const node = document.getElementById(nodeId);
     const loadingToastId = toast.loading("Preparing to share ticket..");
-    if (!node) {
-      toast.error("Something went wrong while trying to share ticket", {
-        id: loadingToastId,
-      });
-      setshareProcessing(false);
-      return;
-    }
-    const ticketImage = await toPng(node);
 
     if (navigator.share) {
-      // Step 2: Convert the canvas to a Blob
-      const blob = await fetch(ticketImage).then((res) => res.blob());
-
-      if (!blob) {
+      if (!blob.current) {
         toast.error("Unable to generate ticket to share", {
           id: loadingToastId,
         });
-        setshareProcessing(false);
         return;
       }
-      const file = new File([blob], "ticket.png", { type: "image/png" });
+      const file = new File([blob.current], "ticket.png", {
+        type: "image/png",
+      });
 
       const shareData: ShareData = {
         files: [file],
@@ -45,7 +51,6 @@ export default function ShareTicketButton({
           files: [file],
         })
       ) {
-        setshareProcessing(false);
         return toast.error("Share format not supported", {
           id: loadingToastId,
         });
@@ -58,8 +63,6 @@ export default function ShareTicketButton({
         toast.error("Something went wrong while trying to share ticket", {
           id: loadingToastId,
         });
-      } finally {
-        setshareProcessing(false);
       }
     } else {
       toast.error("Sharing not supported", { id: loadingToastId });
@@ -68,11 +71,19 @@ export default function ShareTicketButton({
 
   return (
     <button
-      disabled={shareProcessing}
-      className="bg-[#14171A] size-12 grid place-items-center rounded-full text-2xl"
+      disabled={processing}
+      className="bg-[#14171A] size-12 grid place-items-center rounded-full text-2xl relative"
       onClick={shareTicket}
     >
       <FiUpload />
+      <div
+        className={cn(
+          "absolute inset-0 grid place-items-center rounded-full bg-black/60",
+          !processing && "hidden"
+        )}
+      >
+        <LoadingSvg />
+      </div>
     </button>
   );
 }

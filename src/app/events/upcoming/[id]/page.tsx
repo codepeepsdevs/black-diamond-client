@@ -31,7 +31,6 @@ import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
 
 const UpComingEventDetailPage = () => {
-  const [eventModalState, setEventModalState] = useState<boolean>(false);
   const order = useOrderStore();
   const [promocode, setPromocode] = useState<string>(
     order.promocode?.key || ""
@@ -41,14 +40,8 @@ const UpComingEventDetailPage = () => {
   const router = useRouter();
 
   const eventQuery = useGetEvent(params.id || "");
+  const eventData = eventQuery.data?.data;
   const eventAddonsQuery = useGetAddons(params.id || "");
-
-  useEffect(() => {
-    // if event is upcoming route to upcoming event page
-    if (eventQuery.data?.data.eventStatus === "PAST") {
-      router.push("/events/past/" + eventQuery.data.data.id);
-    }
-  }, []);
 
   useEffect(() => {
     if (eventQuery.isSuccess && eventAddonsQuery.isSuccess) {
@@ -118,8 +111,9 @@ const UpComingEventDetailPage = () => {
 
   if (eventQuery.isPending) {
     return <Loading />;
+  } else if (!eventQuery.isPending && eventData?.eventStatus === "PAST") {
+    return router.push("/events/past/" + eventData.id);
   }
-
   return (
     <>
       <div className="w-full flex items-center justify-center text-white">
@@ -135,7 +129,7 @@ const UpComingEventDetailPage = () => {
                   centerSlidePercentage: 100,
                 }}
                 imageStyles="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)]"
-                containerClassName="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
+                containerClassName="w-full [&_.carousel-slider]:h-full  [&_.carousel-root]:h-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
                 carouselImages={eventQuery.data?.data?.images || []}
                 variant="events"
               />

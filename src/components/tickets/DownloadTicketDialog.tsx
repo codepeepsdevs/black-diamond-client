@@ -28,10 +28,6 @@ export function DownloadTicketDialog({
     new Date(orderDetails?.event.startTime || Date.now())
   );
 
-  const getTargetElement = (id: string) => {
-    return () => document.getElementById(id);
-  };
-
   return (
     <Dialog.Root {...props}>
       <Dialog.Portal>

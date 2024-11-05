@@ -32,46 +32,44 @@ export default function ViewTicketDetailsPage() {
   const orderDetails = data?.data;
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
 
-  useEffect(() => {
-    if (isFetched && !orderDetails) {
-      toast.error("Order not found");
-      router.push("/tickets/");
-    }
-  }, [orderDetails]);
-
-  useEffect(() => {
-    if (isFetched && orderDetails?.paymentStatus !== "SUCCESSFUL") {
-      ErrorToast({
-        title: "Payment Error",
-        descriptions: ["Order has not been paid for"],
-      });
-      router.push("/tickets");
-      return;
-    }
-    if (
-      isFetched &&
-      orderDetails?.paymentStatus === "SUCCESSFUL" &&
-      orderDetails?.status !== "COMPLETED"
-    ) {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Please fill in the ticket details"],
-      });
-      router.push(`/tickets/${params.ticketId}/fill-details`);
-      return;
-    }
-    if (isFetched && orderDetails?.status === "CANCELLED") {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Order has not been cancelled"],
-      });
-      router.push(`/tickets`);
-      return;
-    }
-  }, [orderDetails]);
+  // useEffect(() => {
+  //   if (isFetched && !orderDetails) {
+  //     ErrorToast({ title: "Error", descriptions: ["Order not found"] });
+  //     router.push("/tickets/");
+  //   }
+  // }, [orderDetails]);
 
   if (isPending) {
     return <Loading />;
+  } else if (!orderDetails) {
+    ErrorToast({ title: "Error", descriptions: ["Order not found"] });
+    router.push("/tickets/");
+    return;
+  } else if (isFetched && orderDetails.paymentStatus !== "SUCCESSFUL") {
+    ErrorToast({
+      title: "Payment Error",
+      descriptions: ["Order has not been paid for"],
+    });
+    router.push("/tickets");
+    return;
+  } else if (
+    isFetched &&
+    orderDetails.paymentStatus === "SUCCESSFUL" &&
+    orderDetails.status === "PENDING"
+  ) {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Please fill in the ticket details"],
+    });
+    router.push(`/tickets/${params.ticketId}/fill-details`);
+    return;
+  } else if (isFetched && orderDetails.status === "CANCELLED") {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Order has not been cancelled"],
+    });
+    router.push(`/tickets`);
+    return;
   }
 
   return (

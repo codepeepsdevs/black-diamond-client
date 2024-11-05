@@ -21,7 +21,6 @@ const PastEventsDetailPage = () => {
   const [eventModalState, setEventModalState] = useState<boolean>(false);
   const [eventNotFoundDialogOpen, setEventNotFoundDialogOpen] = useState(false);
   const params = useParams<{ id: string }>();
-  const router = useRouter();
 
   const pastEventQuery = useGetEvent(params.id);
   const pastEvent = pastEventQuery.data?.data;
@@ -47,7 +46,7 @@ const PastEventsDetailPage = () => {
                   centerSlidePercentage: 100,
                 }}
                 imageStyles="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)]"
-                containerClassName="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
+                containerClassName="w-full [&_.carousel-slider]:h-full [&_.carousel-root]:h-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
                 carouselImages={pastEventQuery.data?.data?.images || []}
                 variant="events"
               />
