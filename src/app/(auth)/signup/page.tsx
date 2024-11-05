@@ -19,6 +19,7 @@ import { useLogin, useRegister } from "@/api/auth/auth.queries";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import VerifyAccountDialog from "@/components/shared/Modals/VerifyAccountDialog";
 import useAuthEmailStore from "@/store/authEmail.store";
+import { watch } from "fs";
 
 // Schema for form validation
 const signupFormSchema = Yup.object().shape({
@@ -58,7 +59,7 @@ const Signup = () => {
     mode: "onBlur",
   });
 
-  const { register, handleSubmit, formState, reset } = form;
+  const { register, handleSubmit, formState, reset, watch } = form;
   const { errors } = formState;
 
   const onSignupSuccess = (data: any) => {
@@ -99,6 +100,8 @@ const Signup = () => {
       setGoogleLoading(false);
     }
   };
+
+  const watchedEmail = watch("email");
 
   // const facebookLoginAction = async () => {
   //   try {
@@ -253,6 +256,7 @@ const Signup = () => {
         </div>
       </section>
       <VerifyAccountDialog
+        email={watchedEmail}
         open={showDialog}
         // defaultOpen={true}
         onOpenChange={() => {

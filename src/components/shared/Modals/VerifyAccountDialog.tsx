@@ -1,9 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { ComponentProps } from "react";
-import { FaRegClock } from "react-icons/fa";
 import { MdOutlineEmail } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-import useAuthEmailStore from "@/store/authEmail.store";
 
 export default function VerifyAccountDialog({
   email,
