@@ -29,7 +29,7 @@ import { useState } from "react";
 // Import Swiper React componentssss
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import LoadingScreen from "@/app/loading";
+// import LoadingScreen from "@/app/loading";
 import "swiper/css";
 import SuccessToast from "@/components/toast/SuccessToast";
 import ErrorToast from "@/components/toast/ErrorToast";
@@ -101,7 +101,7 @@ export default function LandingPage() {
 
   return (
     <>
-      {!videoCanPlay && <LoadingScreen />}
+      {/* {!videoCanPlay && <LoadingScreen />} */}
       <main className="flex flex-col gap-10">
         <Hero handleVideoCanPlay={handleVideoCanPlay} />
 
