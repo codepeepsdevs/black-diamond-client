@@ -34,6 +34,11 @@ import "swiper/css";
 import SuccessToast from "@/components/toast/SuccessToast";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import {
+  ISubscribe,
+  NewsletterSubscriptionError,
+} from "@/api/newsletter/newsletter.types";
+import { AxiosError } from "axios";
 
 export default function LandingPage() {
   const width = useWindowsize();
@@ -71,7 +76,9 @@ export default function LandingPage() {
     });
   };
 
-  const onNewsletterError = (error: any) => {
+  const onNewsletterError = (
+    error: AxiosError<NewsletterSubscriptionError>
+  ) => {
     const descriptions = getApiErrorMessage(
       error,
       "Error Subscribing to newsletter"
@@ -86,7 +93,7 @@ export default function LandingPage() {
     mutate: subscribe,
     isPending: newsletterPending,
     isError: newsletterError,
-  } = useNewsletterSubscribe(onNewsletterSuccess, onNewsletterError);
+  } = useNewsletterSubscribe(onNewsletterError, onNewsletterSuccess);
 
   function handleVideoCanPlay() {
     setVideoCanPlay(true);
