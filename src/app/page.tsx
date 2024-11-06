@@ -25,7 +25,7 @@ import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { scaleVariants } from "@/utils/hoc/motion";
 import { useGetEvents } from "@/api/events/events.queries";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 // Import Swiper React componentssss
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -103,7 +103,9 @@ export default function LandingPage() {
     <>
       {/* {!videoCanPlay && <LoadingScreen />} */}
       <main className="flex flex-col gap-10">
-        <Hero handleVideoCanPlay={handleVideoCanPlay} />
+        <Suspense fallback={<div>Loading..</div>}>
+          <Hero handleVideoCanPlay={handleVideoCanPlay} />
+        </Suspense>
 
         <motion.div
           whileInView={{ opacity: [0, 1] }}
