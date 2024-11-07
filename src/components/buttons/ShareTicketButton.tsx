@@ -14,21 +14,22 @@ export default function ShareTicketButton({
   const blob = useRef<Blob | null>(null);
 
   useEffect(() => {
-    const convertToBlob = async () => {
-      setProcessing(true);
-      const node = document.getElementById(nodeId);
-      if (node) {
-        const ticketImage = await toPng(node);
-        // Step 2: Convert the canvas to a Blob
-        blob.current = await fetch(ticketImage).then((res) => res.blob());
-      }
-      setProcessing(false);
-    };
-
     convertToBlob();
   }, [nodeId]);
 
+  const convertToBlob = async () => {
+    setProcessing(true);
+    const node = document.getElementById(nodeId);
+    if (node) {
+      const ticketImage = await toPng(node);
+      // Step 2: Convert the canvas to a Blob
+      blob.current = await fetch(ticketImage).then((res) => res.blob());
+    }
+    setProcessing(false);
+  };
+
   const shareTicket = async () => {
+    await convertToBlob();
     const loadingToastId = toast.loading("Preparing to share ticket..");
 
     if (navigator.share) {

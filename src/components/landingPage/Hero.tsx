@@ -1,14 +1,12 @@
 "use client";
-import { textVariant } from "@/utils/hoc/motion";
-import { motion } from "framer-motion";
+
 import React, { useState } from "react";
 
-const Hero = () => {
-  const [videoCanPlay, setVideoCanPlay] = useState(false);
-
-  const handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement> = () => {
-    setVideoCanPlay(true);
-  };
+const Hero = ({
+  handleVideoCanPlay,
+}: {
+  handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
+}) => {
   return (
     <div className="relative w-full">
       <video

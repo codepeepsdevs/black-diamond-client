@@ -67,7 +67,7 @@ export function DownloadTicketDialog({
                       {/* END TICKET COUNT */}
 
                       {/* ADD TO WALLET BUTTON */}
-                      <button className="w-full py-4 flex items-center justify-center gap-x-4 bg-black text-center font-bold">
+                      {/* <button className="w-full py-4 flex items-center justify-center gap-x-4 bg-black text-center font-bold">
                         <Image
                           src={appleWalletIcon}
                           alt=""
@@ -75,7 +75,7 @@ export function DownloadTicketDialog({
                           height={20}
                         />
                         <span>Add to Apple Wallet</span>
-                      </button>
+                      </button> */}
                       {/* END ADD TO WALLET BUTTON */}
 
                       {/* TICKET DETAILS */}

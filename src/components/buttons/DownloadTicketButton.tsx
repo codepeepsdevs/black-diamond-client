@@ -22,21 +22,27 @@ export default function DownloadTicketButton({
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
+    generatePng();
+  }, [nodeId]);
+
+  const generatePng = async () => {
     const node = document.getElementById(nodeId);
     if (!node) {
       return;
     }
     setProcessing(true);
-    toPng(node)
+    return toPng(node)
       .then((_ticketImage) => {
         ticketImage.current = _ticketImage;
+        return _ticketImage;
       })
       .finally(() => {
         setProcessing(false);
       });
-  }, [nodeId]);
+  };
 
   const onDownload = async () => {
+    await generatePng();
     if (ticketImage.current) {
       const link = document.createElement("a");
 

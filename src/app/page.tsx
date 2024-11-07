@@ -12,93 +12,31 @@ import {
   HighLights,
 } from "@/components";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import EventCard from "@/components/shared/EventCard";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import TypeWriter from "typewriter-effect";
 import { useRouter } from "next/navigation";
-import { useNewsletterSubscribe } from "@/api/newsletter/newsletter.queries";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { scaleVariants } from "@/utils/hoc/motion";
-import { useGetEvents } from "@/api/events/events.queries";
-import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { useState } from "react";
-// Import Swiper React componentssss
-
-import { Swiper, SwiperSlide } from "swiper/react";
-// import LoadingScreen from "@/app/loading";
 import "swiper/css";
-import SuccessToast from "@/components/toast/SuccessToast";
-import ErrorToast from "@/components/toast/ErrorToast";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
-import {
-  ISubscribe,
-  NewsletterSubscriptionError,
-} from "@/api/newsletter/newsletter.types";
-import { AxiosError } from "axios";
+import UpcomingEventsList from "@/components/shared/UpcomingEventsList";
+import NewsletterForm from "@/components/shared/NewsletterForm";
+import { useState } from "react";
+import Loading from "./loading";
 
 export default function LandingPage() {
   const width = useWindowsize();
   const router = useRouter();
 
-  const upcomingEventsQuery = useGetEvents({
-    eventStatus: "upcoming",
-    search: "",
-  });
-  const upcomingEventsData = upcomingEventsQuery.data?.data;
+  const [videoCanPlay, setVideoCanPlay] = useState(false);
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-  });
-
-  const form = useForm<ISubscribe>({
-    defaultValues: {
-      email: "",
-    },
-    resolver: yupResolver(validationSchema),
-    mode: "onChange",
-  });
-
-  const { register, handleSubmit, formState, watch, reset } = form;
-  const { errors } = formState;
-  const watchedEmail = watch("email");
-
-  const onNewsletterSuccess = (data: any) => {
-    SuccessToast({
-      title: "Success",
-      description: "Subscribed to newsletter",
-    });
+  const handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement> = () => {
+    setVideoCanPlay(true);
   };
-
-  const onNewsletterError = (
-    error: AxiosError<NewsletterSubscriptionError>
-  ) => {
-    const descriptions = getApiErrorMessage(
-      error,
-      "Error Subscribing to newsletter"
-    );
-    ErrorToast({
-      title: "Error",
-      descriptions,
-    });
-  };
-
-  const {
-    mutate: subscribe,
-    isPending: newsletterPending,
-    isError: newsletterError,
-  } = useNewsletterSubscribe(onNewsletterError, onNewsletterSuccess);
 
   return (
     <>
-      {/* {!videoCanPlay && <LoadingScreen />} */}
+      {!videoCanPlay && <Loading />}
       <main className="flex flex-col gap-10">
-        <Hero />
+        <Hero handleVideoCanPlay={handleVideoCanPlay} />
 
         <motion.div
           whileInView={{ opacity: [0, 1] }}
@@ -180,92 +118,7 @@ export default function LandingPage() {
 
         <HighLights />
 
-        {upcomingEventsQuery.isError ? null : (
-          <motion.div
-            whileInView={{ opacity: [0, 1] }}
-            transition={{ duration: 0.5, type: "tween" }}
-            className="w-full flex flex-col gap-4 pl-4 lg:pl-6"
-          >
-            <h2 className="text-base md:text-xl text-white font-semibold">
-              Upcoming Events
-            </h2>
-
-            <Swiper autoplay={true} draggable={true} className="w-full">
-              {upcomingEventsQuery.isPending && !upcomingEventsQuery.isError ? (
-                <>
-                  {new Array(3).fill(0).map((_, index) => {
-                    return (
-                      <SwiperSlide key={index}>
-                        <LoadingSkeleton key={index} className="h-48 sm:h-60" />
-                      </SwiperSlide>
-                    );
-                  })}
-                </>
-              ) : null}
-            </Swiper>
-
-            <Swiper
-              className="w-full text-white"
-              spaceBetween={16}
-              autoplay={{
-                disableOnInteraction: false,
-              }}
-              slidesPerView={1.1}
-              breakpoints={{
-                480: {
-                  slidesPerView: 1.8,
-                },
-                768: {
-                  slidesPerView: 2.2,
-                },
-                1024: {
-                  slidesPerView: 2.6,
-                },
-              }}
-            >
-              {upcomingEventsData?.events.map((event, index) => {
-                return (
-                  <SwiperSlide key={event.id}>
-                    <EventCard
-                      id={event.id}
-                      key={event.id}
-                      index={index}
-                      image={event.coverImage}
-                      title={event.name}
-                      ticketTypes={event.ticketTypes}
-                      startTime={new Date(event.startTime)}
-                      tab={"upcoming"}
-                      variant="landingPage"
-                      className=""
-                    />
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
-
-            {/* <div className="md:hidden">
-            <ScrollMenu>
-              <div className="flex items-center gap-4 sm:gap-2.5">
-                {upcomingEvents.data?.data.map((event, index) => {
-                  return (
-                    <EventCard
-                      id={event.id}
-                      key={event.id}
-                      index={index}
-                      image={event.coverImage}
-                      title={event.name}
-                      ticketTypes={event.ticketTypes}
-                      startTime={new Date(event.startTime)}
-                      tab={"upcoming"}
-                      variant="landingPage"
-                    />
-                  );
-                })}
-              </div>
-            </ScrollMenu>
-          </div> */}
-          </motion.div>
-        )}
+        <UpcomingEventsList />
 
         <motion.div
           whileInView={{ opacity: [0, 1] }}
@@ -307,51 +160,7 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        <motion.div
-          whileInView={{ opacity: [0, 1] }}
-          transition={{ duration: 0.5, type: "tween" }}
-          className="py-10 pb-20 flex flex-col items-center gap-8 text-white text-center text-sm"
-        >
-          <div className="w-[75%] md:w-[35%] lg:w-[25%] flex flex-col gap-2 leading-6">
-            <Link href="" className="underline font-normal">
-              SUBSCRIBE
-            </Link>
-            <p>Subscribe to join our Black Diamond Newsletter</p>
-          </div>
-
-          <div className="w-[80%] md:w-[50%] lg:w-[40%]">
-            <div className="flex justify-between pb-2 items-center text-[#BDBDBD]">
-              <div className="w-[90%]">
-                <input
-                  placeholder="Email"
-                  className="bg-black border-none outline-none w-full placeholder:text-[#BDBDBD]"
-                  type="text w-full"
-                  {...register("email")}
-                />
-              </div>
-
-              {newsletterPending && !newsletterError ? (
-                <LoadingSvg />
-              ) : (
-                <Image
-                  className="hover:opacity-80 cursor-pointer w-[24px] h-[24px]"
-                  src={Forward}
-                  alt="forward"
-                  onClick={() => {
-                    subscribe({
-                      email: watchedEmail,
-                    });
-                  }}
-                />
-              )}
-            </div>
-
-            <div className="border-[1px] border-[#C0C0C0]" />
-            <p className="flex self-start text-red-500 text-xs mt-0.5">
-              {errors.email?.message}
-            </p>
-          </div>
-        </motion.div>
+        <NewsletterForm />
       </main>
     </>
   );

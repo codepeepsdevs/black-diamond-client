@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
 import React from "react";
-import { Preloader } from "../../public/gif";
 
 export default function Loading() {
   return (
