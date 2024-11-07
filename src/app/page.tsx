@@ -25,7 +25,7 @@ import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { scaleVariants } from "@/utils/hoc/motion";
 import { useGetEvents } from "@/api/events/events.queries";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 // Import Swiper React componentssss
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -42,7 +42,6 @@ import { AxiosError } from "axios";
 
 export default function LandingPage() {
   const width = useWindowsize();
-  const [videoCanPlay, setVideoCanPlay] = useState(false);
   const router = useRouter();
 
   const upcomingEventsQuery = useGetEvents({
@@ -95,17 +94,11 @@ export default function LandingPage() {
     isError: newsletterError,
   } = useNewsletterSubscribe(onNewsletterError, onNewsletterSuccess);
 
-  function handleVideoCanPlay() {
-    setVideoCanPlay(true);
-  }
-
   return (
     <>
       {/* {!videoCanPlay && <LoadingScreen />} */}
       <main className="flex flex-col gap-10">
-        <Suspense fallback={<div>Loading..</div>}>
-          <Hero handleVideoCanPlay={handleVideoCanPlay} />
-        </Suspense>
+        <Hero />
 
         <motion.div
           whileInView={{ opacity: [0, 1] }}
@@ -123,8 +116,6 @@ export default function LandingPage() {
                   loop
                   muted
                   playsInline
-                  onCanPlay={handleVideoCanPlay}
-                  onPlaying={handleVideoCanPlay}
                 >
                   <source src="videos/exploreEvents.mp4" type="video/mp4" />
                   Your browser does not support the video tag.

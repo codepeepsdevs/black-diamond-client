@@ -13,7 +13,6 @@ export default function Loading() {
         loop
         muted
         playsInline
-        poster={"/videos/loader.jpg"}
       >
         <source src="/videos/loader.mp4" type="video/mp4" />
         Your browser does not support the video tag.

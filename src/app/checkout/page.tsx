@@ -192,7 +192,7 @@ function CheckoutForm() {
   }
 
   return (
-    <section className="my-sm sm:my-lg">
+    <section className="my-lg">
       <div className="container ">
         <h1 className="text-white text-4xl font-bold mb-7">Checkout</h1>
 
