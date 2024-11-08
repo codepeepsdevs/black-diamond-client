@@ -37,14 +37,13 @@ const Navbar = ({ className }: { className?: string }) => {
         )}
       >
         <div className="flex items-center gap-7">
-          <Image
-            className="cursor-pointer w-14 lg:w-16"
-            src={Logo}
-            alt="Logo"
-            onClick={() => {
-              router.push("/");
-            }}
-          />
+          <Link href={"/"}>
+            <Image
+              className="cursor-pointer w-14 lg:w-16"
+              src={Logo}
+              alt="Logo"
+            />
+          </Link>
 
           <div className="hidden md:flex items-center gap-5">
             {navItems.map((item, index) => {
