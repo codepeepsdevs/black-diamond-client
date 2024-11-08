@@ -1,6 +1,8 @@
 import { CalendarEvent, TicketType } from "@/constants/types";
 import { AxiosError } from "axios";
 import * as dateFns from "date-fns";
+import { format } from "date-fns-tz";
+import { newYorkTimeZone } from "./date-formatter";
 
 export function formatShareUrl(url: string): string {
   const first30: string = url.slice(0, 30);
@@ -35,8 +37,14 @@ export function getApiErrorMessage(
   return descriptions;
 }
 
-export function getPDTDate(startDate: Date, endDate: Date) {
-  return `${dateFns.format(startDate, "EEEE, MMMM d · haaa")} - ${dateFns.format(endDate, "haaa 'PDT'")}`;
+export function getTimeZoneDateRange(startDate: Date, endDate: Date) {
+  const timeZoneAbbr = new Date(startDate || endDate || Date.now())
+    .toLocaleTimeString("en-US", {
+      timeZoneName: "short",
+      timeZone: newYorkTimeZone,
+    })
+    .split(" ")[2];
+  return `${format(startDate, "EEEE, MMMM d · haaa", { timeZone: newYorkTimeZone })} - ${format(endDate, `haaa '${timeZoneAbbr}'`, { timeZone: newYorkTimeZone })}`;
 }
 
 export function getLowestTicket(ticketTypes: TicketType[]) {

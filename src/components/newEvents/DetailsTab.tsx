@@ -29,6 +29,8 @@ import * as dateFns from "date-fns";
 import EventCoverImageInput from "./EventCoverImageInput";
 import { parseAsString, useQueryState } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
+import { fromZonedTime } from "date-fns-tz";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -96,17 +98,21 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       refundPolicy: values.refundPolicy,
       coverImage: values.coverImage,
       images: values.images,
-      startTime: dateFns
-        .add(values.date, {
+      startTime: fromZonedTime(
+        dateFns.add(values.date, {
           hours: startTimeHours,
           minutes: startTimeMinutes,
-        })
+        }),
+        newYorkTimeZone
+      ) // convert to UTC from the user's local time
         .toISOString(),
-      endTime: dateFns
-        .add(values.date, {
+      endTime: fromZonedTime(
+        dateFns.add(values.date, {
           hours: endTimeHours,
           minutes: endTimeMinutes,
-        })
+        }),
+        newYorkTimeZone
+      ) // convert to UTC from the user's local time
         .toISOString(),
       locationType: values.locationType,
     });

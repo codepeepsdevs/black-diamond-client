@@ -16,6 +16,9 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
+import { newYorkTimeZone } from "@/utils/date-formatter";
+import * as dateFnsTz from "date-fns-tz";
+import { getTimeZoneDateRange } from "@/utils/utilityFunctions";
 
 const PastEventsDetailPage = () => {
   const [eventModalState, setEventModalState] = useState<boolean>(false);
@@ -81,20 +84,10 @@ const PastEventsDetailPage = () => {
                   ) : pastEventQuery.data?.data?.startTime &&
                     pastEventQuery.data.data.endTime ? (
                     <p className="text-xs md:text-sm">
-                      {dateFns.format(
-                        new Date(
-                          pastEventQuery.data?.data.startTime || Date.now()
-                        ),
-                        "EEEE, MMMM d · haaa"
-                      )}{" "}
-                      -{" "}
-                      {dateFns.format(
-                        new Date(
-                          pastEventQuery.data?.data.endTime || Date.now()
-                        ),
-                        "haaa"
-                      )}{" "}
-                      PDT
+                      {getTimeZoneDateRange(
+                        new Date(pastEvent?.startTime || Date.now()),
+                        new Date(pastEvent?.endTime || Date.now())
+                      )}
                     </p>
                   ) : (
                     <p>N/A</p>

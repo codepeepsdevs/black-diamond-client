@@ -14,7 +14,10 @@ import {
   useUnpublishEvent,
 } from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
-import { getLowestTicket } from "@/utils/utilityFunctions";
+import {
+  getLowestTicket,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
 import AdminButton from "../buttons/AdminButton";
 
@@ -110,14 +113,9 @@ export default function EditEventDetailsDashboard({
             <div>{event?.name}</div>
             <div>
               <p>
-                {dateFns.format(
+                {getTimeZoneDateRange(
                   new Date(event?.startTime || Date.now()),
-                  "EEEE, MMMM d · haaa"
-                )}{" "}
-                -{" "}
-                {dateFns.format(
-                  new Date(event?.endTime || Date.now()),
-                  "haaa 'PDT'"
+                  new Date(event?.endTime || Date.now())
                 )}
               </p>
               <p>{event?.location}</p>

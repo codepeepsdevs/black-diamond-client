@@ -18,18 +18,23 @@
 //   return formattedDate;
 // };
 
+export const newYorkTimeZone = "America/New_York";
+
 // TODO: Change this to date-fns
 export function getEventDateAndTime(date: Date) {
   const dayOfWeek = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
+    timeZone: newYorkTimeZone,
   }).format(date);
   const day = date.getDate();
-  const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
-    date
-  );
-  const year = new Intl.DateTimeFormat("en-US", { year: "numeric" }).format(
-    date
-  );
+  const month = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    timeZone: newYorkTimeZone,
+  }).format(date);
+  const year = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    timeZone: newYorkTimeZone,
+  }).format(date);
 
   const suffix = getDaySuffix(day);
 
@@ -37,6 +42,7 @@ export function getEventDateAndTime(date: Date) {
     hour: "numeric",
     minute: "numeric",
     hour12: true,
+    timeZone: newYorkTimeZone,
   }).format(date);
 
   return {

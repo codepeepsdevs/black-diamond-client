@@ -25,7 +25,10 @@ import toast from "react-hot-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { PromoCode } from "@/constants/types";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
@@ -161,19 +164,12 @@ const UpComingEventDetailPage = () => {
                       count={1}
                       containerClassName="opacity-10 flex-1"
                     />
-                  ) : eventQuery.data?.data?.startTime &&
-                    eventQuery.data.data.endTime ? (
+                  ) : eventData?.startTime && eventData.endTime ? (
                     <p className="text-xs md:text-sm">
-                      {dateFns.format(
-                        new Date(eventQuery.data?.data.startTime || Date.now()),
-                        "EEEE, MMMM d · haaa"
-                      )}{" "}
-                      -{" "}
-                      {dateFns.format(
-                        new Date(eventQuery.data?.data.endTime || Date.now()),
-                        "haaa"
-                      )}{" "}
-                      PDT
+                      {getTimeZoneDateRange(
+                        new Date(eventData?.startTime || Date.now()),
+                        new Date(eventData?.endTime || Date.now())
+                      )}
                     </p>
                   ) : (
                     <p>N/A</p>

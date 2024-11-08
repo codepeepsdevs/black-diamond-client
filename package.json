@@ -22,6 +22,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "framer-motion": "^11.3.28",
     "html-to-image": "^1.11.11",
     "js-cookie": "^3.0.5",

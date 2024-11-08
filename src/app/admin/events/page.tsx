@@ -6,6 +6,7 @@ import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { Event, EventStatus, OptionProps } from "@/constants/types";
 import { cn } from "@/utils/cn";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 // import { formatEventDate } from "@/utils/date-formatter";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -131,6 +132,7 @@ export default function AdminEventsPage() {
                                 .toLocaleDateString("en-US", {
                                   month: "short",
                                   day: "numeric",
+                                  timeZone: newYorkTimeZone, // PDT timezone
                                 })
                                 .toUpperCase()
                                 .split(" ")
@@ -166,7 +168,7 @@ export default function AdminEventsPage() {
                                   hour: "numeric",
                                   minute: "numeric",
                                   hour12: true, // 12-hour format
-                                  timeZone: "America/Los_Angeles", // PDT timezone
+                                  timeZone: newYorkTimeZone, // PDT timezone
                                   timeZoneName: "short", // Abbreviated time zone
                                 }).format(new Date(event.startTime))}
                               </p>

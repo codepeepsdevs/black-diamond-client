@@ -15,7 +15,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { formatPurchaseDate, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  formatPurchaseDate,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 
@@ -261,7 +264,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
             {order.event.name}
           </div>
           <p className="my-4 text-input-color">
-            {getPDTDate(
+            {getTimeZoneDateRange(
               new Date(order.event.startTime || Date.now()),
               new Date(order.event.endTime || Date.now())
             )}{" "}
@@ -339,7 +342,7 @@ function PastOrderCard({ order }: { order: Order }) {
             {order.event.name}
           </div>
           <p className="my-4 text-input-color">
-            {getPDTDate(
+            {getTimeZoneDateRange(
               new Date(order.event.startTime || Date.now()),
               new Date(order.event.endTime || Date.now())
             )}{" "}

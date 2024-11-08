@@ -16,7 +16,7 @@ import { Router } from "next/router";
 import { loadStripe } from "@stripe/stripe-js";
 import ErrorToast from "@/components/toast/ErrorToast";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
-import { getPDTDate } from "@/utils/utilityFunctions";
+import { getTimeZoneDateRange } from "@/utils/utilityFunctions";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
@@ -107,7 +107,7 @@ export default function ViewTicketDetailsPage() {
                   />
                   <p className="text-[#A3A7AA] mt-5">
                     {orderDetails &&
-                      getPDTDate(
+                      getTimeZoneDateRange(
                         new Date(orderDetails.event.startTime),
                         new Date(orderDetails.event.endTime)
                       )}

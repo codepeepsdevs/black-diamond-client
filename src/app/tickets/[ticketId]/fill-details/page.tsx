@@ -27,7 +27,10 @@ import toast from "react-hot-toast";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "@/app/loading";
-import { getApiErrorMessage, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 
 const ticketFormSchema = Yup.object().shape({
   tickets: Yup.array().of(
@@ -252,7 +255,7 @@ export default function FillTicketDetailsPage() {
               className="object-cover"
             />
             <p className="text-[#A3A7AA] mt-5">
-              {getPDTDate(
+              {getTimeZoneDateRange(
                 new Date(orderDetails?.event.startTime!),
                 new Date(orderDetails?.event.endTime!)
               )}

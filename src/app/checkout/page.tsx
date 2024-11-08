@@ -35,7 +35,10 @@ import { Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Cookies from "js-cookie";
 import { MdGppBad } from "react-icons/md";
-import { getApiErrorMessage, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
 import SuccessToast from "@/components/toast/SuccessToast";
 import { ErrorResponse } from "@/constants/types";
@@ -285,7 +288,7 @@ function CheckoutForm() {
                             {order.event.name}
                           </div>
                           <div>
-                            {getPDTDate(
+                            {getTimeZoneDateRange(
                               new Date(order.event.startTime || Date.now()),
                               new Date(order.event.endTime || Date.now())
                             )}
@@ -397,7 +400,7 @@ function CheckoutForm() {
             <div className="text-white font-medium text-xl">Order Summary</div>
             <div className="text-white font-medium">{order.event.name}</div>
             <div>
-              {getPDTDate(
+              {getTimeZoneDateRange(
                 new Date(order.event.startTime || Date.now()),
                 new Date(order.event.endTime || Date.now())
               )}

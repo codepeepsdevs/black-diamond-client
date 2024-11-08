@@ -13,7 +13,10 @@ import {
   usePublishEvent,
   useUnpublishEvent,
 } from "@/api/events/events.queries";
-import { getLowestTicket, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  getLowestTicket,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
 import AdminButton from "../buttons/AdminButton";
@@ -45,6 +48,13 @@ export default function EventDetailsDashboard({
   const lowestPrice = event?.ticketTypes
     ? getLowestTicket(event?.ticketTypes)?.price || 0
     : 0;
+
+  const totalTickets = event?.ticketTypes.reduce((accValue, ticketType) => {
+    return (accValue += ticketType.quantity);
+  }, 0);
+  const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
+    return (accValue += ticket._count.tickets);
+  }, 0);
 
   const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
@@ -105,7 +115,7 @@ export default function EventDetailsDashboard({
             <div>{event?.name}</div>
             <div>
               <p>
-                {getPDTDate(
+                {getTimeZoneDateRange(
                   new Date(event?.startTime || Date.now()),
                   new Date(event?.endTime || Date.now())
                 )}
@@ -119,7 +129,7 @@ export default function EventDetailsDashboard({
               </div>
               <div>
                 <FiUser />
-                <span>250</span>
+                <span>{totalTickets}</span>
               </div>
             </div>
           </div>
@@ -139,7 +149,9 @@ export default function EventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0/250</div>
+            <div className="text-white font-semibold text-6xl">
+              {totalTicketsSold}/{totalTickets}
+            </div>
           </div>
           {/* END TICKETS SOLD */}
 
