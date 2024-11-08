@@ -30,6 +30,8 @@ export default function LandingPage() {
 
   const handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement> = () => {
     window.setTimeout(() => setVideoCanPlay(true), 1000);
+
+    alert("video can play");
   };
 
   return (
