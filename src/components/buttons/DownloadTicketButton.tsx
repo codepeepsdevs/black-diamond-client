@@ -43,32 +43,34 @@ export default function DownloadTicketButton({
 
   const onDownload = async () => {
     await generatePng();
-    if (ticketImage.current) {
-      const link = document.createElement("a");
+    window.setTimeout(() => {
+      if (ticketImage.current) {
+        const link = document.createElement("a");
 
-      link.href = ticketImage.current;
-      link.download = ticketName || "ticket";
+        link.href = ticketImage.current;
+        link.download = ticketName || "ticket";
 
-      // For non-iOS Safari, open in a new tab
-      const isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        /Safari/.test(navigator.userAgent) &&
-        !/Chrome/.test(navigator.userAgent);
-      if (!isIOS) {
-        link.target = "_blank";
+        // For non-iOS Safari, open in a new tab
+        const isIOS =
+          /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+          /Safari/.test(navigator.userAgent) &&
+          !/Chrome/.test(navigator.userAgent);
+        if (!isIOS) {
+          link.target = "_blank";
+        }
+
+        // Simulate a click on the link
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success("Ticket successfully generated");
+      } else {
+        ErrorToast({
+          title: "Error",
+          descriptions: ["Ticket download is unavailable"],
+        });
       }
-
-      // Simulate a click on the link
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success("Ticket successfully generated");
-    } else {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Ticket download is unavailable"],
-      });
-    }
+    }, 3000);
   };
 
   return (

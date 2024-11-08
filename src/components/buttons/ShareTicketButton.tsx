@@ -32,42 +32,46 @@ export default function ShareTicketButton({
     await convertToBlob();
     const loadingToastId = toast.loading("Preparing to share ticket..");
 
-    if (navigator.share) {
-      if (!blob.current) {
-        toast.error("Unable to generate ticket to share", {
-          id: loadingToastId,
+    window.setTimeout(async () => {
+      if (navigator.share) {
+        if (!blob.current) {
+          toast.error("Unable to generate ticket to share", {
+            id: loadingToastId,
+          });
+          return;
+        }
+        const file = new File([blob.current], "ticket.png", {
+          type: "image/png",
         });
-        return;
-      }
-      const file = new File([blob.current], "ticket.png", {
-        type: "image/png",
-      });
 
-      const shareData: ShareData = {
-        files: [file],
-      };
-
-      if (
-        !navigator.canShare({
+        const shareData: ShareData = {
           files: [file],
-        })
-      ) {
-        return toast.error("Share format not supported", {
-          id: loadingToastId,
-        });
-      }
+        };
 
-      try {
-        await navigator.share(shareData);
-        toast.success("Sharing processed successfully", { id: loadingToastId });
-      } catch (error) {
-        toast.error("Something went wrong while trying to share ticket", {
-          id: loadingToastId,
-        });
+        if (
+          !navigator.canShare({
+            files: [file],
+          })
+        ) {
+          return toast.error("Share format not supported", {
+            id: loadingToastId,
+          });
+        }
+
+        try {
+          await navigator.share(shareData);
+          toast.success("Sharing processed successfully", {
+            id: loadingToastId,
+          });
+        } catch (error) {
+          toast.error("Something went wrong while trying to share ticket", {
+            id: loadingToastId,
+          });
+        }
+      } else {
+        toast.error("Sharing not supported", { id: loadingToastId });
       }
-    } else {
-      toast.error("Sharing not supported", { id: loadingToastId });
-    }
+    }, 3000);
   };
 
   return (
