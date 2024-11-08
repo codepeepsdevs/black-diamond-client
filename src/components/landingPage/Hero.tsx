@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useState } from "react";
 
 const Hero = ({
@@ -19,7 +20,7 @@ const Hero = ({
         onCanPlay={handleVideoCanPlay}
         onPlaying={handleVideoCanPlay}
         onPlay={handleVideoCanPlay}
-        // poster={"/videos/heroVideoPoster.jpg"}
+        poster={"/videos/heroVideoPoster.jpg"}
       >
         <source src="videos/heroVideo.mp4" type="video/mp4" />
         Your browser does not support the video tag.

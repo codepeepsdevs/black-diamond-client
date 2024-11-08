@@ -19,7 +19,7 @@ import { scaleVariants } from "@/utils/hoc/motion";
 import "swiper/css";
 import UpcomingEventsList from "@/components/shared/UpcomingEventsList";
 import NewsletterForm from "@/components/shared/NewsletterForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loading from "./loading";
 
 export default function LandingPage() {
@@ -29,10 +29,14 @@ export default function LandingPage() {
   const [videoCanPlay, setVideoCanPlay] = useState(false);
 
   const handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement> = () => {
-    window.setTimeout(() => setVideoCanPlay(true), 1000);
-
-    alert("video can play");
+    window.setTimeout(() => setVideoCanPlay(true), 200);
   };
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      setVideoCanPlay(true);
+    }, 5000);
+  }, []);
 
   return (
     <>
