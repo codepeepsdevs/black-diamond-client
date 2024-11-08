@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={` bg-black`}>
-        <NextTopLoader />
+        <NextTopLoader showSpinner={false} />
         <ReactQueryProvider>
           {/* <UserProvider> */}
           <Toaster
