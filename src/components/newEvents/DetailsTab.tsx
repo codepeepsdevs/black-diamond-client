@@ -52,8 +52,6 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     parseAsString.withDefault("details")
   );
 
-  const [coverImage, setCoverImage] = useState<string | null>(null);
-
   // const setEventId = useNewEventStore((state) => state.setEventId);
   const [eventId, setEventId] = useQueryState(
     "newEventId",

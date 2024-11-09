@@ -57,8 +57,8 @@ export const newEventSchema = Yup.object().shape({
   endTime: Yup.string().required(),
   location: Yup.string().required(),
   refundPolicy: Yup.string().required(),
-  images: Yup.mixed(),
-  coverImage: Yup.mixed(),
+  images: Yup.mixed<File[]>(),
+  coverImage: Yup.mixed<File>(),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),

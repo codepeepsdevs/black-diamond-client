@@ -129,7 +129,7 @@ export const createEventDetails = async ({
     formData.append(key, value);
   });
 
-  images.forEach((image: File) => formData.append("images", image));
+  images?.forEach((image: File) => formData.append("images", image));
 
   // const formData = jsonToFormData(data);
   return (await request({
