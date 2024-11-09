@@ -1,7 +1,7 @@
 import { CalendarEvent, TicketType } from "@/constants/types";
 import { AxiosError } from "axios";
 import * as dateFns from "date-fns";
-import { format } from "date-fns-tz";
+import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "./date-formatter";
 
 export function formatShareUrl(url: string): string {
@@ -44,8 +44,39 @@ export function getTimeZoneDateRange(startDate: Date, endDate: Date) {
       timeZone: newYorkTimeZone,
     })
     .split(" ")[2];
-  return `${format(startDate, "EEEE, MMMM d · haaa", { timeZone: newYorkTimeZone })} - ${format(endDate, `haaa '${timeZoneAbbr}'`, { timeZone: newYorkTimeZone })}`;
+
+  const startDateNY = dateFnsTz.toZonedTime(startDate, newYorkTimeZone);
+  const endDateNY = dateFnsTz.toZonedTime(endDate, newYorkTimeZone);
+
+  return `${dateFns.format(startDateNY, "EEEE, MMMM d · haaa")} - ${dateFnsTz.format(endDateNY, `h:mmaaa '${timeZoneAbbr}'`)}`;
 }
+
+// export function getUTCDateTimeThroughPlain(date: Date, time: string){
+//     // Convert to a format that Date() can parse
+//     const newYorkDateString = `${dateFns.format(date, "yyyy-MM-dd")}T${time}`;
+
+//     const newYorkDate = dateFns.parse(
+//       newYorkDateString,
+//       "yyyy-MM-dd'T'HH:mm",
+//       new Date()
+//     );
+//     // Convert the date from New York time to UTC
+//     const newYorkUtcDate = fromZonedTime(newYorkDate, newYorkTimeZone);
+
+//     // Format the UTC date to ISO string
+//     const formattedUTCDate = newYorkUtcDate.toISOString();
+// }
+
+// export function getZonedDateAndTimeInput(date: Date) {
+//   // Convert the UTC date to New York time
+//   const newYorkDate = dateFnsTz.toZonedTime(date, newYorkTimeZone);
+
+//   // Format the date and time separately for each input
+//   const formattedDate = dateFns.format(newYorkDate, "yyyy-MM-dd"); // Format for date input
+//   const formattedTime = dateFns.format(newYorkDate, "HH:mm"); // Format for time input
+
+//   return { formattedDate, formattedTime };
+// }
 
 export function getLowestTicket(ticketTypes: TicketType[]) {
   return ticketTypes.length > 0

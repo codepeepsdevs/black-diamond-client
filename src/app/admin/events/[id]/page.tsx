@@ -18,6 +18,9 @@ import EditEventDetailsDashboard from "@/components/manageEvent/EditEventDetails
 import * as Yup from "yup";
 import { editEventDetailsSchema } from "@/api/events/events.schemas";
 import Link from "next/link";
+import * as dateFnsTz from "date-fns-tz";
+import * as dateFns from "date-fns";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
@@ -66,15 +69,24 @@ export default function ManageEventPage() {
   }, [eventId, currentTab]);
 
   useEffect(() => {
+    const date = dateFnsTz.toZonedTime(
+      new Date(event?.startTime || Date.now()),
+      newYorkTimeZone
+    );
+    const endTime = dateFnsTz.toZonedTime(
+      new Date(event?.endTime || Date.now()),
+      newYorkTimeZone
+    );
+    const startTime = dateFnsTz.toZonedTime(
+      new Date(event?.startTime || Date.now()),
+      newYorkTimeZone
+    );
+
     if (eventQuery.isSuccess) {
       setDetailsDefault({
-        date: new Date(event?.startTime || Date.now()),
-        endTime: new Date(event?.endTime || Date.now())
-          .toTimeString()
-          .slice(0, 5),
-        startTime: new Date(event?.startTime || Date.now())
-          .toTimeString()
-          .slice(0, 5),
+        date: date,
+        endTime: endTime.toTimeString().slice(0, 5),
+        startTime: startTime.toTimeString().slice(0, 5),
         location: event?.location || "",
         name: event?.name || "",
         refundPolicy: event?.refundPolicy || "",

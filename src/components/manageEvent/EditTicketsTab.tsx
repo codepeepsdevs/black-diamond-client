@@ -18,6 +18,7 @@ import IconInputField from "../shared/IconInputField";
 import { FaDollarSign, FaRegCalendar, FaRegClock } from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import {
+  editTicketFormSchema,
   newTicketFormSchema,
   updateEventTicketTypeSchema,
 } from "@/api/events/events.schemas";
@@ -38,6 +39,7 @@ import {
 } from "@/api/events/events.types";
 import toast from "react-hot-toast";
 import * as dateFns from "date-fns";
+import * as dateFnsTz from "date-fns-tz";
 import { FormError } from "../shared/FormError";
 import {
   Popover,
@@ -51,6 +53,8 @@ import { useParams, useRouter } from "next/navigation";
 import ErrorToast from "../toast/ErrorToast";
 import SuccessToast from "../toast/SuccessToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -64,7 +68,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const params = useParams<{ id: string }>();
   const eventId = params.id;
   const [ticketToEdit, setTicketToEdit] = useState<Yup.InferType<
-    typeof newTicketFormSchema
+    typeof editTicketFormSchema
   > | null>(null);
 
   const {
@@ -73,6 +77,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
     handleSubmit,
     setValue,
     watch,
+    reset,
   } = useForm<Yup.InferType<typeof updateEventTicketTypeSchema>>({
     resolver: yupResolver(updateEventTicketTypeSchema),
   });
@@ -85,6 +90,8 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
     setCurrentTab("code");
   }
   const ticketTypes = useGetEventTicketTypes(eventId);
+  const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
+  const ticketTypeSalesData = ticketTypeSalesQuery.data?.data;
 
   function handleAction(
     action: (typeof actions)[number],
@@ -103,18 +110,28 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
           });
           return;
         }
+        const zonedStartDate = dateFnsTz.toZonedTime(
+          new Date(ticketToEdit.startDate || Date.now()),
+          newYorkTimeZone
+        );
+        const zonedEndDate = dateFnsTz.toZonedTime(
+          new Date(ticketToEdit.endDate || Date.now()),
+          newYorkTimeZone
+        );
         setTicketToEdit({
           name: ticketToEdit.name,
           price: ticketToEdit.price,
           quantity: Number(ticketToEdit.quantity),
-          startDate: new Date(ticketToEdit.startDate || Date.now()),
-          startTime: new Date(ticketToEdit.startDate || Date.now())
-            .toTimeString()
-            .slice(0, 5),
-          endDate: new Date(ticketToEdit.endDate || Date.now()),
-          endTime: new Date(ticketToEdit.endDate || Date.now())
-            .toTimeString()
-            .slice(0, 5),
+          startDate: dateFns.format(zonedStartDate, "yyyy-MM-dd"),
+          startTime: dateFns.format(zonedStartDate, "HH:mm"),
+          // new Date(ticketToEdit.startDate || Date.now())
+          //   .toTimeString()
+          //   .slice(0, 5),
+          endDate: dateFns.format(zonedEndDate, "yyyy-MM-dd"),
+          endTime: dateFns.format(zonedEndDate, "HH:mm"),
+          // new Date(ticketToEdit.endDate || Date.now())
+          //   .toTimeString()
+          //   .slice(0, 5),
         });
         setTicketToEditId(ticketToEdit.id);
         setEditTicketDialogOpen(true);
@@ -168,7 +185,10 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                       <p className="">
                         On Sale · Ends{" "}
                         {dateFns.format(
-                          new Date(ticketType.endDate),
+                          dateFnsTz.toZonedTime(
+                            new Date(ticketType.endDate),
+                            newYorkTimeZone
+                          ),
                           "MMM d, yyyy 'at' h:mm a"
                         )}
                       </p>
@@ -176,7 +196,11 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                   </div>
                   <div>Sold: </div>
                   <div>
-                    {ticketType._count.tickets}/{ticketType.quantity}
+                    {
+                      ticketTypeSalesData?.find((ticketType) => ticketType.id)
+                        ?._count.tickets
+                    }
+                    /{ticketType.quantity}
                   </div>
                   <div>${ticketType.price.toFixed(2)}</div>
 
@@ -317,14 +341,24 @@ function NewTicketDialog({ ...props }: ComponentProps<typeof Dialog> & {}) {
     createEventTicketType({
       ...values,
       eventId: eventId || "",
-      startDate: dateFns.add(startDate, {
-        hours: startTimeHours,
-        minutes: startTimeMinutes,
-      }),
-      endDate: dateFns.add(endDate, {
-        hours: endTimeHours,
-        minutes: endTimeMinutes,
-      }),
+      startDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(startDate), {
+            hours: startTimeHours,
+            minutes: startTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
+      endDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(endDate), {
+            hours: endTimeHours,
+            minutes: endTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
     });
   }
 
@@ -479,7 +513,7 @@ function EditTicketDialog({
   defaultValues,
   ...props
 }: ComponentProps<typeof Dialog> & {
-  defaultValues: Yup.InferType<typeof newTicketFormSchema>;
+  defaultValues: Yup.InferType<typeof editTicketFormSchema>;
   ticketTypeId: string;
 }) {
   const {
@@ -489,8 +523,8 @@ function EditTicketDialog({
     watch,
     setValue,
     reset,
-  } = useForm<Yup.InferType<typeof newTicketFormSchema>>({
-    resolver: yupResolver(newTicketFormSchema),
+  } = useForm<Yup.InferType<typeof editTicketFormSchema>>({
+    resolver: yupResolver(editTicketFormSchema),
     defaultValues,
     shouldUnregister: false,
   });
@@ -531,7 +565,7 @@ function EditTicketDialog({
     endDate,
     endTime,
     ...values
-  }: Yup.InferType<typeof newTicketFormSchema>) {
+  }: Yup.InferType<typeof editTicketFormSchema>) {
     const [startTimeHours, startTimeMinutes] = startTime
       .split(":")
       .map((value) => Number(value));
@@ -542,14 +576,24 @@ function EditTicketDialog({
 
     updateTicketType({
       ...values,
-      startDate: dateFns.add(startDate, {
-        hours: startTimeHours,
-        minutes: startTimeMinutes,
-      }),
-      endDate: dateFns.add(endDate, {
-        hours: endTimeHours,
-        minutes: endTimeMinutes,
-      }),
+      startDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(startDate), {
+            hours: startTimeHours,
+            minutes: startTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
+      endDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(endDate), {
+            hours: endTimeHours,
+            minutes: endTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
       ticketTypeId: ticketTypeId,
     });
   }
@@ -558,8 +602,8 @@ function EditTicketDialog({
   const watchedStartDate = watch("startDate");
   // FIXME: Date not filling in on dialog dialog open
   useEffect(() => {
-    setValue("endDate", defaultValues.endDate || new Date());
-    setValue("startDate", defaultValues.startDate || new Date());
+    setValue("endDate", defaultValues.endDate);
+    setValue("startDate", defaultValues.startDate);
   }, [defaultValues]);
 
   return (

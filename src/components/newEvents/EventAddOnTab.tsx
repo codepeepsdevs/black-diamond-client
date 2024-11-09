@@ -33,6 +33,8 @@ import * as dateFns from "date-fns";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import ErrorToast from "../toast/ErrorToast";
 import { useRouter } from "next/navigation";
+import * as dateFnsTz from "date-fns-tz";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EventAddOnTab({ isActive }: { isActive: boolean }) {
   const [createAddOnDialogOpen, setCreateAddonDialogOpen] = useState(false);
@@ -87,7 +89,10 @@ export default function EventAddOnTab({ isActive }: { isActive: boolean }) {
                   <p className="">
                     On Sale ·{" "}
                     {dateFns.format(
-                      new Date(addon.endTime),
+                      dateFnsTz.toZonedTime(
+                        new Date(addon.endTime),
+                        newYorkTimeZone
+                      ),
                       "MMM dd, yyyy 'at' hh:mm a"
                     )}
                   </p>

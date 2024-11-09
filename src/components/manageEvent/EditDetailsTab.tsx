@@ -34,7 +34,7 @@ import Image from "next/image";
 import EditEventImagesInputField from "./EditEventImagesInputField";
 import { FiTrash2 } from "react-icons/fi";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
-import { fromZonedTime } from "date-fns-tz";
+import { fromZonedTime, toZonedTime } from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EditDetailsTab({
@@ -95,6 +95,7 @@ export default function EditDetailsTab({
     useUpdateEventDetails(onEditDetailsError, onEditDetailsSuccess);
 
   function onSubmit(values: Yup.InferType<typeof editEventDetailsSchema>) {
+    console.log("----------------------------");
     const [startTimeHours, startTimeMinutes] = values.startTime
       .split(":")
       .map((value) => Number(value));
@@ -109,7 +110,7 @@ export default function EditDetailsTab({
       location: values.location,
       refundPolicy: values.refundPolicy,
       startTime: fromZonedTime(
-        dateFns.add(values.date, {
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: startTimeHours,
           minutes: startTimeMinutes,
         }),
@@ -117,7 +118,7 @@ export default function EditDetailsTab({
       ) // convert to UTC from the user's local time
         .toISOString(),
       endTime: fromZonedTime(
-        dateFns.add(values.date, {
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: endTimeHours,
           minutes: endTimeMinutes,
         }),
@@ -172,7 +173,7 @@ export default function EditDetailsTab({
           <Swiper
             slidesPerView={"auto"}
             spaceBetween={10}
-            className="[&_.swiper-slide]:w-28 mt-5 border border-[#121212]"
+            className="[&_.swiper-slide]:w-40 mt-5 border border-[#121212]"
           >
             {defaultMedia.images?.map((image: string) => {
               return (

@@ -46,7 +46,7 @@ export const getUserUpcomingEventOrders = async (_page?: PageData) => {
 
 export const getOrders = async (options?: OptionProps & DateRangeData) => {
   return await request({
-    url: `/orders/get-orders?page=${options?.page || ""}limit=${options?.limit || ""}&eventStatus=${options?.eventStatus || ""}&startDate=${options?.startDate?.toISOString() || ""}&endDate=${options?.endDate?.toISOString()}`,
+    url: `/orders/get-orders?page=${options?.page || ""}&limit=${options?.limit || ""}&eventStatus=${options?.eventStatus || ""}&startDate=${options?.startDate?.toISOString() || ""}&endDate=${options?.endDate?.toISOString()}`,
     method: "get",
   });
 };

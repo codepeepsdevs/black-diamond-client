@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { dateStringSchema } from "../utility-schemas/datestring.schema";
 
 export const paymentMethods = ["creditCard", "applePay", "paypal"] as const;
 
@@ -82,13 +83,23 @@ export const newTicketFormSchema = Yup.object().shape({
   name: Yup.string().required("Ticket name is required"),
   quantity: Yup.number().required("Ticket quantity is required"),
   price: Yup.number().required("Ticket price is required"),
-  startDate: Yup.date()
-    .typeError("Please provide a valid date")
+  startDate: dateStringSchema.required("Start date is required"),
+  startTime: dateStringSchema.required("Start time is required"),
+  endDate: dateStringSchema.required("End date is required"),
+  endTime: Yup.string().required(),
+});
+
+export const editTicketFormSchema = Yup.object().shape({
+  name: Yup.string().required("Ticket name is required"),
+  quantity: Yup.number().required("Ticket quantity is required"),
+  price: Yup.number().required("Ticket price is required"),
+  startDate: Yup.string()
+    // .typeError("Please provide a valid date")
     .required("Start date is required"),
   startTime: Yup.string()
-    .typeError("Please provide a valid date")
+    // .typeError("Please provide a valid date")
     .required("Start time is required"),
-  endDate: Yup.date().required("End date is required"),
+  endDate: Yup.string().required("End date is required"),
   endTime: Yup.string().required(),
 });
 
@@ -134,12 +145,12 @@ export const newAddOnSchema = Yup.object().shape({
     ),
 
   // Start Date and Time (required)
-  startDate: Yup.date().required("Start Date is required"),
+  startDate: dateStringSchema.required("Start Date is required"),
 
   startTime: Yup.string().required("Start Time is required"),
 
   // End Date and Time (required and should be after the start date)
-  endDate: Yup.date()
+  endDate: dateStringSchema
     .required("End Date is required")
     .min(Yup.ref("startDate"), "End Date must be after the Start Date"),
 
@@ -175,9 +186,9 @@ export const newPromocodeFormSchema = Yup.object()
       // )
       .nullable()
       .typeError("Must be a number"),
-    startDate: Yup.date().required("Start date is required"),
+    startDate: dateStringSchema.required("Start date is required"),
     startTime: Yup.string().required("Start time is required"),
-    endDate: Yup.date().required("End date is required"),
+    endDate: dateStringSchema.required("End date is required"),
     endTime: Yup.string().required(),
     // applyTo: Yup.string().oneOf(["all-visible", "certain-visible"]),
     applyToTicketIds: Yup.array()

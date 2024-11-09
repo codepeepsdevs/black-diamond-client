@@ -99,7 +99,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       coverImage: values.coverImage,
       images: values.images,
       startTime: fromZonedTime(
-        dateFns.add(values.date, {
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: startTimeHours,
           minutes: startTimeMinutes,
         }),
@@ -107,7 +107,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       ) // convert to UTC from the user's local time
         .toISOString(),
       endTime: fromZonedTime(
-        dateFns.add(values.date, {
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: endTimeHours,
           minutes: endTimeMinutes,
         }),
