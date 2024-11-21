@@ -42,26 +42,13 @@ const EventCard: React.FC<EventCardProps> = ({
 
   const { date, time } = getEventDateAndTime(dateTime);
 
-  // const handleClick = (id: Event["id"]) => {
-  //   router.push(`/events/${tab}/${id}`);
-  // };
+  const handleClick = (id: Event["id"]) => {
+    router.push(`/events/${tab}/${id}`);
+  };
   return (
     <motion.div
       onClick={() => {
-        // handleClick(id)
-        if (index == 0) {
-          window.open(
-            "https://www.eventbrite.com/e/stranger-thingz-tickets-1041395190047?utm_experiment=test_share_listing&aff=ebdsshios",
-            "_blank",
-            "noopener,noreferrer"
-          );
-        } else {
-          window.open(
-            "https://www.eventbrite.com/e/freaknik-tickets-1041376484097?utm_experiment=test_share_listing&aff=ebdsshios",
-            "_blank",
-            "noopener,noreferrer"
-          );
-        }
+        handleClick(id);
       }}
       variants={fadeIn("up", "spring", index * 0.5, 0.75)}
       className={className}
