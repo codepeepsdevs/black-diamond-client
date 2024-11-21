@@ -259,7 +259,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base min-w-0 break-words hyphens-auto">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 truncate break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>
@@ -342,7 +342,7 @@ function PastOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base min-w-0 break-words hyphens-auto">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 truncate break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>

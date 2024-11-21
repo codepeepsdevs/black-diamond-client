@@ -9,6 +9,7 @@ import {
   GetTicketSoldStatsResponse,
   TicketTypeSalesResponse,
   GetUserOrders,
+  FillTicketDetailsResponse,
 } from "./order.types";
 import {
   DateRangeData,
@@ -27,7 +28,7 @@ export const getOrderDetails = async (orderId: string) => {
 };
 
 export const fillTicketDetails = async (formData: FillTicketDetailsData) => {
-  return await request<Order>({
+  return await request<FillTicketDetailsResponse>({
     url: `/orders/fill-ticket-details`,
     method: "post",
     data: formData,
