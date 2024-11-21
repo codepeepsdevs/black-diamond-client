@@ -242,7 +242,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
@@ -294,7 +294,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
           alt=""
           width={350}
           height={350}
-          className="max-md:w-32 w-60 object-cover"
+          className="max-md:w-32 w-60 h-full object-fill"
         />
         {/* END EVENT POSTER */}
       </div>
@@ -326,7 +326,7 @@ function PastOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
@@ -377,7 +377,7 @@ function PastOrderCard({ order }: { order: Order }) {
           alt=""
           width={350}
           height={350}
-          className="max-md:w-32 w-60 object-cover"
+          className="max-md:w-32 w-60 h-full object-fill"
         />
         {/* END EVENT POSTER */}
       </div>
