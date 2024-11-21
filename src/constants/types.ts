@@ -137,6 +137,7 @@ export type Event = {
   createdAt: string; // ISO string (Date)
   updatedAt: string; // ISO string (Date)
   ticketTypes: TicketType[];
+  eventBriteURL?: string;
 };
 
 export type Ticket = ITicketDetail & {

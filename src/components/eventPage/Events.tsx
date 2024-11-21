@@ -35,6 +35,7 @@ const Events: React.FC<EventsProps> = ({ tab, isPending, isError, events }) => {
               title={event.name}
               ticketTypes={event.ticketTypes}
               startTime={new Date(event.startTime)}
+              eventBriteUrl={event?.eventBriteURL}
               tab={tab}
             />
           );
