@@ -15,7 +15,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Dialog from "@radix-ui/react-dialog";
 import { FiCheck, FiUpload } from "react-icons/fi";
-import { HiMiniCalendar } from "react-icons/hi2";
 // import { formatEventDate } from "@/utils/date-formatter";
 import {
   useCheckPaymentStatus,
@@ -23,7 +22,6 @@ import {
   useOrderDetails,
 } from "@/api/order/order.queries";
 import { useParams, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "@/app/loading";
@@ -31,6 +29,7 @@ import {
   getApiErrorMessage,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ticketFormSchema = Yup.object().shape({
   tickets: Yup.array().of(
@@ -52,11 +51,8 @@ const ticketFormSchema = Yup.object().shape({
 export type FillTicketDetailsData = Yup.InferType<typeof ticketFormSchema> & {
   orderId: string;
 };
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-);
 export default function FillTicketDetailsPage() {
-  const [orderCompleteDialogOpen, setOrderCompleteDialogOpen] = useState(false);
+  // const [orderCompleteDialogOpen, setOrderCompleteDialogOpen] = useState(false);
   const router = useRouter();
   const params = useParams<{ ticketId: string }>();
   const {
@@ -73,6 +69,7 @@ export default function FillTicketDetailsPage() {
   const [useBuyersInfo, setUseBuyersInfo] = useState<boolean[]>([]);
 
   const orderDetails = data?.data;
+  console.log("Fill ticket details page: ", orderDetails);
 
   const {
     register,
@@ -113,7 +110,7 @@ export default function FillTicketDetailsPage() {
       });
     },
     (data) => {
-      setOrderCompleteDialogOpen(true);
+      // setOrderCompleteDialogOpen(true);
     }
   );
 
@@ -376,10 +373,10 @@ export default function FillTicketDetailsPage() {
         </div>
       </div>
 
-      <OrderCompleteDialog
+      {/* <OrderCompleteDialog
         open={orderCompleteDialogOpen}
         onOpenChange={setOrderCompleteDialogOpen}
-      />
+      /> */}
     </section>
   );
 }
@@ -451,49 +448,52 @@ export default function FillTicketDetailsPage() {
 //   );
 // }
 
-function OrderCompleteDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
-  const router = useRouter();
-  const params = useParams<{ ticketId: string }>();
+// function OrderCompleteDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
+//   const queryClient = useQueryClient();
+//   const params = useParams<{ ticketId: string }>();
 
-  return (
-    <Dialog.Root {...props} modal={true}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
-          <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg min-w-80">
-            <div className="bg-[#4267B2] text-white size-24 mx-auto rounded-full grid place-items-center">
-              <FiCheck className="text-4xl" />
-            </div>
+//   return (
+//     <Dialog.Root {...props} modal={true}>
+//       <Dialog.Portal>
+//         <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
+//           <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg min-w-80">
+//             <div className="bg-[#4267B2] text-white size-24 mx-auto rounded-full grid place-items-center">
+//               <FiCheck className="text-4xl" />
+//             </div>
 
-            <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
-              Order Complete
-            </div>
+//             <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
+//               Order Complete
+//             </div>
 
-            <p className="text-white text-base text-center lg:text-xl my-6">
-              See you at the event
-            </p>
+//             <p className="text-white text-base text-center lg:text-xl my-6">
+//               See you at the event
+//             </p>
 
-            {/* <div className="flex gap-x-6 justify-center mb-6">
-              <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
-                <FiUpload />
-              </button>
-              <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
-                <HiMiniCalendar />
-              </button>
-            </div> */}
+//             {/* <div className="flex gap-x-6 justify-center mb-6">
+//               <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
+//                 <FiUpload />
+//               </button>
+//               <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
+//                 <HiMiniCalendar />
+//               </button>
+//             </div> */}
 
-            <div className="flex justify-center">
-              <SubmitButton
-                className=""
-                onClick={() =>
-                  router.push(`/tickets/${params.ticketId}/view-details`)
-                }
-              >
-                VIEW TICKET
-              </SubmitButton>
-            </div>
-          </Dialog.Content>
-        </Dialog.Overlay>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
+//             <div className="flex justify-center">
+//               <SubmitButton
+//                 className=""
+//                 onClick={async () => {
+//                   await queryClient.invalidateQueries({
+//                     queryKey: ["order-details", params.ticketId],
+//                   });
+//                   // router.push(`/tickets/${params.ticketId}/view-details`)
+//                 }}
+//               >
+//                 VIEW TICKET
+//               </SubmitButton>
+//             </div>
+//           </Dialog.Content>
+//         </Dialog.Overlay>
+//       </Dialog.Portal>
+//     </Dialog.Root>
+//   );
+// }

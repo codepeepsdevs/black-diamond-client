@@ -43,3 +43,8 @@ export type GetOrders = {
   orders: ExtendedOrder[];
   ordersCount: number;
 };
+
+export type FillTicketDetailsResponse = {
+  message: string;
+  orderId: string;
+};

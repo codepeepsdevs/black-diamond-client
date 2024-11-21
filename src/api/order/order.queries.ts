@@ -29,6 +29,7 @@ import { FillTicketDetailsData } from "@/app/tickets/[ticketId]/fill-details/pag
 import {
   AssignGuestOrderData,
   AssignGuestOrderResponse,
+  FillTicketDetailsResponse,
   GetOrders,
   GetRevenueData,
   GetRevenueResponse,
@@ -51,11 +52,11 @@ export const useOrderDetails = (orderId: string) => {
 
 export const useFillTicketDetails = (
   onError: (error: AxiosError<Error>) => void,
-  onSuccess: (data: AxiosResponse<Order>) => void
+  onSuccess: (data: AxiosResponse<FillTicketDetailsResponse>) => void
 ) => {
   const queryClient = useQueryClient();
   return useMutation<
-    AxiosResponse<Order>,
+    AxiosResponse<FillTicketDetailsResponse>,
     AxiosError<Error>,
     FillTicketDetailsData
   >({
@@ -63,8 +64,9 @@ export const useFillTicketDetails = (
     onError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["order-details", data.data.id],
+        queryKey: ["order-details", data.data.orderId],
       });
+
       onSuccess(data);
     },
   });
