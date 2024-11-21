@@ -18,13 +18,14 @@ import { useLogin } from "@/api/auth/auth.queries";
 import ErrorToast from "@/components/toast/ErrorToast";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import SuccessToast from "@/components/toast/SuccessToast";
-import DialogComponent from "@/components/shared/Dialog";
+import VerifyAccountDialog from "@/components/shared/Modals/VerifyAccountDialog";
 import useAuthEmailStore from "@/store/authEmail.store";
 import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import { AxiosResponse } from "axios";
 import { LoginResponse } from "@/api/auth/auth.types";
 import { parseAsString, useQueryState } from "nuqs";
+import CompleteSignupDialog from "@/components/shared/Modals/CompleteSignupDialog";
 
 const loginFormSchema = Yup.object().shape({
   email: Yup.string()
@@ -42,6 +43,8 @@ const Login = () => {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirectUrl");
   const [showDialog, setShowDialog] = useState(false);
+  const [showCompleteSignupDialog, setShowCompleteSignupDialog] =
+    useState(false);
   const router = useRouter();
 
   const [googleLoading, setGoogleLoading] = useState<boolean>(false);
@@ -81,8 +84,10 @@ const Login = () => {
   const onLoginError = (error: any) => {
     const errorMessage = error.response.data.message;
 
-    if (errorMessage === "email not confirmed") {
+    if (errorMessage === "email not verified") {
       setShowDialog(true);
+    } else if (errorMessage === "complete signup") {
+      setShowCompleteSignupDialog(true);
     } else {
       const descriptions = Array.isArray(errorMessage)
         ? errorMessage
@@ -114,6 +119,8 @@ const Login = () => {
       setGoogleLoading(false);
     }
   };
+
+  const watchedEmail = watch("email");
 
   // const facebookLoginAction = async () => {
   //   try {
@@ -228,11 +235,17 @@ const Login = () => {
           </form>
         </div>
       </section>
-      <DialogComponent
+      <VerifyAccountDialog
+        email={watchedEmail}
         open={showDialog}
         onOpenChange={() => {
           setShowDialog(false);
         }}
+      />
+      <CompleteSignupDialog
+        email={watchedEmail}
+        open={showCompleteSignupDialog}
+        onOpenChange={() => setShowCompleteSignupDialog(false)}
       />
     </>
   );

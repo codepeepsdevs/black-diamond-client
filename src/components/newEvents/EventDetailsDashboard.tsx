@@ -1,22 +1,25 @@
 import Image from "next/image";
 import React from "react";
 import TicketsIcon from "./TicketIcon";
-import { FiUser } from "react-icons/fi";
+import { FiDownload, FiUpload, FiUser } from "react-icons/fi";
 import { VscTriangleDown } from "react-icons/vsc";
-import { FaYoutube } from "react-icons/fa";
-import {
-  FaFacebook,
-  FaFacebookF,
-  FaInstagram,
-  FaTwitter,
-} from "react-icons/fa6";
+import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { parseAsString, useQueryState } from "nuqs";
-import { useGetEvent, useGetEventRevenue } from "@/api/events/events.queries";
-import { getLowestTicket, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  useGetEvent,
+  useGetEventRevenue,
+  usePublishEvent,
+  useUnpublishEvent,
+} from "@/api/events/events.queries";
+import {
+  getLowestTicket,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import AdminButton from "../buttons/AdminButton";
 
 export default function EventDetailsDashboard({
   isActive,
@@ -27,6 +30,11 @@ export default function EventDetailsDashboard({
     "newEventId",
     parseAsString.withDefault("")
   );
+
+  const { mutate: publishEvent, isPending: publishEventPending } =
+    usePublishEvent(eventId);
+  const { mutate: unpublishEvent, isPending: unpublishEventPending } =
+    useUnpublishEvent(eventId);
 
   const eventQuery = useGetEvent(eventId);
   const event = eventQuery.data?.data;
@@ -41,7 +49,14 @@ export default function EventDetailsDashboard({
     ? getLowestTicket(event?.ticketTypes)?.price || 0
     : 0;
 
-  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
+  const totalTickets = event?.ticketTypes.reduce((accValue, ticketType) => {
+    return (accValue += ticketType.quantity);
+  }, 0);
+  const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
+    return (accValue += ticket._count.tickets);
+  }, 0);
+
+  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
   const differenceInDays = dateFns.differenceInDays(
     new Date(event?.endTime || Date.now()),
@@ -64,6 +79,29 @@ export default function EventDetailsDashboard({
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
+      {/* ACTION BUTTONS */}
+      <div className="flex items-center justify-end mt-12">
+        {event?.isPublished ? (
+          <AdminButton
+            disabled={unpublishEventPending}
+            onClick={() => unpublishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+          >
+            <FiDownload /> <span>Unpublish</span>
+          </AdminButton>
+        ) : (
+          <AdminButton
+            disabled={publishEventPending}
+            onClick={() => publishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 disabled:opacity-50"
+          >
+            <FiUpload /> <span>Publish</span>
+          </AdminButton>
+        )}
+      </div>
+      {/* END ACTION BUTTONS */}
       <div className="bg-[#151515] overflow-y-auto mt-12">
         <div className="p-6 flex items-center w-full gap-x-6 whitespace-nowrap">
           <Image
@@ -77,7 +115,7 @@ export default function EventDetailsDashboard({
             <div>{event?.name}</div>
             <div>
               <p>
-                {getPDTDate(
+                {getTimeZoneDateRange(
                   new Date(event?.startTime || Date.now()),
                   new Date(event?.endTime || Date.now())
                 )}
@@ -91,7 +129,7 @@ export default function EventDetailsDashboard({
               </div>
               <div>
                 <FiUser />
-                <span>250</span>
+                <span>{totalTickets}</span>
               </div>
             </div>
           </div>
@@ -111,7 +149,9 @@ export default function EventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0/250</div>
+            <div className="text-white font-semibold text-6xl">
+              {totalTicketsSold}/{totalTickets}
+            </div>
           </div>
           {/* END TICKETS SOLD */}
 

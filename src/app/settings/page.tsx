@@ -10,7 +10,6 @@ import { useGetUser } from "@/api/user/user.queries";
 import Loading from "@/app/loading";
 import { AddressInfo, BillingAddressInfo, ContactInfo } from "@/components";
 import SuccessToast from "@/components/toast/SuccessToast";
-import useUserStore from "@/store/user.store";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AxiosResponse } from "axios";

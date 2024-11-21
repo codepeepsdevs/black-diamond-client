@@ -1,4 +1,4 @@
-import { DateRangeData } from "@/constants/types";
+import { DateRangeData, User } from "@/constants/types";
 
 export interface IUpdateUser {
   id: number;
@@ -17,3 +17,21 @@ export type UsersStatsResponse = {
   usersCount: number;
   upTrend: boolean;
 };
+
+export type NewUsersTodayStats = {
+  newUsersCount: number;
+  upTrend: boolean;
+};
+
+export type GetUserData = {
+  users: (User & {
+    amountSpent: number;
+  })[];
+  usersCount: number;
+};
+
+export type AdminUsersStats = {
+  adminsCount: number;
+};
+
+export type DownloadUsersData = Response;

@@ -26,6 +26,7 @@ const RenderCarousel: React.FC<RenderCarouselProps> = ({
   return (
     <div className={cn("h-[168px] md:h-[384px]", containerClassName)}>
       <Carousel
+        showThumbs={false}
         autoPlay
         infiniteLoop
         autoFocus

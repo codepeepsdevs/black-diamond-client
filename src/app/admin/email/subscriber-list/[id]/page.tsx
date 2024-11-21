@@ -128,7 +128,6 @@ function ManageListDialog({ ...props }: ComponentProps<typeof Dialog>) {
     );
 
   function handleUploadCSVFile(csvFile: File) {
-    console.log(csvFile);
     loadingToast.current = toast.loading(
       "Uploading file.. please do not press anything.."
     );

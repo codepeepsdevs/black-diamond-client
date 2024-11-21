@@ -4,8 +4,10 @@ import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import Events from "@/components/eventPage/Events";
 import { IoSearch } from "react-icons/io5";
+import { parseAsString, useQueryState } from "nuqs";
 
 import { useGetEvents } from "@/api/events/events.queries";
+import { SearchQueryState } from "@/constants/types";
 
 const EventTabs = [
   {
@@ -19,13 +21,17 @@ const EventTabs = [
 ] as const;
 
 const EventsPage = () => {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
+  const [activeTab, setActiveTab] = useQueryState(
+    "tab",
+    parseAsString.withDefault("upcoming")
+  ) as SearchQueryState<"upcoming" | "past">;
   const [filterString, setFilterString] = useState<string>("");
 
-  const events = useGetEvents({
+  const eventsQuery = useGetEvents({
     eventStatus: activeTab,
     search: filterString,
   });
+  const eventsData = eventsQuery.data?.data;
 
   const handleSearch: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
@@ -65,9 +71,9 @@ const EventsPage = () => {
       </div>
 
       <Events
-        events={events.data?.data || []}
-        isPending={events.isPending}
-        isError={events.isError}
+        events={eventsData?.events || []}
+        isPending={eventsQuery.isPending}
+        isError={eventsQuery.isError}
         tab={activeTab}
       />
     </div>

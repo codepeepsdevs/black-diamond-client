@@ -40,7 +40,6 @@ export const getSubscriberList = async (listId: string) => {
 
 export const uploadListByCSV = async (data: UploadByCSVData) => {
   const formData = new FormData();
-  console.log(data);
   formData.append("listId", data.listId);
   formData.append("csvFile", data.csvFile);
 

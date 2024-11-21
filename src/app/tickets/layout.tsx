@@ -19,20 +19,6 @@ export default function AuthenticatedLayout({
   const pathname = usePathname();
   const currentPath = encodeURIComponent(pathname);
 
-  // useEffect(() => {
-  //   console.log(userQuery);
-  //   // if the query has fetched and the status is 401, unauthorized, redirect the user
-  //   if (userQuery.isFetched && userQuery.data?.status === 401) {
-  //     console.log("isfetching", userQuery.isFetching);
-  //     ErrorToast({
-  //       title: "Authentication Error",
-  //       descriptions: ["User must be logged in to view orders/tickets"],
-  //     });
-  //     router.push(`/login?redirectUrl=${currentPath}`);
-  //   }
-  //   //   TODO: Complete the logic to redirect the user to login page and then back to what they were doing..
-  // }, [userQuery.isFetching, userQuery.data?.status]);
-
   useEffect(() => {
     const token = Cookies.get("accessToken");
     const isExpired = isTokenExpired(token || "");

@@ -10,11 +10,12 @@ import Menu from "./Menu";
 import useOnClickOutside from "@/hooks/useOnClickOutside";
 import useScrolledAway from "@/hooks/useScrolledAway";
 import { navItems } from "./data";
-import useUserStore from "@/store/user.store";
 import Profile from "./Profile";
+import { useGetUser } from "@/api/user/user.queries";
 
 const Navbar = ({ className }: { className?: string }) => {
-  const user = useUserStore((state) => state.user);
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
   const router = useRouter();
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
@@ -36,14 +37,13 @@ const Navbar = ({ className }: { className?: string }) => {
         )}
       >
         <div className="flex items-center gap-7">
-          <Image
-            className="cursor-pointer w-14 lg:w-16"
-            src={Logo}
-            alt="Logo"
-            onClick={() => {
-              router.push("/");
-            }}
-          />
+          <Link href={"/"}>
+            <Image
+              className="cursor-pointer w-14 lg:w-16"
+              src={Logo}
+              alt="Logo"
+            />
+          </Link>
 
           <div className="hidden md:flex items-center gap-5">
             {navItems.map((item, index) => {
@@ -80,7 +80,7 @@ const Navbar = ({ className }: { className?: string }) => {
         </div>
 
         <div className="flex items-center gap-4">
-          {user ? (
+          {userData ? (
             <Image
               className="block cursor-pointer"
               priority

@@ -1,22 +1,25 @@
 import Image from "next/image";
 import React from "react";
 import TicketsIcon from "./TicketIcon";
-import { FiUser } from "react-icons/fi";
+import { FiDownload, FiUpload, FiUser } from "react-icons/fi";
 import { VscTriangleDown } from "react-icons/vsc";
-import { FaYoutube } from "react-icons/fa";
-import {
-  FaFacebook,
-  FaFacebookF,
-  FaInstagram,
-  FaTwitter,
-} from "react-icons/fa6";
+import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { useParams } from "next/navigation";
-import { useGetEvent } from "@/api/events/events.queries";
+import {
+  useGetEvent,
+  useGetEventRevenue,
+  usePublishEvent,
+  useUnpublishEvent,
+} from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
-import { getLowestTicket } from "@/utils/utilityFunctions";
+import {
+  getLowestTicket,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import AdminButton from "../buttons/AdminButton";
 
 export default function EditEventDetailsDashboard({
   isActive,
@@ -25,6 +28,11 @@ export default function EditEventDetailsDashboard({
 }) {
   const params = useParams<{ id: string }>();
   const eventId = params.id;
+
+  const { mutate: publishEvent, isPending: publishEventPending } =
+    usePublishEvent(eventId);
+  const { mutate: unpublishEvent, isPending: unpublishEventPending } =
+    useUnpublishEvent(eventId);
 
   const eventQuery = useGetEvent(eventId);
   const event = eventQuery.data?.data;
@@ -35,8 +43,14 @@ export default function EditEventDetailsDashboard({
   const totalTickets = event?.ticketTypes.reduce((accValue, ticketType) => {
     return (accValue += ticketType.quantity);
   }, 0);
+  const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
+    return (accValue += ticket._count.tickets);
+  }, 0);
 
-  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
+  const eventRevenueQuery = useGetEventRevenue(eventId);
+  const eventRevenue = eventRevenueQuery.data?.data;
+
+  const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // const eventLink = `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
   const differenceInDays = dateFns.differenceInDays(
     new Date(event?.endTime || Date.now()),
@@ -63,6 +77,29 @@ export default function EditEventDetailsDashboard({
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
+      {/* ACTION BUTTONS */}
+      <div className="flex items-center justify-end mt-12">
+        {event?.isPublished ? (
+          <AdminButton
+            disabled={unpublishEventPending}
+            onClick={() => unpublishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+          >
+            <FiDownload /> <span>Unpublish</span>
+          </AdminButton>
+        ) : (
+          <AdminButton
+            disabled={publishEventPending}
+            onClick={() => publishEvent(eventId)}
+            variant="primary"
+            className="flex items-center gap-2 disabled:opacity-50"
+          >
+            <FiUpload /> <span>Publish</span>
+          </AdminButton>
+        )}
+      </div>
+      {/* END ACTION BUTTONS */}
       <div className="bg-[#151515] overflow-y-auto mt-12">
         <div className="p-6 flex items-center w-full gap-x-6 whitespace-nowrap">
           <Image
@@ -70,20 +107,15 @@ export default function EditEventDetailsDashboard({
             alt="Cover image"
             width={180}
             height={180}
-            className="size-24 object-cover"
+            className="size-24 object-cover shrink-0"
           />
           <div className="space-y-2 flex-1">
             <div>{event?.name}</div>
             <div>
               <p>
-                {dateFns.format(
+                {getTimeZoneDateRange(
                   new Date(event?.startTime || Date.now()),
-                  "EEEE, MMMM d · haaa"
-                )}{" "}
-                -{" "}
-                {dateFns.format(
-                  new Date(event?.endTime || Date.now()),
-                  "haaa 'PDT'"
+                  new Date(event?.endTime || Date.now())
                 )}
               </p>
               <p>{event?.location}</p>
@@ -100,9 +132,15 @@ export default function EditEventDetailsDashboard({
             </div>
           </div>
 
-          <p className="text-[#34C759] font-medium text-xl self-end pl-32">
-            Your event is in {differenceInDays} day(s)!
-          </p>
+          {differenceInDays > 0 ? (
+            <p className="text-[#34C759] font-medium text-xl self-end pl-32">
+              Your event is in {differenceInDays} day(s)!
+            </p>
+          ) : (
+            <p className="text-red-500 font-medium text-xl self-end pl-32">
+              This event was {Math.abs(differenceInDays)} day(s) ago!
+            </p>
+          )}
         </div>
       </div>
 
@@ -115,7 +153,9 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0/250</div>
+            <div className="text-white font-semibold text-6xl">
+              {totalTicketsSold}/{totalTickets}
+            </div>
           </div>
           {/* END TICKETS SOLD */}
 
@@ -125,7 +165,9 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Revenue</span>
             </div>
-            <div className="text-white font-semibold text-6xl">$0.00</div>
+            <div className="text-white font-semibold text-6xl">
+              ${Number(eventRevenue?.revenue).toFixed(2)}
+            </div>
           </div>
           {/* END REVENUE */}
 

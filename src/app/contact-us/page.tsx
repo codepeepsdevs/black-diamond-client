@@ -37,6 +37,10 @@ export default function ContactUsPage() {
       title: "Success",
       description: "Message sent! We will get back to you shortly",
     });
+
+    // Reset the form
+    reset();
+    clearAttachment();
   };
 
   const onContactUsError = (error: any) => {

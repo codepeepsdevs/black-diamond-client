@@ -2,7 +2,6 @@
 
 import React, { ComponentProps, useEffect, useState } from "react";
 import AdminSidebar from "@/components/shared/AdminSidebar";
-import useUserStore from "@/store/user.store";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import {
 import { MdGppBad } from "react-icons/md";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
+import { useGetUser } from "@/api/user/user.queries";
 
 export default function AdminLayout({
   children,
@@ -20,27 +20,27 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [showDialog, setShowDialog] = useState<boolean>(false);
-  const user = useUserStore((state) => state.user);
-  const isPending = useUserStore((state) => state.isPending);
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
 
   useEffect(() => {
-    if (isPending) {
+    if (userQuery.isPending) {
       return;
     }
-    if (user?.role !== "admin") {
+    if (userData?.role !== "admin") {
       setShowDialog(true);
     }
-  }, [user, isPending]);
+  }, [userData, userQuery.isPending]);
   return (
     <>
-      {isPending && (
+      {userQuery.isPending && (
         <div className="min-h-screen flex items-center container">
           <LoadingMessage className="text-4xl">
             Loading admin dashboard.
           </LoadingMessage>
         </div>
       )}
-      {user?.role === "admin" && (
+      {userData?.role === "admin" && (
         <div className={`flex min-h-[50vh] `}>
           <AdminSidebar />
           {/* The min-w-0 is to prevent the contents of the container from overflowing */}

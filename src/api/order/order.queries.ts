@@ -1,10 +1,22 @@
-import { DateRangeData, OptionProps, Order, PageData } from "@/constants/types";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  DateRangeData,
+  ErrorResponse,
+  OptionProps,
+  Order,
+  PageData,
+} from "@/constants/types";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
 import {
   assignGuestOrder,
   checkPaymentStatus,
   fillTicketDetails,
+  generateOrderReport,
   getOrderDetails,
   getOrders,
   getRevenue,
@@ -17,6 +29,8 @@ import { FillTicketDetailsData } from "@/app/tickets/[ticketId]/fill-details/pag
 import {
   AssignGuestOrderData,
   AssignGuestOrderResponse,
+  FillTicketDetailsResponse,
+  GetOrders,
   GetRevenueData,
   GetRevenueResponse,
   GetTicketSoldStatsResponse,
@@ -36,14 +50,25 @@ export const useOrderDetails = (orderId: string) => {
   });
 };
 
-export const useFillEventDetails = (
-  onError: (error: Error) => void,
-  onSuccess: (data: AxiosResponse<Order>) => void
+export const useFillTicketDetails = (
+  onError: (error: AxiosError<Error>) => void,
+  onSuccess: (data: AxiosResponse<FillTicketDetailsResponse>) => void
 ) => {
-  return useMutation<AxiosResponse<Order>, Error, FillTicketDetailsData>({
+  const queryClient = useQueryClient();
+  return useMutation<
+    AxiosResponse<FillTicketDetailsResponse>,
+    AxiosError<Error>,
+    FillTicketDetailsData
+  >({
     mutationFn: fillTicketDetails,
     onError,
-    onSuccess,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["order-details", data.data.orderId],
+      });
+
+      onSuccess(data);
+    },
   });
 };
 
@@ -62,7 +87,7 @@ export type ExtendedOrder = Order & {
 };
 
 export const useGetOrders = (options?: OptionProps & DateRangeData) => {
-  return useQuery<AxiosResponse<ExtendedOrder[]>>({
+  return useQuery<AxiosResponse<GetOrders>>({
     queryKey: ["get-orders", options],
     queryFn: () => getOrders(options),
     placeholderData: keepPreviousData,
@@ -123,4 +148,16 @@ export const useGetTicketsSoldStats = (range?: DateRangeData) => {
       queryFn: () => getTicketsSoldStats(range),
     }
   );
+};
+
+export const useGenerateOrderReport = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: () => void
+) => {
+  return useMutation<void, AxiosError<Error>, DateRangeData>({
+    mutationKey: [`generate-order-report`],
+    mutationFn: generateOrderReport,
+    onError,
+    onSuccess,
+  });
 };

@@ -15,7 +15,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { formatPurchaseDate, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  formatPurchaseDate,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 
@@ -128,16 +131,15 @@ export default function MyOrdersPage() {
         <div className="text-white">
           {upcomingData.isFetching ? (
             <LoadingMessage>Loading upcoming events tickets</LoadingMessage>
-          ) : (
-            upage &&
-            upcomingEventOrders?.orderCount && (
+          ) : upage ? (
+            upcomingEventOrders?.orderCount ? (
               <div>
                 Showing {upage * 10 - 9}-
                 {isUlast ? upcomingEventOrders.orderCount : upage * 10} of{" "}
                 {upcomingEventOrders.orderCount}
               </div>
-            )
-          )}
+            ) : null
+          ) : null}
         </div>
         {/* END UPCOMING TICKETS PAGINATION */}
       </div>
@@ -196,16 +198,15 @@ export default function MyOrdersPage() {
         <div className="text-white">
           {pastData.isFetching ? (
             <LoadingMessage>Loading past event tickets</LoadingMessage>
-          ) : (
-            ppage &&
-            pastEventOrders?.orderCount && (
+          ) : ppage ? (
+            pastEventOrders?.orderCount ? (
               <div>
                 Showing {ppage * 10 - 9}-
                 {isPlast ? pastEventOrders.orderCount : ppage * 10} of{" "}
                 {pastEventOrders.orderCount}
               </div>
-            )
-          )}
+            ) : null
+          ) : null}
         </div>
         {/* END PAST TICKETS PAGINATION */}
       </div>
@@ -222,38 +223,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
 
   const handleLink: React.MouseEventHandler<HTMLAnchorElement> = async (e) => {
     e.preventDefault();
-    const stripe = await stripePromise;
-    // if (order.paymentStatus !== "SUCCESSFUL" && order.status !== "CANCELLED") {
-    //   if (!order.sessionId) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: ["No payment session found to complete the payment."],
-    //     });
-    //     return;
-    //   }
-    //   if (!stripe) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: ["Something went wrong."],
-    //     });
-    //     return;
-    //   }
 
-    //   const result = await stripe.redirectToCheckout({
-    //     sessionId: order.sessionId, // This is the session ID you got from the server
-    //   });
-    //   ErrorToast({
-    //     title: "Redirecting to checkout",
-    //     descriptions: [order.sessionId, order.paymentStatus, order.status],
-    //   });
-    //   if (result.error) {
-    //     ErrorToast({
-    //       title: "Payment Error",
-    //       descriptions: [result.error.message || "Something went wrong"],
-    //     });
-    //     return;
-    //   }
-    // } else {
     switch (order.status) {
       case "PENDING":
         router.push(`/tickets/${order.id}/fill-details`);
@@ -272,7 +242,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
@@ -289,12 +259,12 @@ function UpcomingOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 truncate break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>
           <p className="my-4 text-input-color">
-            {getPDTDate(
+            {getTimeZoneDateRange(
               new Date(order.event.startTime || Date.now()),
               new Date(order.event.endTime || Date.now())
             )}{" "}
@@ -303,13 +273,18 @@ function UpcomingOrderCard({ order }: { order: Order }) {
             Purchased on{" "}
             {formatPurchaseDate(new Date(order.createdAt || Date.now()))} <br />
           </p>
-          <Link
-            href={`#`}
-            onClick={handleLink}
-            className="text-[#4267B2] text-sm md:text-base"
-          >
-            View Order Tickets
-          </Link>
+          <div className="flex items-center gap-x-2">
+            <Link
+              href={`#`}
+              onClick={handleLink}
+              className="text-[#4267B2] text-sm md:text-base"
+            >
+              View Order Tickets
+            </Link>
+            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
+              {order.tickets.length}
+            </span>
+          </div>
         </div>
         {/* END DETAILS */}
 
@@ -319,7 +294,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
           alt=""
           width={350}
           height={350}
-          className="max-md:w-32 w-60 object-cover"
+          className="max-md:w-32 w-60 h-full object-fill"
         />
         {/* END EVENT POSTER */}
       </div>
@@ -351,7 +326,7 @@ function PastOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
@@ -367,12 +342,12 @@ function PastOrderCard({ order }: { order: Order }) {
         {/* END DATE */}
 
         {/* DETAILS */}
-        <div className="flex-1 my-4 text-xs md:text-base">
+        <div className="flex-1 my-4 text-xs md:text-base min-w-0 truncate break-words hyphens-auto">
           <div className="text-input-color font-medium text-sm md:text-2xl">
             {order.event.name}
           </div>
           <p className="my-4 text-input-color">
-            {getPDTDate(
+            {getTimeZoneDateRange(
               new Date(order.event.startTime || Date.now()),
               new Date(order.event.endTime || Date.now())
             )}{" "}
@@ -381,13 +356,18 @@ function PastOrderCard({ order }: { order: Order }) {
             Purchased on{" "}
             {formatPurchaseDate(new Date(order.createdAt || Date.now()))} <br />
           </p>
-          <Link
-            href={`#`}
-            onClick={handleLink}
-            className="text-[#4267B2] text-sm md:text-base"
-          >
-            View Order Tickets
-          </Link>
+          <div className="flex items-center gap-x-2">
+            <Link
+              href={`#`}
+              onClick={handleLink}
+              className="text-[#4267B2] text-sm md:text-base"
+            >
+              View Order Tickets
+            </Link>
+            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
+              {order.tickets.length}
+            </span>
+          </div>
         </div>
         {/* END DETAILS */}
 
@@ -397,7 +377,7 @@ function PastOrderCard({ order }: { order: Order }) {
           alt=""
           width={350}
           height={350}
-          className="max-md:w-32 w-60 object-cover"
+          className="max-md:w-32 w-60 h-full object-fill"
         />
         {/* END EVENT POSTER */}
       </div>

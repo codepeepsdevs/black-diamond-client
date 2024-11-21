@@ -10,7 +10,6 @@ import { useForgotPassword } from "@/api/auth/auth.queries";
 import ErrorToast from "@/components/toast/ErrorToast";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import SuccessToast from "@/components/toast/SuccessToast";
-import DialogComponent from "@/components/shared/Dialog";
 import useAuthEmailStore from "@/store/authEmail.store";
 
 const forgotPasswordFormSchema = Yup.object().shape({
@@ -117,12 +116,6 @@ const ForgotPassword = () => {
           </form>
         </div>
       </section>
-      <DialogComponent
-        open={showDialog}
-        onOpenChange={() => {
-          setShowDialog(false);
-        }}
-      />
     </>
   );
 };

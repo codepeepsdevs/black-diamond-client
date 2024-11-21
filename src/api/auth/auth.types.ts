@@ -34,5 +34,7 @@ export type CompleteSignupResponse = User & {
 
 export type CompleteSignupData = Omit<
   Yup.InferType<typeof signupFormSchema>,
-  "confirmPassword"
->;
+  "confirmPassword" | "email" | "agreeToTerms"
+> & {
+  token: string;
+};

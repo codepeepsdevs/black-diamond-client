@@ -15,19 +15,21 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Dialog from "@radix-ui/react-dialog";
 import { FiCheck, FiUpload } from "react-icons/fi";
-import { HiMiniCalendar } from "react-icons/hi2";
 // import { formatEventDate } from "@/utils/date-formatter";
 import {
   useCheckPaymentStatus,
-  useFillEventDetails,
+  useFillTicketDetails,
   useOrderDetails,
 } from "@/api/order/order.queries";
 import { useParams, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { loadStripe } from "@stripe/stripe-js";
 import Loading from "@/app/loading";
-import { getPDTDate } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ticketFormSchema = Yup.object().shape({
   tickets: Yup.array().of(
@@ -49,11 +51,8 @@ const ticketFormSchema = Yup.object().shape({
 export type FillTicketDetailsData = Yup.InferType<typeof ticketFormSchema> & {
   orderId: string;
 };
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
-);
 export default function FillTicketDetailsPage() {
-  const [orderCompleteDialogOpen, setOrderCompleteDialogOpen] = useState(false);
+  // const [orderCompleteDialogOpen, setOrderCompleteDialogOpen] = useState(false);
   const router = useRouter();
   const params = useParams<{ ticketId: string }>();
   const {
@@ -70,6 +69,7 @@ export default function FillTicketDetailsPage() {
   const [useBuyersInfo, setUseBuyersInfo] = useState<boolean[]>([]);
 
   const orderDetails = data?.data;
+  console.log("Fill ticket details page: ", orderDetails);
 
   const {
     register,
@@ -98,19 +98,26 @@ export default function FillTicketDetailsPage() {
     mutate: fillTicketDetails,
     isPending: fillTicketDetailsPending,
     isError: fillTicketDetailsError,
-  } = useFillEventDetails(
+  } = useFillTicketDetails(
     (e) => {
-      toast.error("An error occurred while filling ticket details");
+      const errorMessage = getApiErrorMessage(
+        e,
+        "An error occurred while filling ticket details"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
     },
     (data) => {
-      setOrderCompleteDialogOpen(true);
+      // setOrderCompleteDialogOpen(true);
     }
   );
 
   // Filling in the details if it has been filled before
   useEffect(() => {
-    if (orderDetailsisFetched) {
-      const defaultValues = orderDetails!.tickets.map((ticket) => {
+    if (orderDetails && orderDetailsisFetched) {
+      const defaultValues = orderDetails.tickets.map((ticket) => {
         return {
           ticketId: ticket.id!,
           firstName: ticket.firstName || "",
@@ -125,12 +132,6 @@ export default function FillTicketDetailsPage() {
     }
   }, [orderDetailsisFetched, orderDetails]);
 
-  useEffect(() => {
-    if (orderDetailsisFetched && orderDetails?.paymentStatus !== "SUCCESSFUL") {
-      // TODO: Inform the user that they haven't completed payment
-    }
-  }, []);
-
   const { fields } = useFieldArray({
     control: control,
     name: "tickets",
@@ -140,85 +141,56 @@ export default function FillTicketDetailsPage() {
     fillTicketDetails({ ...values, orderId: params.ticketId });
   }
 
-  useEffect(() => {
-    // If order details have been fetched and there is no data, show error and redirect
-    if (orderDetailsisFetched && !orderDetails) {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Could not fetch order details"],
-      });
-      router.push("/tickets");
-    }
-  }, [orderDetailsisFetched, orderDetails]);
+  // useEffect(() => {
+  //   // If order details have been fetched and there is no data, show error and redirect
+  //   if (orderDetailsisFetched && !orderDetails) {
+  //     ErrorToast({
+  //       title: "Error",
+  //       descriptions: ["Could not fetch order details"],
+  //     });
+  //     router.push("/tickets");
+  //   }
+  // }, [orderDetailsisFetched, orderDetails]);
 
-  useEffect(() => {
-    handleRedirect();
-  }, [orderDetailsisFetched, orderDetails, checkPaymentStatusFetched]);
-
-  async function handleRedirect() {
+  const handleRedirect: () =>
+    | { redirect: false }
+    | { redirect: true; to: string } = () => {
     // if order details is empty of payment status is not fetched, don't do anything
     if (!orderDetails || !checkPaymentStatusFetched) {
-      console.log("no order details or payment status has not been fetched");
-      return;
+      return { redirect: false };
     }
-    const stripe = await stripePromise;
+    // const stripe = await stripePromise;
     // cannot edit ticket details if event is in the past so just show an error and redirect the user
-    if (orderDetails?.event.eventStatus === "PAST") {
+    if (orderDetails.event.eventStatus === "PAST") {
       ErrorToast({
         title: "Error",
         descriptions: [
           "Event is in the past, cannot fill ticket details for a past event",
         ],
       });
-      return;
+      return { redirect: true, to: "/tickets" };
     }
 
-    // if the order has not been paid for and the order has not been cancelled,
-    // allow payment for the order
-    if (!paymentStatus?.data.paid && orderDetails.status !== "CANCELLED") {
+    // if order has been paid for or the user has cancelled the order, this section runs
+    // if(orderDetails.status === "PENDING") {
+    //     return {redirect: true, to: `/tickets/${orderDetails.id}/fill-details`};
+    // } else
+    if (orderDetails.status === "COMPLETED") {
+      return {
+        redirect: true,
+        to: `/tickets/${orderDetails.id}/view-details`,
+      };
+    } else if (orderDetails.status === "CANCELLED") {
       ErrorToast({
-        title: "Order error",
-        descriptions: ["Order has not been paid for, redirecting to gateway"],
+        title: "Error",
+        descriptions: ["This order has been cancelled"],
       });
-      console.log("order has not been paid and it has not been cancelled");
-      if (!stripe || !orderDetails.sessionId) {
-        ErrorToast({
-          title: "Error",
-          descriptions: ["Something went wrong."],
-        });
-        return;
-      }
-      const result = await stripe.redirectToCheckout({
-        sessionId: orderDetails.sessionId, // This is the session ID you got from the server
-      });
-
-      if (result.error) {
-        ErrorToast({
-          title: "Payment Error",
-          descriptions: [result.error.message || "Something went wrong"],
-        });
-        router.push("/tickets");
-      }
+      return { redirect: true, to: `/tickets` };
     } else {
-      console.log("entering switch block");
-      // if order has been paid for or the user has cancelled the order, this section runs
-      switch (orderDetails.status) {
-        case "PENDING":
-          router.push(`/tickets/${orderDetails.id}/fill-details`);
-          break;
-        case "COMPLETED":
-          router.push(`/tickets/${orderDetails.id}/view-details`);
-          break;
-        case "CANCELLED":
-          ErrorToast({
-            title: "Error",
-            descriptions: ["This order has been cancelled"],
-          });
-          router.push(`/tickets`);
-          break;
-      }
+      // if the order is pending i.e ticket details has not been filled
+      return { redirect: false };
     }
-  }
+  };
 
   function toggleCopyBuyersInfo(index: number) {
     const toggleHandler: React.MouseEventHandler<HTMLInputElement> = (e) => {
@@ -246,8 +218,20 @@ export default function FillTicketDetailsPage() {
     return toggleHandler;
   }
 
-  if (orderDetailsIsPending || checkPaymentStatusPending) {
+  const shouldRedirect = handleRedirect();
+
+  if (orderDetailsIsPending || checkPaymentStatusPending || !orderDetails) {
     return <Loading />;
+  } // If order details have been fetched and there is no data, show error and redirect
+  else if (orderDetailsisFetched && !orderDetails) {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Could not fetch order details"],
+    });
+    router.push("/tickets");
+    return;
+  } else if (shouldRedirect.redirect) {
+    return router.push(shouldRedirect.to);
   }
 
   return (
@@ -268,7 +252,7 @@ export default function FillTicketDetailsPage() {
               className="object-cover"
             />
             <p className="text-[#A3A7AA] mt-5">
-              {getPDTDate(
+              {getTimeZoneDateRange(
                 new Date(orderDetails?.event.startTime!),
                 new Date(orderDetails?.event.endTime!)
               )}
@@ -389,10 +373,10 @@ export default function FillTicketDetailsPage() {
         </div>
       </div>
 
-      <OrderCompleteDialog
+      {/* <OrderCompleteDialog
         open={orderCompleteDialogOpen}
         onOpenChange={setOrderCompleteDialogOpen}
-      />
+      /> */}
     </section>
   );
 }
@@ -464,49 +448,52 @@ export default function FillTicketDetailsPage() {
 //   );
 // }
 
-function OrderCompleteDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
-  const router = useRouter();
-  const params = useParams<{ ticketId: string }>();
+// function OrderCompleteDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
+//   const queryClient = useQueryClient();
+//   const params = useParams<{ ticketId: string }>();
 
-  return (
-    <Dialog.Root {...props} modal={true}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
-          <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg min-w-80">
-            <div className="bg-[#4267B2] text-white size-24 mx-auto rounded-full grid place-items-center">
-              <FiCheck className="text-4xl" />
-            </div>
+//   return (
+//     <Dialog.Root {...props} modal={true}>
+//       <Dialog.Portal>
+//         <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
+//           <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg min-w-80">
+//             <div className="bg-[#4267B2] text-white size-24 mx-auto rounded-full grid place-items-center">
+//               <FiCheck className="text-4xl" />
+//             </div>
 
-            <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
-              Order Complete
-            </div>
+//             <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
+//               Order Complete
+//             </div>
 
-            <p className="text-white text-base text-center lg:text-xl my-6">
-              See you at the event
-            </p>
+//             <p className="text-white text-base text-center lg:text-xl my-6">
+//               See you at the event
+//             </p>
 
-            {/* <div className="flex gap-x-6 justify-center mb-6">
-              <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
-                <FiUpload />
-              </button>
-              <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
-                <HiMiniCalendar />
-              </button>
-            </div> */}
+//             {/* <div className="flex gap-x-6 justify-center mb-6">
+//               <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
+//                 <FiUpload />
+//               </button>
+//               <button className="bg-[#333333] size-12 rounded-full text-text-color text-xl inline-grid place-items-center">
+//                 <HiMiniCalendar />
+//               </button>
+//             </div> */}
 
-            <div className="flex justify-center">
-              <SubmitButton
-                className=""
-                onClick={() =>
-                  router.push(`/tickets/${params.ticketId}/view-details`)
-                }
-              >
-                VIEW TICKET
-              </SubmitButton>
-            </div>
-          </Dialog.Content>
-        </Dialog.Overlay>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
+//             <div className="flex justify-center">
+//               <SubmitButton
+//                 className=""
+//                 onClick={async () => {
+//                   await queryClient.invalidateQueries({
+//                     queryKey: ["order-details", params.ticketId],
+//                   });
+//                   // router.push(`/tickets/${params.ticketId}/view-details`)
+//                 }}
+//               >
+//                 VIEW TICKET
+//               </SubmitButton>
+//             </div>
+//           </Dialog.Content>
+//         </Dialog.Overlay>
+//       </Dialog.Portal>
+//     </Dialog.Root>
+//   );
+// }

@@ -1,6 +1,5 @@
 import {
   keepPreviousData,
-  QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
@@ -19,26 +18,41 @@ import {
   updateEventDetails,
   upateTicketTypeDetails,
   getEventRevenue,
+  adminGetEvents,
+  removeImageFromSlide,
+  publishEvent,
+  unpublishEvent,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
   AddOn,
   ErrorResponse,
   Event,
+  EventStatus,
   OptionProps,
   PromoCode,
+  TicketCount,
   TicketType,
 } from "@/constants/types";
 import {
+  AdminGetEvents,
   CreateEventAddonResponse,
   CreateEventDetailsResponse,
   CreateEventPromocodeResponse,
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
+  GetEvents,
+  PublishEventResponse,
+  RemoveSlideData,
+  RemoveSlideResponse,
+  UnpublishEventResponse,
   UpdateEventDetailsResponse,
   UpdateTicketTypeResponse,
 } from "./events.types";
 import toast from "react-hot-toast";
+import ErrorToast from "@/components/toast/ErrorToast";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import SuccessToast from "@/components/toast/SuccessToast";
 
 // export const useUpcomingEvents = (options: OptionProps) => {
 //   return useQuery<AxiosResponse<Event[]>>({
@@ -60,14 +74,8 @@ import toast from "react-hot-toast";
 //   });
 // };
 
-type ExtendedEvents = (Event & {
-  gross: number;
-  totalSales: number;
-  totalTickets: number;
-})[];
-
 export const useGetEvents = (options: OptionProps) => {
-  return useQuery<AxiosResponse<ExtendedEvents>>({
+  return useQuery<AxiosResponse<GetEvents>>({
     queryKey: ["get-events", options],
     queryFn: () => getEvents(options),
     placeholderData: keepPreviousData,
@@ -76,8 +84,18 @@ export const useGetEvents = (options: OptionProps) => {
   });
 };
 
+export const useAdminGetEvents = (options: OptionProps) => {
+  return useQuery<AxiosResponse<AdminGetEvents>>({
+    queryKey: ["admin-get-events", options],
+    queryFn: () => adminGetEvents(options),
+    placeholderData: keepPreviousData,
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
 export const useGetEvent = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<Event>>({
+  return useQuery<AxiosResponse<Event & EventStatus>>({
     queryKey: ["get-event", eventId],
     queryFn: () => getEvent(eventId),
     // enabled: false,
@@ -86,7 +104,10 @@ export const useGetEvent = (eventId: Event["id"]) => {
 };
 
 export const useGetEventTicketTypes = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<TicketType[]>, AxiosError<ErrorResponse>>({
+  return useQuery<
+    AxiosResponse<(TicketType & TicketCount)[]>,
+    AxiosError<ErrorResponse>
+  >({
     queryKey: ["get-event-ticket-types", eventId],
     queryFn: () => getEventTicketTypes(eventId),
     // enabled: false,
@@ -194,12 +215,14 @@ export const useUpdateEventDetails = (
   onError: (error: AxiosError<ErrorResponse>) => void,
   onSuccess: (data: AxiosResponse<UpdateEventDetailsResponse>) => void
 ) => {
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateEventDetails,
     onError,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["get-event", data.data.id] });
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["get-event", data.data.id],
+      });
       onSuccess(data);
     },
   });
@@ -209,7 +232,7 @@ export const useUpdateTicketType = (
   onError: (error: AxiosError<ErrorResponse>) => void,
   onSuccess: (data: AxiosResponse<UpdateTicketTypeResponse>) => void
 ) => {
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: upateTicketTypeDetails,
     onError,
@@ -231,5 +254,101 @@ export const useGetEventRevenue = (eventId: Event["id"]) => {
     queryFn: () => getEventRevenue(eventId),
     // enabled: false,
     // refetchInterval: 0,
+  });
+};
+
+export const usePublishEvent = (eventId: Event["id"]) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<PublishEventResponse>,
+    AxiosError<ErrorResponse>,
+    string
+  >({
+    mutationKey: ["publish-event", eventId],
+    mutationFn: publishEvent,
+    onError: (e) => {
+      const errorMessage = getApiErrorMessage(
+        e,
+        "Something went wrong while publishing event"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      SuccessToast({
+        title: "Success",
+        description: "Event successfully published",
+      });
+    },
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
+export const useUnpublishEvent = (eventId: Event["id"]) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    AxiosResponse<UnpublishEventResponse>,
+    AxiosError<ErrorResponse>,
+    string
+  >({
+    mutationKey: ["unpublish-event", eventId],
+    mutationFn: unpublishEvent,
+    onError: (e) => {
+      const errorMessage = getApiErrorMessage(
+        e,
+        "Something went wrong while unpublishing event"
+      );
+      ErrorToast({
+        title: "Error",
+        descriptions: errorMessage,
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      SuccessToast({
+        title: "Success",
+        description: "Event successfully unpublished",
+      });
+    },
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
+export const useRemoveImageFromSlide = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AxiosResponse<RemoveSlideResponse>,
+    AxiosError<Error>,
+    RemoveSlideData
+  >({
+    mutationFn: removeImageFromSlide,
+    mutationKey: ["remove-image"],
+    onError: (e) => {
+      const errorMessage = getApiErrorMessage(
+        e,
+        "Something went wrong while deleting slide"
+      );
+      ErrorToast({
+        title: "Delete Error",
+        descriptions: errorMessage,
+      });
+    },
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["get-event", data.data.eventId],
+      });
+
+      SuccessToast({
+        title: "Success",
+        description: data.data.message,
+      });
+    },
   });
 };

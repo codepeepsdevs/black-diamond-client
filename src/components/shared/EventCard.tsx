@@ -82,8 +82,7 @@ const EventCard: React.FC<EventCardProps> = ({
             src={image}
             alt={`event image`}
             fill
-            objectFit="cover"
-            className="z-0 w-full"
+            className="z-0 w-full object-fill"
           />
         </div>
 
@@ -113,16 +112,18 @@ const EventCard: React.FC<EventCardProps> = ({
                 src={tab == "past" ? PastTicket : Ticket}
                 alt="get ticket"
               />
-              <div className="flex justify-end items-center">
-                <div className="text-end">
-                  <p className="text-xs sm:text-sm">
-                    {tab == "past" ? "Started at:" : "Starting at:"}
-                  </p>
-                  <p className="text-sm sm:text-base text-white font-bold">
-                    ${lowestTicket?.price.toFixed(2) || "N/A"}
-                  </p>
+              {tab === "past" ? null : (
+                <div className="flex justify-end items-center">
+                  <div className="text-end">
+                    <p className="text-xs sm:text-sm">
+                      {tab == "past" ? "Started at" : "Starting at:"}
+                    </p>
+                    <p className="text-sm sm:text-base text-white font-bold">
+                      ${lowestTicket?.price.toFixed(2) || "N/A"}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

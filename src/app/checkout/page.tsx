@@ -35,7 +35,10 @@ import { Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import Cookies from "js-cookie";
 import { MdGppBad } from "react-icons/md";
-import { getApiErrorMessage, getPDTDate } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
 import SuccessToast from "@/components/toast/SuccessToast";
 import { ErrorResponse } from "@/constants/types";
@@ -141,7 +144,6 @@ function CheckoutForm() {
   };
 
   const onCheckoutError = (e: AxiosError<ErrorResponse>) => {
-    console.log("checkout error");
     const errorMessage = getApiErrorMessage(e, "Error placing order");
     ErrorToast({
       title: "Error",
@@ -193,7 +195,7 @@ function CheckoutForm() {
   }
 
   return (
-    <section className="my-sm sm:my-lg">
+    <section className="my-lg">
       <div className="container ">
         <h1 className="text-white text-4xl font-bold mb-7">Checkout</h1>
 
@@ -286,7 +288,7 @@ function CheckoutForm() {
                             {order.event.name}
                           </div>
                           <div>
-                            {getPDTDate(
+                            {getTimeZoneDateRange(
                               new Date(order.event.startTime || Date.now()),
                               new Date(order.event.endTime || Date.now())
                             )}
@@ -398,7 +400,7 @@ function CheckoutForm() {
             <div className="text-white font-medium text-xl">Order Summary</div>
             <div className="text-white font-medium">{order.event.name}</div>
             <div>
-              {getPDTDate(
+              {getTimeZoneDateRange(
                 new Date(order.event.startTime || Date.now()),
                 new Date(order.event.endTime || Date.now())
               )}

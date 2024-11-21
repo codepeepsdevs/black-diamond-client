@@ -25,13 +25,15 @@ import toast from "react-hot-toast";
 import { AxiosError, AxiosResponse } from "axios";
 import { PromoCode } from "@/constants/types";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import {
+  getApiErrorMessage,
+  getTimeZoneDateRange,
+} from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
 import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
 
 const UpComingEventDetailPage = () => {
-  const [eventModalState, setEventModalState] = useState<boolean>(false);
   const order = useOrderStore();
   const [promocode, setPromocode] = useState<string>(
     order.promocode?.key || ""
@@ -41,19 +43,11 @@ const UpComingEventDetailPage = () => {
   const router = useRouter();
 
   const eventQuery = useGetEvent(params.id || "");
+  const eventData = eventQuery.data?.data;
   const eventAddonsQuery = useGetAddons(params.id || "");
 
   useEffect(() => {
-    // if event is upcoming route to upcoming event page
-    if (eventQuery.data?.data.eventStatus === "PAST") {
-      router.push("/events/past/" + eventQuery.data.data.id);
-    }
-  }, []);
-
-  useEffect(() => {
     if (eventQuery.isSuccess && eventAddonsQuery.isSuccess) {
-      console.log("event", eventQuery);
-      console.log("addon", eventAddonsQuery);
       if (!eventQuery.data?.data) {
         router.replace("/events");
         return;
@@ -115,14 +109,14 @@ const UpComingEventDetailPage = () => {
 
   // update total discount anytime promocode or order is updated
   useEffect(() => {
-    console.log("computing promocode");
     order.updateDiscount();
   }, [order.promocode, order.ticketOrders]);
 
   if (eventQuery.isPending) {
     return <Loading />;
+  } else if (!eventQuery.isPending && eventData?.eventStatus === "PAST") {
+    return router.push("/events/past/" + eventData.id);
   }
-
   return (
     <>
       <div className="w-full flex items-center justify-center text-white">
@@ -138,7 +132,7 @@ const UpComingEventDetailPage = () => {
                   centerSlidePercentage: 100,
                 }}
                 imageStyles="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)]"
-                containerClassName="w-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
+                containerClassName="w-full [&_.carousel-slider]:h-full  [&_.carousel-root]:h-full min-h-[350px] sm:min-h-[calc(100vh_-_120px)] overflow-hidden"
                 carouselImages={eventQuery.data?.data?.images || []}
                 variant="events"
               />
@@ -170,19 +164,12 @@ const UpComingEventDetailPage = () => {
                       count={1}
                       containerClassName="opacity-10 flex-1"
                     />
-                  ) : eventQuery.data?.data?.startTime &&
-                    eventQuery.data.data.endTime ? (
+                  ) : eventData?.startTime && eventData.endTime ? (
                     <p className="text-xs md:text-sm">
-                      {dateFns.format(
-                        new Date(eventQuery.data?.data.startTime || Date.now()),
-                        "EEEE, MMMM d · haaa"
-                      )}{" "}
-                      -{" "}
-                      {dateFns.format(
-                        new Date(eventQuery.data?.data.endTime || Date.now()),
-                        "haaa"
-                      )}{" "}
-                      PDT
+                      {getTimeZoneDateRange(
+                        new Date(eventData?.startTime || Date.now()),
+                        new Date(eventData?.endTime || Date.now())
+                      )}
                     </p>
                   ) : (
                     <p>N/A</p>

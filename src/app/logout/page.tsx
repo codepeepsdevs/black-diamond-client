@@ -3,24 +3,19 @@ import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Cookies from "js-cookie";
-import useUserStore from "@/store/user.store";
 import { useQueryClient } from "@tanstack/react-query";
 import { removeHeaderToken } from "@/utils/axios-utils";
 
 const Logout = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const setUser = useUserStore((state) => state.setUser);
   const queryClient = useQueryClient();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setLoading(true);
     Cookies.remove("accessToken");
-    queryClient.removeQueries({
-      queryKey: ["get-user"],
-    });
+    await Promise.all([queryClient.clear()]);
     removeHeaderToken();
-    setUser(null);
     router.replace("/");
   };
 

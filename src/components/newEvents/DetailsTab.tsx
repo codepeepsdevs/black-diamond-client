@@ -29,6 +29,8 @@ import * as dateFns from "date-fns";
 import EventCoverImageInput from "./EventCoverImageInput";
 import { parseAsString, useQueryState } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
+import { fromZonedTime } from "date-fns-tz";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -49,8 +51,6 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     "tab",
     parseAsString.withDefault("details")
   );
-
-  const [coverImage, setCoverImage] = useState<string | null>(null);
 
   // const setEventId = useNewEventStore((state) => state.setEventId);
   const [eventId, setEventId] = useQueryState(
@@ -96,17 +96,21 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       refundPolicy: values.refundPolicy,
       coverImage: values.coverImage,
       images: values.images,
-      startTime: dateFns
-        .add(values.date, {
+      startTime: fromZonedTime(
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: startTimeHours,
           minutes: startTimeMinutes,
-        })
+        }),
+        newYorkTimeZone
+      ) // convert to UTC from the user's local time
         .toISOString(),
-      endTime: dateFns
-        .add(values.date, {
+      endTime: fromZonedTime(
+        dateFns.add(dateFns.startOfDay(values.date), {
           hours: endTimeHours,
           minutes: endTimeMinutes,
-        })
+        }),
+        newYorkTimeZone
+      ) // convert to UTC from the user's local time
         .toISOString(),
       locationType: values.locationType,
     });
@@ -158,7 +162,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
             <label htmlFor="event-summary">Event Summary</label>
             <textarea
               rows={8}
-              className="w-full text-black text-xs lg:text-base p-4 border border-input-border"
+              className="w-full text-black p-4 border border-input-border"
               {...register("summary")}
             />
             <FormError error={errors.summary} />

@@ -16,7 +16,7 @@ import { Router } from "next/router";
 import { loadStripe } from "@stripe/stripe-js";
 import ErrorToast from "@/components/toast/ErrorToast";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
-import { getPDTDate } from "@/utils/utilityFunctions";
+import { getTimeZoneDateRange } from "@/utils/utilityFunctions";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
@@ -30,48 +30,47 @@ export default function ViewTicketDetailsPage() {
     params.ticketId
   );
   const orderDetails = data?.data;
+  console.log("View details: ", orderDetails);
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
 
-  useEffect(() => {
-    if (isFetched && !orderDetails) {
-      toast.error("Order not found");
-      router.push("/tickets/");
-    }
-  }, [orderDetails]);
-
-  useEffect(() => {
-    if (isFetched && orderDetails?.paymentStatus !== "SUCCESSFUL") {
-      ErrorToast({
-        title: "Payment Error",
-        descriptions: ["Order has not been paid for"],
-      });
-      router.push("/tickets");
-      return;
-    }
-    if (
-      isFetched &&
-      orderDetails?.paymentStatus === "SUCCESSFUL" &&
-      orderDetails?.status !== "COMPLETED"
-    ) {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Please fill in the ticket details"],
-      });
-      router.push(`/tickets/${params.ticketId}/fill-details`);
-      return;
-    }
-    if (isFetched && orderDetails?.status === "CANCELLED") {
-      ErrorToast({
-        title: "Error",
-        descriptions: ["Order has not been cancelled"],
-      });
-      router.push(`/tickets`);
-      return;
-    }
-  }, [orderDetails]);
+  // useEffect(() => {
+  //   if (isFetched && !orderDetails) {
+  //     ErrorToast({ title: "Error", descriptions: ["Order not found"] });
+  //     router.push("/tickets/");
+  //   }
+  // }, [orderDetails]);
 
   if (isPending) {
     return <Loading />;
+  } else if (!orderDetails) {
+    ErrorToast({ title: "Error", descriptions: ["Order not found"] });
+    router.push("/tickets/");
+    return;
+  } else if (isFetched && orderDetails.paymentStatus !== "SUCCESSFUL") {
+    ErrorToast({
+      title: "Payment Error",
+      descriptions: ["Order has not been paid for"],
+    });
+    router.push("/tickets");
+    return;
+  } else if (
+    isFetched &&
+    orderDetails.paymentStatus === "SUCCESSFUL" &&
+    orderDetails.status === "PENDING"
+  ) {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Please fill in the ticket details"],
+    });
+    router.push(`/tickets/${params.ticketId}/fill-details`);
+    return;
+  } else if (isFetched && orderDetails.status === "CANCELLED") {
+    ErrorToast({
+      title: "Error",
+      descriptions: ["Order has not been cancelled"],
+    });
+    router.push(`/tickets`);
+    return;
   }
 
   return (
@@ -109,7 +108,7 @@ export default function ViewTicketDetailsPage() {
                   />
                   <p className="text-[#A3A7AA] mt-5">
                     {orderDetails &&
-                      getPDTDate(
+                      getTimeZoneDateRange(
                         new Date(orderDetails.event.startTime),
                         new Date(orderDetails.event.endTime)
                       )}

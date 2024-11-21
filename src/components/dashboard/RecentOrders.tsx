@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,20 +12,35 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import Checkbox from "../shared/Checkbox";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
-import { FiMoreHorizontal } from "react-icons/fi";
-import { Order } from "@/constants/types";
 import { ExtendedOrder, useGetOrders } from "@/api/order/order.queries";
 import { FaSort, FaSortDown } from "react-icons/fa6";
 import * as dateFns from "date-fns";
 import { cn } from "@/utils/cn";
+import toast from "react-hot-toast";
 
-const RecentOrdersTable = () => {
-  const orderListQuery = useGetOrders();
+const RecentOrdersTable = ({
+  startDate,
+  endDate,
+}: {
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}) => {
+  const orderListQuery = useGetOrders({ startDate, endDate });
+  const orderListData = orderListQuery.data?.data;
+
+  useEffect(() => {
+    let toastId;
+    if (!toastId && orderListQuery.isFetching) {
+      toastId = toast.loading("Order table data loading");
+    } else {
+      toast.dismiss(toastId);
+      toastId = null;
+    }
+
+    return () => {
+      toastId && toast.dismiss(toastId);
+    };
+  }, [orderListQuery.isFetching]);
 
   const columns: ColumnDef<ExtendedOrder>[] = React.useMemo(
     () => [
@@ -184,7 +199,7 @@ const RecentOrdersTable = () => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: orderListQuery.data?.data || [],
+    data: orderListData?.orders || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -262,30 +277,6 @@ const RecentOrdersTable = () => {
             </tbody>
           </table>
         </div>
-        {/* <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div> */}
       </div>
     </>
   );

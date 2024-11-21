@@ -17,10 +17,10 @@ import EditEventAddOnTab from "@/components/manageEvent/EditEventAddOnTab";
 import EditEventDetailsDashboard from "@/components/manageEvent/EditEventDetailsDashboard";
 import * as Yup from "yup";
 import { editEventDetailsSchema } from "@/api/events/events.schemas";
-import DetailsTab from "@/components/newEvents/DetailsTab";
-import TicketsTab from "@/components/newEvents/TicketsTab";
-import PromoCodeTab from "@/components/newEvents/PromoCodeTab";
-import EventAddOnTab from "@/components/newEvents/EventAddOnTab";
+import Link from "next/link";
+import * as dateFnsTz from "date-fns-tz";
+import * as dateFns from "date-fns";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
@@ -34,7 +34,6 @@ type Tabs = (typeof tabsList)[number]["id"];
 
 export default function ManageEventPage() {
   const params = useParams<{ id: string }>();
-  const router = useRouter();
   const [notFoundDialogOpen, setNotFoundDialogOpen] = useState(false);
   const [currentTab, setCurrentTab] = useQueryState(
     "tab",
@@ -43,6 +42,13 @@ export default function ManageEventPage() {
   const [detailsDefault, setDetailsDefault] = useState<Yup.InferType<
     typeof editEventDetailsSchema
   > | null>(null);
+  const [defaultMedia, setDefaultMedia] = useState<{
+    images: string[];
+    coverImage: string | undefined;
+  }>({
+    images: [],
+    coverImage: "",
+  });
 
   const eventId = params.id;
 
@@ -63,15 +69,24 @@ export default function ManageEventPage() {
   }, [eventId, currentTab]);
 
   useEffect(() => {
+    const date = dateFnsTz.toZonedTime(
+      new Date(event?.startTime || Date.now()),
+      newYorkTimeZone
+    );
+    const endTime = dateFnsTz.toZonedTime(
+      new Date(event?.endTime || Date.now()),
+      newYorkTimeZone
+    );
+    const startTime = dateFnsTz.toZonedTime(
+      new Date(event?.startTime || Date.now()),
+      newYorkTimeZone
+    );
+
     if (eventQuery.isSuccess) {
       setDetailsDefault({
-        date: new Date(event?.startTime || Date.now()),
-        endTime: new Date(event?.endTime || Date.now())
-          .toTimeString()
-          .slice(0, 5),
-        startTime: new Date(event?.startTime || Date.now())
-          .toTimeString()
-          .slice(0, 5),
+        date: date,
+        endTime: endTime.toTimeString().slice(0, 5),
+        startTime: startTime.toTimeString().slice(0, 5),
         location: event?.location || "",
         name: event?.name || "",
         refundPolicy: event?.refundPolicy || "",
@@ -80,8 +95,12 @@ export default function ManageEventPage() {
         // coverImage: event?.coverImage,
         // images: event?.coverImage,
       });
+      setDefaultMedia({
+        coverImage: event?.coverImage,
+        images: event?.images || [],
+      });
     }
-  }, [eventQuery.isSuccess]);
+  }, [eventQuery.isSuccess, eventQuery.data?.data]);
 
   return (
     <>
@@ -89,7 +108,12 @@ export default function ManageEventPage() {
         <div className="mx-8 mt-20 pt-10">
           {/* TOP BREADCRUMB */}
           <h1 className="text-3xl font-semibold text-white flex items-center gap-x-4">
-            <span className="text-[#A3A7AA]">Events</span>{" "}
+            <Link
+              href={"/admin/events"}
+              className="text-[#A3A7AA] hover:opacity-80"
+            >
+              Events
+            </Link>
             <FaChevronRight className="size-4" />
             <span>Manage Event</span>
           </h1>
@@ -129,6 +153,7 @@ export default function ManageEventPage() {
           {currentTab === "details" && detailsDefault !== null && (
             <EditDetailsTab
               defaultValues={detailsDefault}
+              defaultMedia={defaultMedia}
               isActive={currentTab === "details"}
             />
           )}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useGetEvents } from "@/api/events/events.queries";
+import { useAdminGetEvents, useGetEvents } from "@/api/events/events.queries";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
-import { Event, OptionProps } from "@/constants/types";
+import { Event, EventStatus, OptionProps } from "@/constants/types";
 import { cn } from "@/utils/cn";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 // import { formatEventDate } from "@/utils/date-formatter";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -25,13 +26,20 @@ export default function AdminEventsPage() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [eventStatus, setEventStatus] =
     useState<OptionProps["eventStatus"]>("all");
-  const eventsQuery = useGetEvents({ page, eventStatus });
+  const eventsQuery = useAdminGetEvents({ page, eventStatus });
+  const eventsData = eventsQuery.data?.data;
   const router = useRouter();
+
+  const isLast = eventsData?.eventsCount
+    ? page * 10 >= eventsData.eventsCount
+      ? true
+      : false
+    : true;
 
   function handleAction(
     action: (typeof actions)[number],
     eventId: string,
-    eventStatus?: Event["eventStatus"]
+    eventStatus?: EventStatus["eventStatus"]
   ) {
     switch (action) {
       case "view":
@@ -103,13 +111,19 @@ export default function AdminEventsPage() {
             {/* END LIST HEAEDER */}
             {/* LIST BODY */}
             {eventsQuery.isPending ? (
-              <LoadingMessage>Loading events..</LoadingMessage>
+              <tbody>
+                <tr>
+                  <td colSpan={4}>
+                    <LoadingMessage>Loading events..</LoadingMessage>
+                  </td>
+                </tr>
+              </tbody>
             ) : (
               <tbody className="text-text-color [&>tr>td]:px-4">
                 {eventsQuery.data?.data || !eventsQuery.isError ? (
-                  eventsQuery.data.data.map((event) => {
+                  eventsData?.events.map((event) => {
                     return (
-                      <tr>
+                      <tr key={event.id}>
                         <td className="py-6">
                           <div className="flex items-start gap-x-6">
                             {/* MONTH AND DAY */}
@@ -118,6 +132,7 @@ export default function AdminEventsPage() {
                                 .toLocaleDateString("en-US", {
                                   month: "short",
                                   day: "numeric",
+                                  timeZone: newYorkTimeZone, // PDT timezone
                                 })
                                 .toUpperCase()
                                 .split(" ")
@@ -153,7 +168,7 @@ export default function AdminEventsPage() {
                                   hour: "numeric",
                                   minute: "numeric",
                                   hour12: true, // 12-hour format
-                                  timeZone: "America/Los_Angeles", // PDT timezone
+                                  timeZone: newYorkTimeZone, // PDT timezone
                                   timeZoneName: "short", // Abbreviated time zone
                                 }).format(new Date(event.startTime))}
                               </p>
@@ -172,7 +187,7 @@ export default function AdminEventsPage() {
                               <div className="bg-[#333333] rounded-full h-1 min-w-40 overflow-hidden">
                                 <div
                                   style={{
-                                    width: `${(event.totalSales / event.totalTickets) * 100}*`,
+                                    width: `${(event.totalSales / event.totalTickets) * 100}`,
                                   }}
                                   className="bg-[#A3A7AA] h-full"
                                 ></div>
@@ -188,7 +203,7 @@ export default function AdminEventsPage() {
 
                         {/* STATUS */}
                         <td className="capitalize">
-                          {event.eventStatus.toLowerCase()}
+                          {event.eventStatus?.toLowerCase()}
                         </td>
                         {/* END STATUS */}
 
@@ -216,43 +231,45 @@ export default function AdminEventsPage() {
 
         {/* TABLE PAGINATION */}
         <div className="flex items-center justify-end space-x-2 py-4">
-          {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
-          {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
-          {/* TODO: implement loading indicator  */}
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
-                  }
-                  return prev - 1;
-                })
-              }
-              disabled={page == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {page}
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="space-x-2 flex items-center">
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() =>
+                  setPage((prev) => {
+                    if (prev <= 1) {
+                      return 1;
+                    }
+                    return prev - 1;
+                  })
+                }
+                disabled={page == 1}
+              >
+                <FiChevronsLeft />
+              </button>
+              <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                {page}
+              </div>
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={isLast}
+              >
+                <FiChevronsRight />
+              </button>
             </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setPage((prev) => prev + 1)}
-              //   disabled={!table.getCanNextPage()}
-            >
-              <FiChevronsRight />
-            </button>
           </div>
         </div>
-        {/* TODO: Implement showing from total rows */}
-        <div>
+        <div className="text-white">
           {eventsQuery.isFetching ? (
-            <LoadingMessage>Loading data</LoadingMessage>
-          ) : (
-            <div>Showing 1-10 of 1,253</div>
-          )}
+            <LoadingMessage>Loading events..</LoadingMessage>
+          ) : page && eventsData?.eventsCount ? (
+            <div>
+              Showing {page * 10 - 9}-
+              {isLast ? eventsData.eventsCount : page * 10} of{" "}
+              {eventsData.eventsCount}
+            </div>
+          ) : null}
         </div>
         {/* END TABLE PAGINATION */}
       </div>
@@ -297,6 +314,7 @@ function FilterSelect({
         {items.map((item) => {
           return (
             <button
+              key={item.value}
               onClick={() => {
                 setSelectValue(item.value);
                 onSelect(item.value);
@@ -320,11 +338,11 @@ function ActionDropDown({
   handleAction,
 }: {
   eventId: string;
-  eventStatus: Event["eventStatus"];
+  eventStatus: EventStatus["eventStatus"];
   handleAction: (
     action: (typeof actions)[number],
     eventId: string,
-    eventStatus: Event["eventStatus"]
+    eventStatus: EventStatus["eventStatus"]
   ) => void;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -344,6 +362,7 @@ function ActionDropDown({
         {actions.map((item) => {
           return (
             <button
+              key={item}
               onClick={() => {
                 handleAction(item, eventId, eventStatus);
                 setDropdownOpen(false);

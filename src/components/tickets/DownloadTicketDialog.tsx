@@ -2,8 +2,6 @@ import { getEventDateAndTime } from "@/utils/date-formatter";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useParams } from "next/navigation";
 import { ComponentProps, useCallback } from "react";
-import ErrorToast from "../toast/ErrorToast";
-import html2canvas from "html2canvas";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -29,10 +27,6 @@ export function DownloadTicketDialog({
   const { date, time } = getEventDateAndTime(
     new Date(orderDetails?.event.startTime || Date.now())
   );
-
-  const getTargetElement = (id: string) => {
-    return () => document.getElementById(id);
-  };
 
   return (
     <Dialog.Root {...props}>
@@ -73,7 +67,7 @@ export function DownloadTicketDialog({
                       {/* END TICKET COUNT */}
 
                       {/* ADD TO WALLET BUTTON */}
-                      <button className="w-full py-4 flex items-center justify-center gap-x-4 bg-black text-center font-bold">
+                      {/* <button className="w-full py-4 flex items-center justify-center gap-x-4 bg-black text-center font-bold">
                         <Image
                           src={appleWalletIcon}
                           alt=""
@@ -81,7 +75,7 @@ export function DownloadTicketDialog({
                           height={20}
                         />
                         <span>Add to Apple Wallet</span>
-                      </button>
+                      </button> */}
                       {/* END ADD TO WALLET BUTTON */}
 
                       {/* TICKET DETAILS */}
@@ -194,7 +188,6 @@ export function DownloadTicketDialog({
                       {/* TICKET ACTIONS */}
                       <div className="text-[#C0C0C0] flex items-center gap-x-6 justify-center">
                         {/* SHARE BUTTON */}
-                        {/* TODO: Fix the content passed to the props */}
                         <ShareTicketButton nodeId={ticket.id || ""} />
                         {/* END SHARE BUTTON */}
 

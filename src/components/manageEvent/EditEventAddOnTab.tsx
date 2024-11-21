@@ -29,11 +29,13 @@ import toast from "react-hot-toast";
 import { FormError } from "../shared/FormError";
 import AddonImageInput from "./AddonImageInput";
 import * as dateFns from "date-fns";
+import * as dateFnsTz from "date-fns-tz";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { useParams } from "next/navigation";
 import ErrorToast from "../toast/ErrorToast";
 import { AxiosError } from "axios";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EditEventAddOnTab({ isActive }: { isActive: boolean }) {
   const [createAddOnDialogOpen, setCreateAddonDialogOpen] = useState(false);
@@ -92,7 +94,10 @@ export default function EditEventAddOnTab({ isActive }: { isActive: boolean }) {
                   <p className="">
                     On Sale ·{" "}
                     {dateFns.format(
-                      new Date(addon.endTime),
+                      dateFnsTz.toZonedTime(
+                        new Date(addon.endTime),
+                        newYorkTimeZone
+                      ),
                       "MMM dd, yyyy 'at' hh:mm a"
                     )}
                   </p>

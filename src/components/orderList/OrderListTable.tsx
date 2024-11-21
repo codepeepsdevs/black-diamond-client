@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -30,14 +30,47 @@ import { cn } from "@/utils/cn";
 import { DatePickerWithRange } from "../shared/DatePickerWithRange";
 import { parseAsInteger, useQueryState, useQueryStates } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
+import { DateRange } from "react-day-picker";
+import toast from "react-hot-toast";
 
-const OrderListTable = () => {
+const OrderListTable = ({
+  startDate,
+  endDate,
+}: {
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}) => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [eventFilter, setEventFilter] =
     useState<OptionProps["eventStatus"]>("all");
   const orderListQuery = useGetOrders({
     eventStatus: eventFilter,
+    page,
+    limit: 10,
+    startDate,
+    endDate,
   });
+  const orderListData = orderListQuery.data?.data;
+
+  useEffect(() => {
+    let toastId;
+    if (!toastId && orderListQuery.isFetching) {
+      toastId = toast.loading("Order table data loading");
+    } else {
+      toast.dismiss(toastId);
+      toastId = null;
+    }
+
+    return () => {
+      toastId && toast.dismiss(toastId);
+    };
+  }, [orderListQuery.isFetching]);
+
+  const isLast = orderListData?.orders
+    ? page * 10 >= orderListData.ordersCount
+      ? true
+      : false
+    : true;
 
   const columns: ColumnDef<ExtendedOrder>[] = React.useMemo(
     () => [
@@ -196,7 +229,7 @@ const OrderListTable = () => {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data: orderListQuery.data?.data || [],
+    data: orderListData?.orders || [],
     manualPagination: true,
     columns,
     onSortingChange: setSorting,
@@ -298,43 +331,49 @@ const OrderListTable = () => {
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
-          {/* TODO: implement disabling of the next and prev buttons when there is not more data and maybe even preloading tables */}
-          {/* TODO: return hasMore, hasPrev, total number of pages, current page e.t.c  */}
-          {/* TODO: implement loading indicator  */}
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
-                  }
-                  return prev - 1;
-                })
-              }
-              disabled={page == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {page}
+          {/* TABLE PAGINATION */}
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="space-x-2 flex items-center">
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() =>
+                  setPage((prev) => {
+                    if (prev <= 1) {
+                      return 1;
+                    }
+                    return prev - 1;
+                  })
+                }
+                disabled={page == 1}
+              >
+                <FiChevronsLeft />
+              </button>
+              <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                {page}
+              </div>
+              <button
+                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={isLast}
+              >
+                <FiChevronsRight />
+              </button>
             </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setPage((prev) => prev + 1)}
-              //   disabled={!table.getCanNextPage()}
-            >
-              <FiChevronsRight />
-            </button>
           </div>
+          {/* END TABLE PAGINATION */}
         </div>
-        {/* TODO: Implement showing from total rows */}
-        <div>
+        <div className="text-white">
           {orderListQuery.isFetching ? (
-            <LoadingMessage>Loading data</LoadingMessage>
-          ) : (
-            <div>Showing 1-10 of 1,253</div>
-          )}
+            <LoadingMessage>Loading order list..</LoadingMessage>
+          ) : page ? (
+            orderListData?.ordersCount ? (
+              <div>
+                Showing {page * 10 - 9}-
+                {isLast ? orderListData.ordersCount : page * 10} of{" "}
+                {orderListData.ordersCount}
+              </div>
+            ) : null
+          ) : null}
         </div>
       </div>
     </>
@@ -380,6 +419,7 @@ function FilterSelect({
         {items.map((item) => {
           return (
             <button
+              key={item.value}
               onClick={() => {
                 setSelectValue(item.value);
                 onSelect(item.value);

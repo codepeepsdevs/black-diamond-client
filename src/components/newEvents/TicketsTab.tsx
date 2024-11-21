@@ -35,6 +35,7 @@ import { CreateEventTicketTypeResponse } from "@/api/events/events.types";
 // import { useNewEventStore } from "@/store/new-event.store";
 import toast from "react-hot-toast";
 import * as dateFns from "date-fns";
+import * as dateFnsTz from "date-fns-tz";
 import { FormError } from "../shared/FormError";
 import {
   Popover,
@@ -42,6 +43,7 @@ import {
   PopoverPortal,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function TicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -117,7 +119,10 @@ export default function TicketsTab({ isActive }: { isActive: boolean }) {
                     <p className="">
                       On Sale · Ends{" "}
                       {dateFns.format(
-                        new Date(ticketType.endDate),
+                        dateFnsTz.toZonedTime(
+                          new Date(ticketType.endDate),
+                          newYorkTimeZone
+                        ),
                         "MMM d, yyyy 'at' h:mm a"
                       )}
                     </p>
@@ -262,14 +267,24 @@ function AddTicketDialog({ ...props }: ComponentProps<typeof Dialog>) {
     createEventTicketType({
       ...values,
       eventId: eventId || "",
-      startDate: dateFns.add(startDate, {
-        hours: startTimeHours,
-        minutes: startTimeMinutes,
-      }),
-      endDate: dateFns.add(endDate, {
-        hours: endTimeHours,
-        minutes: endTimeMinutes,
-      }),
+      startDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(startDate), {
+            hours: startTimeHours,
+            minutes: startTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
+      endDate: dateFnsTz
+        .fromZonedTime(
+          dateFns.add(dateFns.startOfDay(endDate), {
+            hours: endTimeHours,
+            minutes: endTimeMinutes,
+          }),
+          newYorkTimeZone
+        )
+        .toISOString(),
     });
   }
 

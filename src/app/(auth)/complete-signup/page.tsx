@@ -21,6 +21,7 @@ import { jwtDecode } from "jwt-decode";
 import { signupFormSchema } from "@/api/auth/auth.schema";
 import SuccessToast from "@/components/toast/SuccessToast";
 import { useCompleteSignup } from "@/api/auth/auth.queries";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
 
 const api = process.env.NEXT_PUBLIC_BACKEND_API as string;
 
@@ -30,6 +31,7 @@ const CompleteSignup = () => {
   const [tokenInfoDialogOpen, setTokenInfoDialogOpen] = useState(false);
 
   const router = useRouter();
+  const token = searchParams.get("token") || "";
 
   const form = useForm<Yup.InferType<typeof signupFormSchema>>({
     defaultValues: {
@@ -57,14 +59,14 @@ const CompleteSignup = () => {
   };
 
   const onSignupError = (error: any) => {
-    const errorMessage = error.response.data.message;
-    const descriptions = Array.isArray(errorMessage)
-      ? errorMessage
-      : [errorMessage];
+    const errorMessage = getApiErrorMessage(
+      error,
+      "Something went wrong while completing signup"
+    );
 
     ErrorToast({
       title: "Registration Failed",
-      descriptions,
+      descriptions: errorMessage,
     });
   };
 
@@ -75,11 +77,12 @@ const CompleteSignup = () => {
   } = useCompleteSignup(onSignupError, onSignupSuccess);
 
   const onSubmit = async (data: Yup.InferType<typeof signupFormSchema>) => {
-    const { agreeToTerms, ...rest } = data;
-    signup(rest);
+    const { agreeToTerms, email, ...rest } = data;
+    signup({
+      ...rest,
+      token,
+    });
   };
-
-  const token = searchParams.get("token") || "";
 
   useEffect(() => {
     try {
