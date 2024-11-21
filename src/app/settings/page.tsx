@@ -78,7 +78,6 @@ const AccountSettingsForm = () => {
   );
 
   function onSubmit(values: Yup.InferType<typeof accountFormSchema>) {
-    console.log("submitting");
     updateAccountSettings({
       address1: values.address.address1,
       address2: values.address.address2,

@@ -95,7 +95,6 @@ export default function EditDetailsTab({
     useUpdateEventDetails(onEditDetailsError, onEditDetailsSuccess);
 
   function onSubmit(values: Yup.InferType<typeof editEventDetailsSchema>) {
-    console.log("----------------------------");
     const [startTimeHours, startTimeMinutes] = values.startTime
       .split(":")
       .map((value) => Number(value));

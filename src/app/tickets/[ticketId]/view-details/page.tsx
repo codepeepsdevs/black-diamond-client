@@ -30,7 +30,6 @@ export default function ViewTicketDetailsPage() {
     params.ticketId
   );
   const orderDetails = data?.data;
-  console.log("View details: ", orderDetails);
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
 
   // useEffect(() => {

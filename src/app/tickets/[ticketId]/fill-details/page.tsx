@@ -69,8 +69,6 @@ export default function FillTicketDetailsPage() {
   const [useBuyersInfo, setUseBuyersInfo] = useState<boolean[]>([]);
 
   const orderDetails = data?.data;
-  console.log("Fill ticket details page: ", orderDetails);
-
   const {
     register,
     control,
