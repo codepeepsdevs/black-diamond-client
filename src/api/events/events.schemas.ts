@@ -84,7 +84,7 @@ export const newTicketFormSchema = Yup.object().shape({
   quantity: Yup.number().required("Ticket quantity is required"),
   price: Yup.number().required("Ticket price is required"),
   startDate: dateStringSchema.required("Start date is required"),
-  startTime: dateStringSchema.required("Start time is required"),
+  startTime: Yup.string().required("Start time is required"),
   endDate: dateStringSchema.required("End date is required"),
   endTime: Yup.string().required(),
 });

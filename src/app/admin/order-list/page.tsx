@@ -74,7 +74,7 @@ export default function OrderListPage() {
         {/* END TABLE ACTION BUTTONS */}
 
         {/* ORDER TABLE */}
-        <OrderListTable dateRange={date} />
+        <OrderListTable startDate={date?.from} endDate={date?.to} />
         {/* END ORDER TABLE */}
       </div>
     </section>

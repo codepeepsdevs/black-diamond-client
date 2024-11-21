@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -31,11 +31,14 @@ import { DatePickerWithRange } from "../shared/DatePickerWithRange";
 import { parseAsInteger, useQueryState, useQueryStates } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { DateRange } from "react-day-picker";
+import toast from "react-hot-toast";
 
 const OrderListTable = ({
-  dateRange,
+  startDate,
+  endDate,
 }: {
-  dateRange: DateRange | undefined;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 }) => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [eventFilter, setEventFilter] =
@@ -44,9 +47,24 @@ const OrderListTable = ({
     eventStatus: eventFilter,
     page,
     limit: 10,
-    ...dateRange,
+    startDate,
+    endDate,
   });
   const orderListData = orderListQuery.data?.data;
+
+  useEffect(() => {
+    let toastId;
+    if (!toastId && orderListQuery.isFetching) {
+      toastId = toast.loading("Order table data loading");
+    } else {
+      toast.dismiss(toastId);
+      toastId = null;
+    }
+
+    return () => {
+      toastId && toast.dismiss(toastId);
+    };
+  }, [orderListQuery.isFetching]);
 
   const isLast = orderListData?.orders
     ? page * 10 >= orderListData.ordersCount

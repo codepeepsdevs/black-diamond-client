@@ -28,8 +28,7 @@ export default function VerifyAccountDialog({
 
             <div className="flex flex-col justify-center items-center gap-2 sm:gap-3 mt-6">
               <p className="text-[#C0C0C0] text-sm sm:text-base text-center lg:text-xl">
-                We sent a link to {email} to activate your account and get your
-                tickets.{" "}
+                We sent a link to your email to activate your account.
               </p>
               <p className="text-[#C0C0C0] text-sm sm:text-base text-center lg:text-xl">
                 For your security, the link expires in 15 minutes.

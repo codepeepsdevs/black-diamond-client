@@ -33,7 +33,7 @@ const Careers = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <h2 className="font-ibmplexsans uppercase flex flex-col gap-y-1 w-full text-5xl sm:text-6xl font-bold text-white text-center bg-black mix-blend-multiply">
+          <h2 className="font-ibmplexsans uppercase flex flex-col md:flex-row gap-x-5 gap-y-1 w-full text-5xl sm:text-6xl font-bold text-white text-center bg-black mix-blend-multiply">
             <span>Become</span>
             <span>a</span>
             <span>promoter</span>

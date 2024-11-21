@@ -1,6 +1,6 @@
 import PartiesEvents from "./Parties.png";
-import FashionEvents from "./Fashon.png";
-import LivePerformanceEvents from "./LivePerformance.png";
+import FashionEvents from "./fashion.jpg";
+import LivePerformanceEvents from "./live-performance.png";
 import { StaticImageData } from "next/image";
 
 interface LangingPageEventProps {

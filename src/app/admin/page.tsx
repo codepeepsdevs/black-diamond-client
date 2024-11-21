@@ -6,13 +6,13 @@ import {
   useGetRevenue,
   useGetTicketsSoldStats,
 } from "@/api/order/order.queries";
-import { useGetUsers, useUsersStats } from "@/api/user/user.queries";
+import { useUsersStats } from "@/api/user/user.queries";
 import RecentOrdersTable from "@/components/dashboard/RecentOrders";
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
-import { addDays, subDays, subMonths } from "date-fns";
-import React, { useEffect } from "react";
-import { DateRange, DayPicker } from "react-day-picker";
-import toast from "react-hot-toast";
+import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
+import { subMonths } from "date-fns";
+import React from "react";
+import { DateRange } from "react-day-picker";
 import { VscTriangleDown, VscTriangleUp } from "react-icons/vsc";
 
 export default function AdminHomePage() {
@@ -21,24 +21,20 @@ export default function AdminHomePage() {
     to: new Date(),
   });
 
-  // const usersQuery = useGetUsers();
-  // const users = usersQuery.data?.data;
   const upcomingEventsQuery = useAdminGetEvents({
     eventStatus: "upcoming",
   });
   const upcomingEvents = upcomingEventsQuery.data?.data;
-  const ordersQuery = useGetOrders({
-    startDate: date?.from,
-    endDate: date?.to,
-  });
-  const orders = ordersQuery.data?.data;
   const revenueQuery = useGetRevenue({
     startDate: date?.from,
     endDate: date?.to,
   });
   const revenueData = revenueQuery.data?.data;
 
-  const ticketsSoldQuery = useGetTicketsSoldStats();
+  const ticketsSoldQuery = useGetTicketsSoldStats({
+    startDate: date?.from,
+    endDate: date?.to,
+  });
   const ticketsSoldData = ticketsSoldQuery.data?.data;
 
   const usersStatsQuery = useUsersStats({
@@ -53,7 +49,7 @@ export default function AdminHomePage() {
         <h1 className="text-3xl font-semibold text-white">Dashboard</h1>
         <p className="text-sm text-[#A3A7AA] mb-5">Welcome Liam</p>
 
-        <div className="flex justify-end">
+        <div className="flex gap-x-2 justify-end items-center">
           <DatePickerWithRange
             selected={date}
             onSelect={setDate}
@@ -75,7 +71,11 @@ export default function AdminHomePage() {
                 <span>Tickets sold</span>
               </div>
               <div className="text-white font-semibold text-6xl">
-                {ticketsSoldData?.ticketsSold || 0}
+                {ticketsSoldQuery.isFetching ? (
+                  <LoadingSvg />
+                ) : (
+                  <span>{ticketsSoldData?.ticketsSold || 0}</span>
+                )}
               </div>
             </div>
             {/* END TICKETS SOLD */}
@@ -91,7 +91,11 @@ export default function AdminHomePage() {
                 <span>Revenue</span>
               </div>
               <div className="text-white font-semibold text-6xl">
-                ${revenueData?.revenue || 0}
+                {revenueQuery.isFetching ? (
+                  <LoadingSvg />
+                ) : (
+                  <span>${revenueData?.revenue || 0}</span>
+                )}
               </div>
             </div>
             {/* END REVENUE */}
@@ -107,7 +111,11 @@ export default function AdminHomePage() {
                 <span>Total Users</span>
               </div>
               <div className="text-white font-semibold text-6xl">
-                {usersStats?.usersCount || 0}
+                {usersStatsQuery.isFetching ? (
+                  <LoadingSvg />
+                ) : (
+                  <span>{usersStats?.usersCount || 0}</span>
+                )}
               </div>
             </div>
             {/* END TOTAL USERS */}
@@ -119,7 +127,11 @@ export default function AdminHomePage() {
                 <span>Upcoming Events</span>
               </div>
               <div className="text-white font-semibold text-6xl">
-                {upcomingEvents?.eventsCount || 0}
+                {upcomingEventsQuery.isFetching ? (
+                  <LoadingSvg />
+                ) : (
+                  <span>{upcomingEvents?.eventsCount || 0}</span>
+                )}
               </div>
             </div>
             {/* END UPCOMING EVENTS */}
@@ -129,7 +141,7 @@ export default function AdminHomePage() {
 
         <div className="mt-12">
           <div className="text-xl font-medium text-white">Recent Order</div>
-          <RecentOrdersTable />
+          <RecentOrdersTable startDate={date?.from} endDate={date?.to} />
         </div>
       </div>
     </section>
