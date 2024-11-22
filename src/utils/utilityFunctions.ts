@@ -48,7 +48,7 @@ export function getTimeZoneDateRange(startDate: Date, endDate: Date) {
   const startDateNY = dateFnsTz.toZonedTime(startDate, newYorkTimeZone);
   const endDateNY = dateFnsTz.toZonedTime(endDate, newYorkTimeZone);
 
-  return `${dateFns.format(startDateNY, "EEEE, MMMM d · haaa")} - ${dateFnsTz.format(endDateNY, `h:mmaaa '${timeZoneAbbr}'`)}`;
+  return `${dateFns.format(startDateNY, "EEEE, MMMM d · h:mmaaa")} - ${dateFnsTz.format(endDateNY, `h:mmaaa '${timeZoneAbbr}'`)}`;
 }
 
 // export function getUTCDateTimeThroughPlain(date: Date, time: string){
