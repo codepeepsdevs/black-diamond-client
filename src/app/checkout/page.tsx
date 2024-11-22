@@ -239,7 +239,7 @@ function CheckoutForm() {
             <div className="text-sm space-y-4 my-8">
               {/* UPDATES CHECK */}
               <div className="flex items-center gap-x-5">
-                <Checkbox />
+                <Checkbox {...register("eventUpdates")} />
                 <p className="text-input-color">
                   Keep me updated on more events and news from Black Diamond
                   Entertainment.
@@ -248,13 +248,13 @@ function CheckoutForm() {
               {/* END UPDATES CHECK */}
 
               {/* PROMO EMAIL CHECK */}
-              <div className="flex items-center gap-x-5">
+              {/* <div className="flex items-center gap-x-5">
                 <Checkbox />
                 <p className="text-input-color">
                   Send me emails about the upcoming events and other promotional
                   contents.
                 </p>
-              </div>
+              </div> */}
               {/* END PROMO EMAIL CHECK */}
             </div>
 

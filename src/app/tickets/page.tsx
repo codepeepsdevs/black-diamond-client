@@ -93,6 +93,8 @@ export default function MyOrdersPage() {
               );
             })}
           </>
+        ) : upcomingEventOrders?.orderCount === 0 ? (
+          <div></div>
         ) : (
           upcomingEventOrders?.userOrders?.map((order, index) => (
             <UpcomingOrderCard order={order} key={index} />
@@ -160,6 +162,8 @@ export default function MyOrdersPage() {
               );
             })}
           </>
+        ) : pastEventOrders?.orderCount === 0 ? (
+          <div></div>
         ) : (
           pastEventOrders?.userOrders?.map((order, index) => (
             <PastOrderCard order={order} key={index} />
