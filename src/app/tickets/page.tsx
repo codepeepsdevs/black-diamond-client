@@ -20,8 +20,10 @@ import {
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
+import * as dateFnsTz from "date-fns-tz";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 import { CustomButton } from "@/components";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 const tabs = {
   UPCOMING_TICKETS: "upcoming-tickets",
@@ -297,8 +299,10 @@ function UpcomingOrderCard({ order }: { order: Order }) {
       <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
-          {dateFns
-            .format(order.event.startTime, "MMM d")
+          {dateFnsTz
+            .format(order.event.startTime, "MMM d", {
+              timeZone: newYorkTimeZone,
+            })
             .toUpperCase()
             .toUpperCase()
             .split(" ")
@@ -381,8 +385,10 @@ function PastOrderCard({ order }: { order: Order }) {
       <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
-          {dateFns
-            .format(order.event.startTime, "MMM d")
+          {dateFnsTz
+            .format(order.event.startTime, "MMM d", {
+              timeZone: newYorkTimeZone,
+            })
             .toUpperCase()
             .split(" ")
             .map((item) => (
