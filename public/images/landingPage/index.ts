@@ -21,7 +21,7 @@ export const landingPageEvents: LangingPageEventProps[] = [
     path: "fashion",
   },
   {
-    name: "Live performances",
+    name: "Live Performances",
     image: LivePerformanceEvents,
     path: "livePerformances",
   },

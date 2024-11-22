@@ -21,6 +21,7 @@ import {
 } from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
+import { CustomButton } from "@/components";
 
 const tabs = {
   UPCOMING_TICKETS: "upcoming-tickets",
@@ -28,6 +29,7 @@ const tabs = {
 } as const;
 
 export default function MyOrdersPage() {
+  const router = useRouter();
   const [ppage, setPPage] = useQueryState(
     "ppage",
     parseAsInteger.withDefault(1)
@@ -57,10 +59,12 @@ export default function MyOrdersPage() {
 
   return (
     <div className=" mb-20">
-      <h1 className="text-4xl font-medium text-white">My Ticket Orders</h1>
+      <h1 className="text-3xl 2xs:text-4xl font-medium text-white">
+        My Ticket Orders
+      </h1>
 
       {/* TAB CONTAINER */}
-      <div className="text-xl font-medium mt-8">
+      <div className="text-base 2xs:text-lg xs:text-xl font-medium mt-8">
         <button
           data-active={currentTab === "upcoming-tickets"}
           className="text-[#757575] py-3 px-4 data-[active=true]:text-white transition-colors data-[active=true]:border-b"
@@ -93,8 +97,25 @@ export default function MyOrdersPage() {
               );
             })}
           </>
-        ) : upcomingEventOrders?.orderCount === 0 ? (
-          <div></div>
+        ) : upcomingEventOrders?.userOrders?.length === 0 ? (
+          <div className="pt-6 2xs:pt-12 xs:pt-20  w-full flex flex-col gap-4 text-white justify-center items-center">
+            <div className="w-[85%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] text-center flex flex-col gap-2 justify-center items-center">
+              <h2 className="text-xl 2xs:text-2xl sm:text-3xl">
+                No Tickets Yet
+              </h2>
+              <p className="text-sm 2xs:text-base sm:text-lg">
+                Explore upcoming events and purchase your tickets. All your
+                purchased tickets will be displayed here.
+              </p>
+            </div>
+            <CustomButton
+              className="font-black py-3 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%]"
+              onClick={() => {
+                router.push("/events");
+              }}
+              content="EXPLORE EVENTS"
+            />
+          </div>
         ) : (
           upcomingEventOrders?.userOrders?.map((order, index) => (
             <UpcomingOrderCard order={order} key={index} />
@@ -102,37 +123,42 @@ export default function MyOrdersPage() {
         )}
 
         {/* UPCOMING TICKETS PAGINATION */}
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setUPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
+        {upcomingEventOrders?.userOrders &&
+          upcomingEventOrders.userOrders?.length > 0 && (
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="space-x-2 flex items-center">
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() =>
+                    setUPage((prev) => {
+                      if (prev <= 1) {
+                        return 1;
+                      }
+                      return prev - 1;
+                    })
                   }
-                  return prev - 1;
-                })
-              }
-              disabled={upage == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {upage}
+                  disabled={upage == 1}
+                >
+                  <FiChevronsLeft />
+                </button>
+                <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                  {upage}
+                </div>
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() => setUPage((prev) => prev + 1)}
+                  disabled={isUlast}
+                >
+                  <FiChevronsRight />
+                </button>
+              </div>
             </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setUPage((prev) => prev + 1)}
-              disabled={isUlast}
-            >
-              <FiChevronsRight />
-            </button>
-          </div>
-        </div>
+          )}
         <div className="text-white">
           {upcomingData.isFetching ? (
-            <LoadingMessage>Loading upcoming events tickets</LoadingMessage>
+            <>
+              {/* <LoadingMessage>Loading upcoming events tickets</LoadingMessage> */}
+            </>
           ) : upage ? (
             upcomingEventOrders?.orderCount ? (
               <div>
@@ -162,8 +188,24 @@ export default function MyOrdersPage() {
               );
             })}
           </>
-        ) : pastEventOrders?.orderCount === 0 ? (
-          <div></div>
+        ) : pastEventOrders?.userOrders?.length === 0 ? (
+          <div className="pt-6 2xs:pt-12 xs:pt-20  w-full flex flex-col gap-4 text-white justify-center items-center">
+            <div className="w-[85%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] text-center flex flex-col gap-2 justify-center items-center">
+              <h2 className="text-xl 2xs:text-2xl sm:text-3xl">
+                No Past Tickets
+              </h2>
+              <p className="text-sm 2xs:text-base sm:text-lg">
+                Your past events tickets will appear here
+              </p>
+            </div>
+            <CustomButton
+              className="font-black py-3 w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%]"
+              onClick={() => {
+                router.push("/events");
+              }}
+              content="EXPLORE PAST EVENTS"
+            />
+          </div>
         ) : (
           pastEventOrders?.userOrders?.map((order, index) => (
             <PastOrderCard order={order} key={index} />
@@ -171,37 +213,43 @@ export default function MyOrdersPage() {
         )}
 
         {/* PAST TICKETS PAGINATION */}
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setPPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
+        {pastEventOrders?.userOrders &&
+          pastEventOrders.userOrders?.length > 0 && ( // Use optional chaining here
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="space-x-2 flex items-center">
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() =>
+                    setPPage((prev) => {
+                      if (prev <= 1) {
+                        return 1;
+                      }
+                      return prev - 1;
+                    })
                   }
-                  return prev - 1;
-                })
-              }
-              disabled={ppage == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {ppage}
+                  disabled={ppage == 1}
+                >
+                  <FiChevronsLeft />
+                </button>
+                <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                  {ppage}
+                </div>
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() => setPPage((prev) => prev + 1)}
+                  disabled={isPlast}
+                >
+                  <FiChevronsRight />
+                </button>
+              </div>
             </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setPPage((prev) => prev + 1)}
-              disabled={isPlast}
-            >
-              <FiChevronsRight />
-            </button>
-          </div>
-        </div>
+          )}
         <div className="text-white">
           {pastData.isFetching ? (
-            <LoadingMessage>Loading past event tickets</LoadingMessage>
+            <>
+              {" "}
+              {/* <LoadingMessage>Loading past event tickets</LoadingMessage> */}
+            </>
           ) : ppage ? (
             pastEventOrders?.orderCount ? (
               <div>
