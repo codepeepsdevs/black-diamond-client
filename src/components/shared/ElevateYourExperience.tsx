@@ -58,8 +58,8 @@ export default function ElevateYourExperience() {
         <div className="flex flex-col gap-4">
           <div className="w-full lg:w-[95%] text-sm sm:text-base lg:text-lg leading-6 flex flex-col text-white">
             <span>
-              Welcome! Here, every event is a unique experience, designed to
-              unite, delight, and leave a lasting impression{" "}
+              Welcome to Black Diamond! Here, every event is a unique experience
+              designed to leave a lasting impression.
             </span>
             <TypeWriter
               options={{

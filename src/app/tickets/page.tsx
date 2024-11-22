@@ -326,6 +326,9 @@ function UpcomingOrderCard({ order }: { order: Order }) {
             {formatPurchaseDate(new Date(order.createdAt || Date.now()))} <br />
           </p>
           <div className="flex items-center gap-x-2">
+            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
+              {order.tickets.length}
+            </span>
             <Link
               href={`#`}
               onClick={handleLink}
@@ -333,9 +336,6 @@ function UpcomingOrderCard({ order }: { order: Order }) {
             >
               View Order Tickets
             </Link>
-            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
-              {order.tickets.length}
-            </span>
           </div>
         </div>
         {/* END DETAILS */}
@@ -409,6 +409,9 @@ function PastOrderCard({ order }: { order: Order }) {
             {formatPurchaseDate(new Date(order.createdAt || Date.now()))} <br />
           </p>
           <div className="flex items-center gap-x-2">
+            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
+              {order.tickets.length}
+            </span>{" "}
             <Link
               href={`#`}
               onClick={handleLink}
@@ -416,9 +419,6 @@ function PastOrderCard({ order }: { order: Order }) {
             >
               View Order Tickets
             </Link>
-            <span className="text-white bg-[#a3a7aa] px-1 rounded text-xs">
-              {order.tickets.length}
-            </span>
           </div>
         </div>
         {/* END DETAILS */}

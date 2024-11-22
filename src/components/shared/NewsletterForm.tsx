@@ -70,9 +70,7 @@ export default function NewsletterForm() {
       className="py-10 pb-20 flex flex-col items-center gap-8 text-white text-center text-sm"
     >
       <div className="w-[75%] md:w-[35%] lg:w-[25%] flex flex-col gap-2 leading-6">
-        <Link href="" className="underline font-normal">
-          SUBSCRIBE
-        </Link>
+        <div className="underline font-normal">SUBSCRIBE</div>
         <p>Subscribe to join our Black Diamond Newsletter</p>
       </div>
 
