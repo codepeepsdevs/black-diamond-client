@@ -233,7 +233,8 @@ const UpComingEventDetailPage = () => {
               <div className="text-white mb-8 text-xl font-bold">Tickets</div>
 
               {/* PROMO CODE INPUT */}
-              <div className="border-white border flex items-center p-3 mb-11">
+              {/* TODO: ENABLE PROMOCODE LATER */}
+              {/* <div className="border-white border flex items-center p-3 mb-11">
                 <input
                   value={promocode}
                   onChange={(e) => setPromocode(e.target.value)}
@@ -243,7 +244,7 @@ const UpComingEventDetailPage = () => {
                 <button onClick={() => getPromocode(promocode)}>
                   {getPromocodeIsPending ? "Applying.." : "Apply"}
                 </button>
-              </div>
+              </div> */}
               {/* END PROMO CODE INPUT */}
 
               <EventTickets />

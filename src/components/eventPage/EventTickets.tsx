@@ -4,6 +4,8 @@ import React from "react";
 import Image from "next/image";
 import { Add, Minus } from "../../../public/icons";
 import { useOrderStore } from "@/store/order.store";
+import { newYorkTimeZone } from "@/utils/date-formatter";
+import * as dateFnsTz from "date-fns-tz";
 
 const EventTickets = () => {
   const order = useOrderStore();
@@ -43,11 +45,11 @@ const EventTickets = () => {
             </p> */}
             <p className="text-sm">
               Sales end on{" "}
-              {new Date(order.event?.endTime!).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
+              {order.event?.endTime
+                ? dateFnsTz.format(order.event?.endTime, "MMM dd, yyyy", {
+                    timeZone: newYorkTimeZone,
+                  })
+                : "N/A"}
             </p>
           </div>
         );
