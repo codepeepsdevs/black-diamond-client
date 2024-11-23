@@ -6,6 +6,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import LoadingSkeleton from "./Loader/LoadingSkeleton";
 import EventCard from "./EventCard";
 import { useGetEvents } from "@/api/events/events.queries";
+import { cn } from "@/utils/cn";
+import UpcomingEventCard from "./UpcomingEventCard";
 
 export default function UpcomingEventsList() {
   const upcomingEventsQuery = useGetEvents({
@@ -21,7 +23,10 @@ export default function UpcomingEventsList() {
         <motion.div
           whileInView={{ opacity: [0, 1] }}
           transition={{ duration: 0.5, type: "tween" }}
-          className="w-full flex flex-col gap-4 pl-4 lg:pl-6"
+          className={cn(
+            "w-full flex flex-col gap-4 pl-4 lg:pl-6",
+            eventsCount === 1 && "px-4"
+          )}
         >
           <h2 className="text-base md:text-xl text-white font-semibold">
             Upcoming Events
@@ -47,10 +52,10 @@ export default function UpcomingEventsList() {
             autoplay={{
               disableOnInteraction: false,
             }}
-            slidesPerView={eventsCount === 1 ? 1 : 1.1}
+            slidesPerView={1}
             breakpoints={{
               480: {
-                slidesPerView: 1.8,
+                slidesPerView: 1.5,
               },
               768: {
                 slidesPerView: 2.2,
@@ -79,6 +84,25 @@ export default function UpcomingEventsList() {
               );
             })}
           </Swiper>
+
+          {/* <div className="flex">
+            {upcomingEventsData?.events.map((event, index) => {
+              return (
+                <UpcomingEventCard
+                  id={event.id}
+                  key={event.id}
+                  index={index}
+                  image={event.coverImage}
+                  title={event.name}
+                  ticketTypes={event.ticketTypes}
+                  startTime={new Date(event.startTime)}
+                  tab={"upcoming"}
+                  variant="landingPage"
+                  className=""
+                />
+              );
+            })}
+          </div> */}
         </motion.div>
       )}
     </>
