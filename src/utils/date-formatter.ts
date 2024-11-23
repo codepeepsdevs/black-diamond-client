@@ -53,19 +53,10 @@ export const newYorkTimeZone = "America/New_York";
 //   };
 // }
 
-function getOrdinalSuffix(day: number) {
-  if (day % 10 === 1 && day % 100 !== 11) return "ST";
-  if (day % 10 === 2 && day % 100 !== 12) return "ND";
-  if (day % 10 === 3 && day % 100 !== 13) return "RD";
-  return "TH";
-}
 export function getEventDateAndTime(date: Date) {
-  const day = dateFnsTz.format(date, "d", {
-    timeZone: newYorkTimeZone,
-  });
-  const ordinalSuffix = getOrdinalSuffix(parseInt(day));
+  const zonedTime = dateFnsTz.toZonedTime(date, newYorkTimeZone);
   const dateString = dateFnsTz
-    .format(date, `EEE, d'${ordinalSuffix}' MMM yyyy`)
+    .format(zonedTime, `EEE, do MMM yyyy`)
     .toUpperCase();
 
   const time = new Intl.DateTimeFormat("en-US", {

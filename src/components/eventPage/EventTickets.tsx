@@ -46,9 +46,13 @@ const EventTickets = () => {
             <p className="text-sm">
               Sales end on{" "}
               {order.event?.endTime
-                ? dateFnsTz.format(order.event?.endTime, "MMM dd, yyyy", {
-                    timeZone: newYorkTimeZone,
-                  })
+                ? dateFnsTz.format(
+                    dateFnsTz.toZonedTime(
+                      order.event?.endTime,
+                      newYorkTimeZone
+                    ),
+                    "MMM dd, yyyy"
+                  )
                 : "N/A"}
             </p>
           </div>
