@@ -42,6 +42,7 @@ import {
 import ErrorToast from "@/components/toast/ErrorToast";
 import SuccessToast from "@/components/toast/SuccessToast";
 import { ErrorResponse } from "@/constants/types";
+import Loading from "../loading";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
@@ -58,8 +59,6 @@ function CheckoutForm() {
   const router = useRouter();
   const [successDialogOpen, setSuccessDialogOpen] = useState<boolean>(false);
   const order = useOrderStore();
-  const setOrderId = useOrderStore((state) => state.setOrderId);
-  const [paymentPending, setPaymentPending] = useState(false);
   const [guestInfoDialogOpen, setGuestInfoDialogOpen] =
     useState<boolean>(false);
 
@@ -73,12 +72,12 @@ function CheckoutForm() {
       // Tell the user that they're not logged in and inform them to use their real email as their contact details..
       setGuestInfoDialogOpen(true);
     }
-  }, []);
 
-  if (!order.event?.id) {
-    router.push("/events");
-    return;
-  }
+    if (!order.event?.id) {
+      router.push("/events");
+      return;
+    }
+  }, []);
   const ticketsTotal =
     order.ticketOrders
       ?.map((ticketOrder) => {
@@ -192,6 +191,10 @@ function CheckoutForm() {
       successUrl: `${window.location.protocol}//${window.location.host}/tickets`,
       cancelUrl: `${window.location.protocol}//${window.location.host}/events`,
     } satisfies CheckoutData);
+  }
+
+  if (!order.event?.id) {
+    return <Loading />;
   }
 
   return (
