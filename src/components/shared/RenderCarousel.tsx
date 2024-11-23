@@ -34,6 +34,7 @@ const RenderCarousel: React.FC<RenderCarouselProps> = ({
         interval={5000}
         transitionTime={5000}
         showIndicators={false}
+        swipeable={false}
         renderArrowNext={(clickHandler, hasNext) =>
           hasNext && (
             <div
