@@ -51,9 +51,8 @@ const EventsPage = () => {
                 setActiveTab(item.value);
               }}
               className={classNames({
-                "cursor-pointer": true,
-                "border-b-2 border-white text-white pb-2 px-5":
-                  item.value == activeTab,
+                "cursor-pointer pb-2 px-5": true,
+                "border-b-2 border-white text-white": item.value == activeTab,
               })}
             >
               {item.label}
