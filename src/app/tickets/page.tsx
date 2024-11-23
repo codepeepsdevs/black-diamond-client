@@ -299,10 +299,11 @@ function UpcomingOrderCard({ order }: { order: Order }) {
       <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
-          {dateFnsTz
-            .format(order.event.startTime, "MMM d", {
-              timeZone: newYorkTimeZone,
-            })
+          {dateFns
+            .format(
+              dateFnsTz.toZonedTime(order.event.startTime, newYorkTimeZone),
+              "MMM d"
+            )
             .toUpperCase()
             .toUpperCase()
             .split(" ")
@@ -385,10 +386,11 @@ function PastOrderCard({ order }: { order: Order }) {
       <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
-          {dateFnsTz
-            .format(order.event.startTime, "MMM d", {
-              timeZone: newYorkTimeZone,
-            })
+          {dateFns
+            .format(
+              dateFnsTz.toZonedTime(order.event.startTime, newYorkTimeZone),
+              "MMM d"
+            )
             .toUpperCase()
             .split(" ")
             .map((item) => (

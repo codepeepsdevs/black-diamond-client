@@ -2,13 +2,8 @@ import React from "react";
 import Image from "next/image";
 import { Ticket, PastTicket, Calander, Clock } from "../../../public/icons";
 import classNames from "classnames";
-import { fadeIn } from "@/utils/hoc/motion";
 import { motion } from "framer-motion";
 import { Tilt } from "react-tilt";
-import { useRouter } from "next/navigation";
-import { Event, TicketType } from "@/constants/types";
-import { getEventDateAndTime } from "@/utils/date-formatter";
-import { useOrderStore } from "@/store/order.store";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
