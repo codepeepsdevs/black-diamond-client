@@ -1,11 +1,21 @@
 import { getEventDateAndTime } from "@/utils/date-formatter";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useParams } from "next/navigation";
-import { ComponentProps, useCallback } from "react";
+import { ComponentProps, useCallback, useRef } from "react";
 import Image from "next/image";
 import { FiX } from "react-icons/fi";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { appleWalletIcon, Calander, Clock, Logo } from "../../../public/icons";
+import "swiper/css";
+import "swiper/css/navigation";
+import { Swiper as SwiperType } from "swiper";
+import {
+  appleWalletIcon,
+  Calander,
+  Clock,
+  Logo,
+  Next,
+  Prev,
+} from "../../../public/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { Navigation } from "swiper/modules";
 import ShareTicketButton from "../buttons/ShareTicketButton";
@@ -27,6 +37,8 @@ export function DownloadTicketDialog({
   const { date, time } = getEventDateAndTime(
     new Date(orderDetails?.event.startTime || Date.now())
   );
+
+  const swiperRef = useRef<SwiperType>();
 
   return (
     <Dialog.Root {...props}>
@@ -53,12 +65,20 @@ export function DownloadTicketDialog({
               >
                 <FiX />
               </Dialog.DialogClose>
-              <Swiper slidesPerView={1} loop modules={[Navigation]}>
+
+              <Swiper
+                slidesPerView={1}
+                loop
+                modules={[Navigation]}
+                onBeforeInit={(swiper) => {
+                  swiperRef.current = swiper;
+                }}
+              >
                 {orderDetails?.tickets.map((ticket, index) => {
                   return (
                     <SwiperSlide
                       key={ticket.id}
-                      className="px-4 pt-8 pb-32 space-y-3"
+                      className="px-4 py-8 space-y-3"
                     >
                       {/* TICKET COUNT */}
                       <div className="font-bold p-1 max-w-fit mx-auto">
@@ -234,6 +254,26 @@ export function DownloadTicketDialog({
                   );
                 })}
               </Swiper>
+
+              <div className="flex gap-x-10 justify-center px-4 pb-16">
+                {/* PREV BUTTON */}
+                <button
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  className="z-10 cursor-pointer w-8 lg:w-10"
+                >
+                  <Image className="h-full " src={Prev} alt="prev" />
+                </button>
+                {/* END PREV BUTTON */}
+
+                {/* NEXT BUTTON */}
+                <button
+                  onClick={() => swiperRef.current?.slideNext()}
+                  className="z-10 cursor-pointer w-8 lg:w-10"
+                >
+                  <Image className="h-full " src={Next} alt="next" />
+                </button>
+                {/* END NEXT BUTTON */}
+              </div>
             </div>
           </Dialog.Content>
         </Dialog.Overlay>
