@@ -13,6 +13,7 @@ export default function UpcomingEventsList() {
     search: "",
   });
   const upcomingEventsData = upcomingEventsQuery.data?.data;
+  const eventsCount = upcomingEventsData?.eventsCount;
 
   return (
     <>
@@ -46,7 +47,7 @@ export default function UpcomingEventsList() {
             autoplay={{
               disableOnInteraction: false,
             }}
-            slidesPerView={1.1}
+            slidesPerView={eventsCount === 1 ? 1 : 1.1}
             breakpoints={{
               480: {
                 slidesPerView: 1.8,

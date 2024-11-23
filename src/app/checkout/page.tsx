@@ -59,19 +59,19 @@ function CheckoutForm() {
   const router = useRouter();
   const [successDialogOpen, setSuccessDialogOpen] = useState<boolean>(false);
   const order = useOrderStore();
-  const [guestInfoDialogOpen, setGuestInfoDialogOpen] =
-    useState<boolean>(false);
+  // const [guestInfoDialogOpen, setGuestInfoDialogOpen] =
+  //   useState<boolean>(false);
 
   const stripe = useStripe();
   const elements = useElements();
 
   useEffect(() => {
     // check if the user is logged in..
-    const token = Cookies.get("accessToken");
-    if (!token) {
-      // Tell the user that they're not logged in and inform them to use their real email as their contact details..
-      setGuestInfoDialogOpen(true);
-    }
+    // const token = Cookies.get("accessToken");
+    // if (!token) {
+    //   // Tell the user that they're not logged in and inform them to use their real email as their contact details..
+    //   setGuestInfoDialogOpen(true);
+    // }
 
     if (!order.event?.id) {
       router.push("/events");
@@ -472,11 +472,11 @@ function CheckoutForm() {
         onOpenChange={setSuccessDialogOpen}
       />
 
-      <GuestInfoDialog
+      {/* <GuestInfoDialog
         open={guestInfoDialogOpen}
         onOpenChange={setGuestInfoDialogOpen}
         defaultOpen
-      />
+      /> */}
     </section>
   );
 }
@@ -602,46 +602,46 @@ function CheckoutSuccessDialog({
   );
 }
 
-function GuestInfoDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
-  return (
-    <Dialog.Root {...props} modal={true}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
-          <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg">
-            <div className="bg-red-500 text-white size-24 mx-auto rounded-full grid place-items-center">
-              <MdGppBad className="text-4xl" />
-            </div>
+// function GuestInfoDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
+//   return (
+//     <Dialog.Root {...props} modal={true}>
+//       <Dialog.Portal>
+//         <Dialog.Overlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
+//           <Dialog.Content className="relative bg-[#333333] text-[#A3A7AA] p-6 mx-auto py-9 max-w-lg">
+//             <div className="bg-red-500 text-white size-24 mx-auto rounded-full grid place-items-center">
+//               <MdGppBad className="text-4xl" />
+//             </div>
 
-            <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
-              User not logged in
-            </div>
+//             <div className="text-white text-2xl lg:text-4xl font-medium text-center mt-16">
+//               User not logged in
+//             </div>
 
-            <div className="text-center my-6 space-y-4">
-              <p className="text-white text-base lg:text-xl">
-                It looks like you’re not logged in.
-              </p>
-              <p className="text-text-color text-sm lg:text-base">
-                If you already have an account, please use the email address
-                associated with that account to checkout.
-              </p>
-              <p className="text-text-color text-sm lg:text-base">
-                If you don’t have an account, please provide an email address to
-                associate to the checkout and for a new account.
-              </p>
-            </div>
+//             <div className="text-center my-6 space-y-4">
+//               <p className="text-white text-base lg:text-xl">
+//                 It looks like you’re not logged in.
+//               </p>
+//               <p className="text-text-color text-sm lg:text-base">
+//                 If you already have an account, please use the email address
+//                 associated with that account to checkout.
+//               </p>
+//               <p className="text-text-color text-sm lg:text-base">
+//                 If you don’t have an account, please provide an email address to
+//                 associate to the checkout and for a new account.
+//               </p>
+//             </div>
 
-            <div className="flex justify-center">
-              <AdminButton
-                variant="outline"
-                className=""
-                onClick={() => props.onOpenChange?.(false)}
-              >
-                Continue
-              </AdminButton>
-            </div>
-          </Dialog.Content>
-        </Dialog.Overlay>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
+//             <div className="flex justify-center">
+//               <AdminButton
+//                 variant="outline"
+//                 className=""
+//                 onClick={() => props.onOpenChange?.(false)}
+//               >
+//                 Continue
+//               </AdminButton>
+//             </div>
+//           </Dialog.Content>
+//         </Dialog.Overlay>
+//       </Dialog.Portal>
+//     </Dialog.Root>
+//   );
+// }
