@@ -6,6 +6,7 @@ import { Add, Minus } from "../../../public/icons";
 import { useOrderStore } from "@/store/order.store";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import * as dateFnsTz from "date-fns-tz";
+import cn from "classnames";
 
 const EventTickets = () => {
   const order = useOrderStore();
@@ -16,12 +17,23 @@ const EventTickets = () => {
         return (
           <div className="p-2 border-[#333333] border-b" key={ticketType.id}>
             <div className="flex justify-between items-center text-base">
-              <h3 className="text-white text-lg">{ticketType.name}</h3>
-              <div className="flex items-center gap-1">
+              <h3 className="flex items-center gap-1.5 text-white text-lg">
+                {ticketType.name}{" "}
+                <span className="text-red-500 text-sm">
+                  {ticketType.quantity < 1 ? "Sold Out" : null}
+                </span>
+              </h3>
+              <div
+                className={cn(" flex items-center gap-1", {
+                  // "blur-sm": ticketType.quantity < 1,
+                })}
+              >
                 <button
-                  onClick={() =>
-                    order.updateTicketOrders(ticketType.id, "decrement")
-                  }
+                  onClick={() => {
+                    if (ticketType.quantity > 0) {
+                      order.updateTicketOrders(ticketType.id, "decrement");
+                    }
+                  }}
                 >
                   <Image className="cursor-pointer" src={Minus} alt="minus" />
                 </button>
@@ -31,9 +43,11 @@ const EventTickets = () => {
                   )?.quantity || 0}
                 </div>
                 <button
-                  onClick={() =>
-                    order.updateTicketOrders(ticketType.id, "increment")
-                  }
+                  onClick={() => {
+                    if (ticketType.quantity > 0) {
+                      order.updateTicketOrders(ticketType.id, "increment");
+                    }
+                  }}
                 >
                   <Image className="cursor-pointer" src={Add} alt="add" />
                 </button>
@@ -43,7 +57,11 @@ const EventTickets = () => {
               ${ticketType.price} +{" "}
               <span className="text-sm">{ticketType.fee} Fee</span>
             </p> */}
-            <p className="text-sm">
+            <p
+              className={cn("text-sm", {
+                // "blur-sm": ticketType.quantity < 1,
+              })}
+            >
               Sales end on{" "}
               {order.event?.endTime
                 ? dateFnsTz.format(
