@@ -10,6 +10,7 @@ import {
   TicketTypeSalesResponse,
   GetUserOrders,
   FillTicketDetailsResponse,
+  GeneratePartyListData,
 } from "./order.types";
 import {
   DateRangeData,
@@ -115,6 +116,49 @@ export const generateOrderReport = async (range?: DateRangeData) => {
   // Extract the filename from the Content-Disposition header
   const disposition = response.headers["content-disposition"];
   let filename = "Order_Report"; // Fallback filename
+
+  if (disposition && disposition.includes("filename=")) {
+    const matches = disposition.match(/filename="?([^"]+)"?/);
+    if (matches && matches[1]) {
+      filename = matches[1];
+    }
+  }
+
+  // Step 1: Create a blob from the response
+  const blob = new Blob([response.data], { type: response.data.type });
+
+  // Step 2: Create a download URL for the blob
+  const downloadUrl = window.URL.createObjectURL(blob);
+
+  // Step 3: Create a temporary link element
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = filename;
+
+  // Step 4: Trigger the download
+  document.body.appendChild(link);
+  link.click();
+
+  // Step 5: Clean up
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(downloadUrl);
+};
+
+export const generatePartyList = async (dto: GeneratePartyListData) => {
+  const response = await request({
+    url: `/orders/generate-party-list`,
+    method: "post",
+    headers: {
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    },
+    data: dto,
+    responseType: "blob",
+  });
+
+  // Extract the filename from the Content-Disposition header
+  const disposition = response.headers["content-disposition"];
+  let filename = "Party_List"; // Fallback filename
 
   if (disposition && disposition.includes("filename=")) {
     const matches = disposition.match(/filename="?([^"]+)"?/);

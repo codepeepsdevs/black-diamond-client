@@ -17,6 +17,7 @@ import {
   checkPaymentStatus,
   fillTicketDetails,
   generateOrderReport,
+  generatePartyList,
   getOrderDetails,
   getOrders,
   getRevenue,
@@ -30,6 +31,7 @@ import {
   AssignGuestOrderData,
   AssignGuestOrderResponse,
   FillTicketDetailsResponse,
+  GeneratePartyListData,
   GetOrders,
   GetRevenueData,
   GetRevenueResponse,
@@ -157,6 +159,18 @@ export const useGenerateOrderReport = (
   return useMutation<void, AxiosError<Error>, DateRangeData>({
     mutationKey: [`generate-order-report`],
     mutationFn: generateOrderReport,
+    onError,
+    onSuccess,
+  });
+};
+
+export const useGeneratePartyList = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: () => void
+) => {
+  return useMutation<void, AxiosError<Error>, GeneratePartyListData>({
+    mutationKey: [`generate-party-list`],
+    mutationFn: generatePartyList,
     onError,
     onSuccess,
   });
