@@ -1,7 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import TicketsIcon from "./TicketIcon";
-import { FiDownload, FiUpload, FiUser } from "react-icons/fi";
+import { FiBookOpen, FiDownload, FiUpload, FiUser } from "react-icons/fi";
 import { VscTriangleDown } from "react-icons/vsc";
 import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
@@ -15,11 +15,20 @@ import {
 } from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
 import {
+  getApiErrorMessage,
   getLowestTicket,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
-import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import {
+  useGeneratePartyList,
+  useGetTicketTypeSales,
+} from "@/api/order/order.queries";
 import AdminButton from "../buttons/AdminButton";
+import ErrorToast from "../toast/ErrorToast";
+import SuccessToast from "../toast/SuccessToast";
+import { AxiosError } from "axios";
+import { ErrorResponse } from "@/constants/types";
+import LoadingSvg from "../shared/Loader/LoadingSvg";
 
 export default function EditEventDetailsDashboard({
   isActive,
@@ -33,6 +42,23 @@ export default function EditEventDetailsDashboard({
     usePublishEvent(eventId);
   const { mutate: unpublishEvent, isPending: unpublishEventPending } =
     useUnpublishEvent(eventId);
+
+  const onError = (e: AxiosError<ErrorResponse>) => {
+    const errorMessage = getApiErrorMessage(e, "Error generating order report");
+    ErrorToast({
+      title: "Error",
+      descriptions: errorMessage,
+    });
+  };
+
+  const onSuccess = () => {
+    SuccessToast({
+      title: "Success",
+      description: "Order report generated successfully",
+    });
+  };
+  const { mutate: generatePartyList, isPending: generatePartyListPending } =
+    useGeneratePartyList(onError, onSuccess);
 
   const eventQuery = useGetEvent(eventId);
   const event = eventQuery.data?.data;
@@ -78,7 +104,7 @@ export default function EditEventDetailsDashboard({
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
       {/* ACTION BUTTONS */}
-      <div className="flex items-center justify-end mt-12">
+      <div className="flex items-center justify-end mt-12 gap-x-4">
         {event?.isPublished ? (
           <AdminButton
             disabled={unpublishEventPending}
@@ -86,7 +112,8 @@ export default function EditEventDetailsDashboard({
             variant="primary"
             className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
           >
-            <FiDownload /> <span>Unpublish</span>
+            {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
+            <span>Unpublish</span>
           </AdminButton>
         ) : (
           <AdminButton
@@ -95,9 +122,24 @@ export default function EditEventDetailsDashboard({
             variant="primary"
             className="flex items-center gap-2 disabled:opacity-50"
           >
-            <FiUpload /> <span>Publish</span>
+            {publishEventPending ? <LoadingSvg /> : <FiUpload />}
+            <span>Publish</span>
           </AdminButton>
         )}
+
+        <AdminButton
+          disabled={generatePartyListPending}
+          onClick={() =>
+            generatePartyList({
+              eventId,
+            })
+          }
+          variant="primary"
+          className="flex items-center gap-2 disabled:opacity-50"
+        >
+          {generatePartyListPending ? <LoadingSvg /> : <FiBookOpen />}
+          <span>Party List</span>
+        </AdminButton>
       </div>
       {/* END ACTION BUTTONS */}
       <div className="bg-[#151515] overflow-y-auto mt-12">

@@ -20,6 +20,7 @@ import {
 import * as dateFns from "date-fns";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
 import AdminButton from "../buttons/AdminButton";
+import LoadingSvg from "../shared/Loader/LoadingSvg";
 
 export default function EventDetailsDashboard({
   isActive,
@@ -88,7 +89,8 @@ export default function EventDetailsDashboard({
             variant="primary"
             className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
           >
-            <FiDownload /> <span>Unpublish</span>
+            {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
+            <span>Unpublish</span>
           </AdminButton>
         ) : (
           <AdminButton
@@ -97,7 +99,8 @@ export default function EventDetailsDashboard({
             variant="primary"
             className="flex items-center gap-2 disabled:opacity-50"
           >
-            <FiUpload /> <span>Publish</span>
+            {publishEventPending ? <LoadingSvg /> : <FiUpload />}{" "}
+            <span>Publish</span>
           </AdminButton>
         )}
       </div>

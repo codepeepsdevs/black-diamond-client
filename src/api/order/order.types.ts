@@ -48,3 +48,7 @@ export type FillTicketDetailsResponse = {
   message: string;
   orderId: string;
 };
+
+export type GeneratePartyListData = {
+  eventId: string;
+};
