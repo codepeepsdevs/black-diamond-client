@@ -296,7 +296,7 @@ function UpcomingOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-40 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
@@ -383,7 +383,7 @@ function PastOrderCard({ order }: { order: Order }) {
   };
   return (
     <div className="relative overflow-hidden text-sm md:text-base max-w-4xl">
-      <div className="border border-input-color flex gap-3 md:gap-5 h-44 md:h-60">
+      <div className="border border-input-color flex gap-3 md:gap-5 h-40 md:h-60">
         {/* DATE */}
         <div className="my-4 text-center text-sm md:text-2xl space-y-2 pl-4">
           {dateFns
