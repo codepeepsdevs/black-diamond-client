@@ -27,10 +27,8 @@ import { ExtendedOrder, useGetOrders } from "@/api/order/order.queries";
 import { FaSort, FaSortDown } from "react-icons/fa6";
 import * as dateFns from "date-fns";
 import { cn } from "@/utils/cn";
-import { DatePickerWithRange } from "../shared/DatePickerWithRange";
 import { parseAsInteger, useQueryState, useQueryStates } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
-import { DateRange } from "react-day-picker";
 import toast from "react-hot-toast";
 
 const OrderListTable = ({
@@ -127,6 +125,16 @@ const OrderListTable = ({
         cell: ({ row }) => (
           <div className="capitalize">{row.original.event.name}</div>
         ),
+      },
+      {
+        id: "orderId",
+        header: () => (
+          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
+            <span>Order ID</span>
+            <FaSort className="text-xs" />
+          </div>
+        ),
+        cell: ({ row }) => <div className="capitalize">{row.original.id}</div>,
       },
       {
         id: "customerName",
