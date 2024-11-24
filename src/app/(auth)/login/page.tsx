@@ -107,7 +107,10 @@ const Login = () => {
   } = useLogin(onLoginError, onLoginSuccess);
 
   const onSubmit = async (data: Yup.InferType<typeof loginFormSchema>) => {
-    login(data);
+    login({
+      email: data.email.toLowerCase(),
+      password: data.password,
+    });
   };
 
   const googleLoginAction = async () => {
