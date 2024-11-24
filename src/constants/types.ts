@@ -258,3 +258,9 @@ export type TicketCount = {
     tickets: number;
   };
 };
+
+export type ExtendNested<T, K extends keyof T, V> = {
+  [P in keyof T]: P extends K
+    ? T[P] & V // Extend the nested type
+    : T[P];
+};

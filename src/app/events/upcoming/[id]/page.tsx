@@ -59,6 +59,7 @@ const UpComingEventDetailPage = () => {
           ticketTypeId: ticketType.id,
           quantity: 0,
           price: ticketType.price,
+          soldQuantity: ticketType.soldQuantity,
         })),
         addonOrders: eventAddonsQuery.data?.data.map((addon) => ({
           addonId: addon.id,

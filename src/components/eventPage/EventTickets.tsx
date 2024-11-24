@@ -14,13 +14,20 @@ const EventTickets = () => {
   return (
     <div className=" bg-[#151515] border border-[#333333] text-[#A3A7AA]">
       {order.event?.ticketTypes.map((ticketType) => {
+        const soldQuantity = order.ticketOrders?.find(
+          (ticketOrder) => ticketOrder.ticketTypeId === ticketType.id
+        )?.soldQuantity;
+        let soldOut = false;
+        if (soldQuantity != undefined) {
+          soldOut = soldQuantity >= ticketType.quantity;
+        }
         return (
           <div className="p-2 border-[#333333] border-b" key={ticketType.id}>
             <div className="flex justify-between items-center text-base">
               <h3 className="flex items-center gap-1.5 text-white text-lg">
                 {ticketType.name}{" "}
                 <span className="text-red-500 text-sm">
-                  {ticketType.quantity < 1 ? "Sold Out" : null}
+                  {soldOut ? "Sold Out" : null}
                 </span>
               </h3>
               <div
@@ -29,11 +36,11 @@ const EventTickets = () => {
                 })}
               >
                 <button
+                  disabled={soldOut}
                   onClick={() => {
-                    if (ticketType.quantity > 0) {
-                      order.updateTicketOrders(ticketType.id, "decrement");
-                    }
+                    order.updateTicketOrders(ticketType.id, "decrement");
                   }}
+                  className="disabled:opacity-50"
                 >
                   <Image className="cursor-pointer" src={Minus} alt="minus" />
                 </button>
@@ -43,11 +50,11 @@ const EventTickets = () => {
                   )?.quantity || 0}
                 </div>
                 <button
+                  disabled={soldOut}
                   onClick={() => {
-                    if (ticketType.quantity > 0) {
-                      order.updateTicketOrders(ticketType.id, "increment");
-                    }
+                    order.updateTicketOrders(ticketType.id, "increment");
                   }}
+                  className="disabled:opacity-50"
                 >
                   <Image className="cursor-pointer" src={Add} alt="add" />
                 </button>
