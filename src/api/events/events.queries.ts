@@ -22,6 +22,7 @@ import {
   removeImageFromSlide,
   publishEvent,
   unpublishEvent,
+  EventWithSoldQuantity,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -95,7 +96,7 @@ export const useAdminGetEvents = (options: OptionProps) => {
 };
 
 export const useGetEvent = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<Event & EventStatus>>({
+  return useQuery<AxiosResponse<EventWithSoldQuantity>>({
     queryKey: ["get-event", eventId],
     queryFn: () => getEvent(eventId),
     // enabled: false,

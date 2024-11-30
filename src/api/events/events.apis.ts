@@ -2,6 +2,7 @@ import {
   AddOn,
   Event,
   EventStatus,
+  ExtendNested,
   OptionProps,
   // PageData,
   PromoCode,
@@ -65,8 +66,14 @@ export const adminGetEvents = async (options: OptionProps) => {
   });
 };
 
+export type EventWithSoldQuantity = Omit<Event, "ticketTypes"> &
+  EventStatus & {
+    ticketTypes: (TicketType & {
+      soldQuantity: number;
+    })[];
+  };
 export const getEvent = async (eventId: Event["id"]) => {
-  return await request<Event & EventStatus>({
+  return await request<EventWithSoldQuantity>({
     url: `/events/get-event/${eventId}`,
     method: "get",
   });

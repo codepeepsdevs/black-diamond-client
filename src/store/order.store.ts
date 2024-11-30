@@ -11,6 +11,7 @@ export interface OrderStates {
         ticketTypeId: string;
         quantity: number;
         price: number;
+        soldQuantity: number;
       }[]
     | null;
   addonOrders?:
