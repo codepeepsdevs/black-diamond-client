@@ -153,6 +153,12 @@ export type Ticket = ITicketDetail & {
 //   quantity: number;
 // };
 
+export type TicketTypeVisibility =
+  | "VISIBLE"
+  | "HIDDEN"
+  | "HIDDEN_WHEN_NOT_ON_SALE"
+  | "CUSTOM_SCHEDULE";
+
 export interface TicketType {
   id: string; // MongoDB ObjectId stored as a string
   name: string; // Ticket type name (e.g., VVIP)
@@ -165,6 +171,9 @@ export interface TicketType {
   createdAt: string; // ISO 8601 Date string for creation date
   updatedAt: string; // ISO 8601 Date string for last update date
   promoCodes: PromoCode[];
+  minQty: number;
+  maxQty: number;
+  visibility: TicketTypeVisibility;
 }
 
 export interface AddOn {

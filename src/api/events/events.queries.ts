@@ -43,6 +43,8 @@ import {
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
+  GetPromocodeResponse,
+  GetPromocodesResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -117,7 +119,10 @@ export const useGetEventTicketTypes = (eventId: Event["id"]) => {
 };
 
 export const useGetPromocodes = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<PromoCode[]>, AxiosError<ErrorResponse>>({
+  return useQuery<
+    AxiosResponse<GetPromocodesResponse>,
+    AxiosError<ErrorResponse>
+  >({
     queryKey: ["get-event-promocode", eventId],
     queryFn: () => getEventPromocodes(eventId),
     // enabled: false,
@@ -136,7 +141,7 @@ export const useGetAddons = (eventId: Event["id"]) => {
 
 export const useGetPromocode = (
   onError: (error: AxiosError<Error>) => void,
-  onSuccess: (data: AxiosResponse<PromoCode>) => void
+  onSuccess: (data: AxiosResponse<GetPromocodeResponse>) => void
 ) => {
   return useMutation({
     mutationFn: getPromocode,

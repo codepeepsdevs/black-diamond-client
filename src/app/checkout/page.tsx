@@ -107,7 +107,7 @@ function CheckoutForm() {
     resolver: yupResolver(checkoutFormSchema),
     defaultValues: {
       paymentMethod: "creditCard",
-      promotionalEmails: false,
+      // promotionalEmails: false,
       eventUpdates: false,
     },
   });

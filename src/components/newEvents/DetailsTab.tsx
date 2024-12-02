@@ -31,6 +31,9 @@ import { parseAsString, useQueryState } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { fromZonedTime } from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { Swiper, SwiperSlide } from "swiper/react";
+import Image from "next/image";
+import { FiTrash2 } from "react-icons/fi";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -51,6 +54,8 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     "tab",
     parseAsString.withDefault("details")
   );
+
+  const [imagesPreview, setImagesPreview] = useState<string[] | null>([]);
 
   // const setEventId = useNewEventStore((state) => state.setEventId);
   const [eventId, setEventId] = useQueryState(
@@ -116,6 +121,16 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     });
   }
 
+  const watchedImages = watch("images");
+  const removeImage = (index: number) => {
+    const newImages = watchedImages?.filter((_, i) => i !== index);
+    setValue("images", newImages);
+    setImagesPreview((prevImages) => {
+      const images = prevImages?.filter((_, i) => i !== index);
+      return images || null;
+    });
+  };
+
   const watchedLocationType = watch("locationType");
 
   return (
@@ -142,7 +157,38 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
             onSelectFile={(files) => {
               setValue("images", files);
             }}
+            imagesPreview={imagesPreview}
+            setImagesPreview={setImagesPreview}
           />
+          <Swiper
+            slidesPerView={"auto"}
+            spaceBetween={10}
+            className="[&_.swiper-slide]:w-36 [&_.swiper-slide]:h-32 mt-5 border border-[#121212]"
+          >
+            {imagesPreview?.map((image, index) => {
+              return (
+                <SwiperSlide key={image}>
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={image}
+                      width={150}
+                      height={150}
+                      alt="Slide Image"
+                      sizes=""
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+                      onClick={() => removeImage(index)}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
         </div>
         {/* END UPLOAD IMAGES SECTION */}
 

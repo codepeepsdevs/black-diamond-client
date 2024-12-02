@@ -30,9 +30,8 @@ export type CreateEventDetailsResponse = Event;
 
 export type UpdateEventDetailsResponse = Event;
 
-export type CreateEventTicketTypeData = Omit<
-  Yup.InferType<typeof newTicketFormSchema>,
-  "startTime" | "endTime"
+export type CreateEventTicketTypeData = Yup.InferType<
+  typeof newTicketFormSchema
 > & {
   eventId: Event["id"];
 };
@@ -50,6 +49,15 @@ export type CreateEventPromocodeData = Yup.InferType<
 >;
 
 export type CreateEventPromocodeResponse = PromoCode;
+
+export type GetPromocodesResponse = (PromoCode & {
+  isActive: boolean;
+  used: number;
+})[];
+
+export type GetPromocodeResponse = PromoCode & {
+  isActive: boolean;
+};
 
 export type UpdateTicketTypeResponse = TicketType;
 

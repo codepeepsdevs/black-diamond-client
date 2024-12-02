@@ -46,7 +46,7 @@ export const checkoutFormSchema = Yup.object().shape({
   // }),
 
   eventUpdates: Yup.boolean(),
-  promotionalEmails: Yup.boolean(),
+  // promotionalEmails: Yup.boolean(),
 });
 
 export const newEventSchema = Yup.object().shape({
@@ -57,8 +57,20 @@ export const newEventSchema = Yup.object().shape({
   endTime: Yup.string().required(),
   location: Yup.string().required(),
   refundPolicy: Yup.string().required(),
-  images: Yup.mixed<File[]>(),
-  coverImage: Yup.mixed<File>(),
+  images: Yup.mixed<File[]>().test(
+    "imagesRequired",
+    "Image slides is required",
+    (value) => {
+      return !value || value?.length < 1;
+    }
+  ),
+  coverImage: Yup.mixed<File>().test(
+    "coverImageRequired",
+    "Cover image is required",
+    (value) => {
+      return !value;
+    }
+  ),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),
@@ -72,8 +84,20 @@ export const editEventDetailsSchema = Yup.object().shape({
   endTime: Yup.string().required(),
   location: Yup.string().required(),
   refundPolicy: Yup.string().required(),
-  images: Yup.mixed<File[]>(),
-  coverImage: Yup.mixed<File>(),
+  images: Yup.mixed<File[]>().test(
+    "imagesRequired",
+    "Image slides is required",
+    (value) => {
+      return !value || value?.length < 1;
+    }
+  ),
+  coverImage: Yup.mixed<File>().test(
+    "coverImageRequired",
+    "Cover image is required",
+    (value) => {
+      return !value;
+    }
+  ),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),
@@ -81,18 +105,47 @@ export const editEventDetailsSchema = Yup.object().shape({
 
 export const newTicketFormSchema = Yup.object().shape({
   name: Yup.string().required("Ticket name is required"),
-  quantity: Yup.number().required("Ticket quantity is required"),
-  price: Yup.number().required("Ticket price is required"),
+  quantity: Yup.number()
+    .typeError("Please enter a number")
+    .required("Ticket quantity is required"),
+  price: Yup.number()
+    .typeError("Please enter a number")
+    .required("Ticket price is required"),
   startDate: dateStringSchema.required("Start date is required"),
   startTime: Yup.string().required("Start time is required"),
   endDate: dateStringSchema.required("End date is required"),
-  endTime: Yup.string().required(),
+  endTime: Yup.string().required("End time is required"),
+  visibility: Yup.string()
+    .oneOf(["VISIBLE", "HIDDEN", "HIDDEN_WHEN_NOT_ON_SALE", "CUSTOM_SCHEDULE"])
+    .default("VISIBLE"),
+  minQty: Yup.number()
+    .typeError("Please enter a number")
+    .min(1, "Please enter a minimum of 1")
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .optional()
+    .nullable()
+    .default(1),
+  maxQty: Yup.number()
+    .typeError("Please enter a number")
+    .min(1, "Please enter a minimum of 1")
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .optional()
+    .nullable()
+    .default(undefined),
 });
 
 export const editTicketFormSchema = Yup.object().shape({
   name: Yup.string().required("Ticket name is required"),
-  quantity: Yup.number().required("Ticket quantity is required"),
-  price: Yup.number().required("Ticket price is required"),
+  quantity: Yup.number()
+    .typeError("Please enter a number")
+    .required("Ticket quantity is required"),
+  price: Yup.number()
+    .typeError("Please enter a number")
+    .required("Ticket price is required"),
   startDate: Yup.string()
     // .typeError("Please provide a valid date")
     .required("Start date is required"),
@@ -100,7 +153,30 @@ export const editTicketFormSchema = Yup.object().shape({
     // .typeError("Please provide a valid date")
     .required("Start time is required"),
   endDate: Yup.string().required("End date is required"),
-  endTime: Yup.string().required(),
+  endTime: Yup.string().required("End time is required"),
+  visibility: Yup.string()
+    .oneOf(["VISIBLE", "HIDDEN", "HIDDEN_WHEN_NOT_ON_SALE", "CUSTOM_SCHEDULE"])
+    .default("VISIBLE"),
+  minQty: Yup.number()
+    .integer("Enter a whole number")
+    .typeError("Please enter a number")
+    .min(1, "Please enter a minimum of 1")
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .optional()
+    .nullable()
+    .default(1),
+  maxQty: Yup.number()
+    .integer("Enter a whole number")
+    .typeError("Please enter a number")
+    .min(1, "Please enter a minimum of 1s")
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    )
+    .optional()
+    .nullable()
+    .default(undefined),
 });
 
 // Define the Yup schema
@@ -169,40 +245,58 @@ export const newAddOnSchema = Yup.object().shape({
   willCall: Yup.boolean(),
 });
 
-export const newPromocodeFormSchema = Yup.object()
-  .shape({
-    name: Yup.string().required("Ticket name is required"),
-    key: Yup.string().required("Code key is required"),
-    limit: Yup.number().required("Quantity to apply to is required"),
-    absoluteDiscountAmount: Yup.number()
-      // .transform((value, originalValue) =>
-      //   originalValue.trim() === "" ? null : value
-      // )
-      .nullable() // TODO: apply logic to prevent the user from submitting both mutually exclusive fields or inform them if they do
-      .typeError("Must be a number"),
-    percentageDiscountAmount: Yup.number()
-      // .transform((value, originalValue) =>
-      //   originalValue.trim() === "" ? null : value
-      // )
-      .nullable()
-      .typeError("Must be a number"),
-    startDate: dateStringSchema.required("Start date is required"),
-    startTime: Yup.string().required("Start time is required"),
-    endDate: dateStringSchema.required("End date is required"),
-    endTime: Yup.string().required(),
-    // applyTo: Yup.string().oneOf(["all-visible", "certain-visible"]),
-    applyToTicketIds: Yup.array()
-      .of(Yup.string().required("TicketId must be a string"))
-      .min(1, "Please select at least one ticket")
-      .required("Tickets to apply code to is required"),
-  })
-  .test(
-    "percentage-or-absolute",
-    "You must provide either an absolute or a percentage discount amount",
-    function (value) {
-      return !!(value.absoluteDiscountAmount || value.percentageDiscountAmount);
-    }
-  );
+export const newPromocodeFormSchema = Yup.object().shape({
+  name: Yup.string().required("Ticket name is required"),
+  key: Yup.string().required("Code key is required"),
+  limit: Yup.number()
+    .required("Quantity to apply to is required")
+    .typeError("Must be a number"),
+  absoluteDiscountAmount: Yup.number()
+    .integer()
+    .nullable()
+    .optional()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    ),
+  // .typeError("Must be a number"),
+  percentageDiscountAmount: Yup.number()
+    .integer()
+    .max(100)
+    .nullable()
+    .optional()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : value
+    ),
+  // .typeError("Must be a number"),
+  startDate: dateStringSchema.required("Start date is required"),
+  startTime: Yup.string().required("Start time is required"),
+  endDate: dateStringSchema.required("End date is required"),
+  endTime: Yup.string().required("End time is required"),
+  applyToTicketIds: Yup.array()
+    .of(Yup.string().required("TicketId must be a string"))
+    .min(1, "Please select at least one ticket")
+    .required("Tickets to apply code to is required"),
+});
+// .test(
+//   "exclusive-discount",
+//   "You must provide either an absolute or a percentage discount amount, but not both",
+//   function (value) {
+//     const { absoluteDiscountAmount, percentageDiscountAmount } = value || {};
+//     const hasAbsolute =
+//       absoluteDiscountAmount !== null && absoluteDiscountAmount !== undefined ;
+//     const hasPercentage =
+//       percentageDiscountAmount !== null &&
+//       percentageDiscountAmount !== undefined;
+
+//     console.table({
+//       testPassed:
+//         !(hasAbsolute && hasPercentage) && (hasAbsolute || hasPercentage),
+//     });
+
+//     // Ensure only one is set
+//     return !(hasAbsolute && hasPercentage) && (hasAbsolute || hasPercentage);
+//   }
+// );
 
 export const updateEventTicketTypeSchema = Yup.object().shape({
   displayTicketsRemainder: Yup.boolean(),

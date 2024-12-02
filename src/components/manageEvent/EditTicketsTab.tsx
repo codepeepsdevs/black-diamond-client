@@ -15,7 +15,12 @@ import Input from "../shared/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import IconInputField from "../shared/IconInputField";
-import { FaDollarSign, FaRegCalendar, FaRegClock } from "react-icons/fa6";
+import {
+  FaCheck,
+  FaDollarSign,
+  FaRegCalendar,
+  FaRegClock,
+} from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import {
   editTicketFormSchema,
@@ -32,7 +37,7 @@ import {
   useUpdateTicketType,
 } from "@/api/events/events.queries";
 import { AxiosError, AxiosResponse } from "axios";
-import { ErrorResponse } from "@/constants/types";
+import { ErrorResponse, TicketTypeVisibility } from "@/constants/types";
 import {
   CreateEventTicketTypeResponse,
   UpdateTicketTypeResponse,
@@ -55,6 +60,8 @@ import SuccessToast from "../toast/SuccessToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 import { useGetTicketTypeSales } from "@/api/order/order.queries";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { SelectVisibilityDropDown } from "../newEvents/TicketTypeVisibility";
+import { NewTicketDialog } from "../shared/NewTicketDialog";
 
 export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -124,14 +131,11 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
           quantity: Number(ticketToEdit.quantity),
           startDate: dateFns.format(zonedStartDate, "yyyy-MM-dd"),
           startTime: dateFns.format(zonedStartDate, "HH:mm"),
-          // new Date(ticketToEdit.startDate || Date.now())
-          //   .toTimeString()
-          //   .slice(0, 5),
           endDate: dateFns.format(zonedEndDate, "yyyy-MM-dd"),
           endTime: dateFns.format(zonedEndDate, "HH:mm"),
-          // new Date(ticketToEdit.endDate || Date.now())
-          //   .toTimeString()
-          //   .slice(0, 5),
+          maxQty: ticketToEdit.maxQty,
+          minQty: ticketToEdit.minQty,
+          visibility: ticketToEdit.visibility,
         });
         setTicketToEditId(ticketToEdit.id);
         setEditTicketDialogOpen(true);
@@ -196,11 +200,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                   </div>
                   <div>Sold: </div>
                   <div>
-                    {
-                      ticketTypeSalesData?.find((ticketType) => ticketType.id)
-                        ?._count.tickets
-                    }
-                    /{ticketType.quantity}
+                    {ticketType._count.tickets}/{ticketType.quantity}
                   </div>
                   <div>${ticketType.price.toFixed(2)}</div>
 
@@ -279,232 +279,11 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
       </div>
       {/* <NoTicketsToEditDialog  /> */}
       <NewTicketDialog
+        eventId={eventId}
         open={newTicketDialogOpen}
         onOpenChange={setNewTicketDialogOpen}
       />
     </>
-  );
-}
-
-function NewTicketDialog({ ...props }: ComponentProps<typeof Dialog> & {}) {
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-  } = useForm<Yup.InferType<typeof newTicketFormSchema>>({
-    resolver: yupResolver(newTicketFormSchema),
-  });
-
-  const [ticketCategory, setTicketCategory] = useState<"free" | "paid">("paid");
-  const params = useParams<{ id: string }>();
-  const eventId = params.id;
-  function onCreateEventTicketTypeSuccess(
-    data: AxiosResponse<CreateEventTicketTypeResponse>
-  ) {
-    toast.success(data?.data?.name + "Ticket type created successfully");
-    // The new ticket types should be automatically fetched because the query cache has been invalidated
-    props?.onOpenChange?.(false); // conditionally closing the modal dialog
-    reset();
-  }
-
-  function onCreateEventTicketTypeError(error: AxiosError<ErrorResponse>) {
-    toast.error("An error occurred while creating event ticket type");
-  }
-
-  const {
-    mutate: createEventTicketType,
-    isPending: createEventTicketTypeIsPending,
-    isError: createEventTicketTypeIsError,
-  } = useCreateEventTicketType(
-    onCreateEventTicketTypeError,
-    onCreateEventTicketTypeSuccess
-  );
-
-  function onSubmit({
-    startDate,
-    startTime,
-    endDate,
-    endTime,
-    ...values
-  }: Yup.InferType<typeof newTicketFormSchema>) {
-    const [startTimeHours, startTimeMinutes] = startTime
-      .split(":")
-      .map((value) => Number(value));
-
-    const [endTimeHours, endTimeMinutes] = endTime
-      .split(":")
-      .map((value) => Number(value));
-
-    createEventTicketType({
-      ...values,
-      eventId: eventId || "",
-      startDate: dateFnsTz
-        .fromZonedTime(
-          dateFns.add(dateFns.startOfDay(startDate), {
-            hours: startTimeHours,
-            minutes: startTimeMinutes,
-          }),
-          newYorkTimeZone
-        )
-        .toISOString(),
-      endDate: dateFnsTz
-        .fromZonedTime(
-          dateFns.add(dateFns.startOfDay(endDate), {
-            hours: endTimeHours,
-            minutes: endTimeMinutes,
-          }),
-          newYorkTimeZone
-        )
-        .toISOString(),
-    });
-  }
-
-  return (
-    <Dialog {...props}>
-      <DialogPortal>
-        <DialogOverlay className="bg-black border bg-opacity-50 z-[99] backdrop-blur-sm fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
-          <DialogContent className="bg-[#333333] text-[#A3A7AA] p-6 max-w-lg">
-            <DialogTitle className="text-xl font-semibold">
-              Add Ticket
-            </DialogTitle>
-            <DialogDescription className="hidden">
-              Add new ticket dialog
-            </DialogDescription>
-            <DialogClose />
-
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              {/* FREE OR PAID TICKET TYPE */}
-              <div className="flex items-center gap-x-14 justify-between">
-                <AdminButton
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "flex-1 rounded-none font-medium transition-colors",
-                    ticketCategory === "free" &&
-                      "bg-[#4267B2] bg-opacity-15 border-[#4267B2] text-[#4267B2]"
-                  )}
-                  onClick={() => {
-                    setValue("price", 0);
-                    setTicketCategory("free");
-                  }}
-                >
-                  Free
-                </AdminButton>
-                <AdminButton
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "flex-1 rounded-none font-medium transition-colors",
-                    ticketCategory === "paid" &&
-                      "bg-[#4267B2] bg-opacity-15 outline-[#4267B2] text-[#4267B2]"
-                  )}
-                  onClick={() => {
-                    setTicketCategory("paid");
-                  }}
-                >
-                  Paid
-                </AdminButton>
-              </div>
-              {/* END FREE OR PAID TICKET TYPE */}
-              <div>
-                <label htmlFor="name">Ticket Name*</label>
-                <Input {...register("name")} />
-                <FormError error={errors.name} />
-              </div>
-              <div>
-                <label htmlFor="quantity">Ticket Quantity*</label>
-                <Input {...register("quantity")} />
-                <FormError error={errors.quantity} />
-              </div>
-              <div>
-                <label htmlFor="price">Ticket Price</label>
-                <IconInputField
-                  variant="white"
-                  disabled={ticketCategory === "free"}
-                  className="bg-input-bg"
-                  Icon={<FaDollarSign />}
-                  value={ticketCategory === "free" ? watch("price") : undefined}
-                  {...register("price")}
-                />
-                <FormError error={errors.price} />
-              </div>
-              <div className="flex items-center gap-x-4 gap-y-4">
-                <div className="flex-1">
-                  <label htmlFor="start-date">Start Date*</label>
-                  <IconInputField
-                    variant="white"
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("startDate", { required: true })}
-                    id="start-date"
-                    type="date"
-                  />
-                  <FormError error={errors.startDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="start-time">Start Time*</label>
-                  <IconInputField
-                    variant="white"
-                    id="start-time"
-                    type="time"
-                    className="bg-input-bg"
-                    {...register("startTime", { required: true })}
-                    Icon={<FaRegClock />}
-                  />
-                  <FormError error={errors.startTime} />
-                </div>
-              </div>
-              <div className="flex items-center gap-x-4">
-                <div className="flex-1">
-                  <label htmlFor="end-date">End Date*</label>
-                  <IconInputField
-                    variant="white"
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("endDate", { required: true })}
-                    type="date"
-                  />
-                  <FormError error={errors.endDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="end-time">End Time*</label>
-                  <IconInputField
-                    variant="white"
-                    className="bg-input-bg"
-                    Icon={<FaRegClock />}
-                    type="time"
-                    {...register("endTime", { required: true })}
-                  />
-                  <FormError error={errors.endTime} />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-x-12 mt-4 gap-y-4">
-                <AdminButton
-                  disabled={createEventTicketTypeIsPending}
-                  type="button"
-                  onClick={() => props?.onOpenChange?.(false)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancel
-                </AdminButton>
-                <AdminButton
-                  disabled={createEventTicketTypeIsPending}
-                  variant="ghost"
-                  className="flex-1"
-                >
-                  {createEventTicketTypeIsPending ? "Saving..." : "Save"}
-                </AdminButton>
-              </div>
-            </form>
-          </DialogContent>
-        </DialogOverlay>
-      </DialogPortal>
-    </Dialog>
   );
 }
 
@@ -561,50 +340,25 @@ function EditTicketDialog({
 
   function onSubmit({
     startDate,
-    startTime,
     endDate,
-    endTime,
     ...values
   }: Yup.InferType<typeof editTicketFormSchema>) {
-    const [startTimeHours, startTimeMinutes] = startTime
-      .split(":")
-      .map((value) => Number(value));
-
-    const [endTimeHours, endTimeMinutes] = endTime
-      .split(":")
-      .map((value) => Number(value));
-
     updateTicketType({
       ...values,
-      startDate: dateFnsTz
-        .fromZonedTime(
-          dateFns.add(dateFns.startOfDay(startDate), {
-            hours: startTimeHours,
-            minutes: startTimeMinutes,
-          }),
-          newYorkTimeZone
-        )
-        .toISOString(),
-      endDate: dateFnsTz
-        .fromZonedTime(
-          dateFns.add(dateFns.startOfDay(endDate), {
-            hours: endTimeHours,
-            minutes: endTimeMinutes,
-          }),
-          newYorkTimeZone
-        )
-        .toISOString(),
+      startDate: new Date(startDate).toISOString(),
+      endDate: new Date(endDate).toISOString(),
       ticketTypeId: ticketTypeId,
     });
   }
 
   const watchedEndDate = watch("endDate");
   const watchedStartDate = watch("startDate");
+  const watchedVisibility = watch("visibility");
   // FIXME: Date not filling in on dialog dialog open
-  useEffect(() => {
-    setValue("endDate", defaultValues.endDate);
-    setValue("startDate", defaultValues.startDate);
-  }, [defaultValues]);
+  // useEffect(() => {
+  //   setValue("endDate", defaultValues.endDate);
+  //   setValue("startDate", defaultValues.startDate);
+  // }, [defaultValues]);
 
   return (
     <Dialog {...props}>
@@ -675,7 +429,49 @@ function EditTicketDialog({
                 />
                 <FormError error={errors.price} />
               </div>
-              <div className="flex items-center gap-x-4 gap-y-4">
+              <div>
+                <p>Tickets per order</p>
+                <div className="flex items-center gap-x-4 gap-y-4">
+                  <div className="flex-1">
+                    <label htmlFor="min-qty">Min Quantity</label>
+                    <Input
+                      variant="white"
+                      {...register("minQty")}
+                      id="min-qty"
+                      type="number"
+                      pattern="[0-9]"
+                      min={1}
+                    />
+                    <FormError error={errors.minQty} />
+                  </div>
+                  <div className="flex-1">
+                    <label htmlFor="max-qty">Max Qty</label>
+                    <Input
+                      variant="white"
+                      id="min-qty"
+                      type="number"
+                      {...register("maxQty")}
+                      pattern="[0-9]"
+                      min={1}
+                    />
+                    <FormError error={errors.maxQty} />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="visibility">Visibility*</label>
+                <SelectVisibilityDropDown
+                  selected={watchedVisibility}
+                  setSelected={(value) => setValue("visibility", value)}
+                />
+                <FormError error={errors.visibility} />
+              </div>
+              <div
+                className={cn(
+                  "flex items-center gap-x-4 gap-y-4 transition overflow-hidden"
+                  // watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                )}
+              >
                 <div className="flex-1">
                   <label htmlFor="start-date">Start Date*</label>
                   <IconInputField
@@ -704,7 +500,12 @@ function EditTicketDialog({
                   <FormError error={errors.startTime} />
                 </div>
               </div>
-              <div className="flex items-center gap-x-4">
+              <div
+                className={cn(
+                  "flex items-center gap-x-4 gap-y-4 transition overflow-hidden"
+                  // watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                )}
+              >
                 <div className="flex-1">
                   <label htmlFor="end-date">End Date*</label>
                   <IconInputField

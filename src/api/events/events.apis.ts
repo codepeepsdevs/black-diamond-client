@@ -22,6 +22,8 @@ import {
   CreateEventTicketTypeData,
   CreateEventTicketTypeResponse,
   GetEventRevenueResponse,
+  GetPromocodeResponse,
+  GetPromocodesResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -96,7 +98,7 @@ export const getEventPromocodes = async (eventId: Event["id"]) => {
   return (await request({
     url: `/events/${eventId}/get-promocodes`,
     method: "get",
-  })) as AxiosResponse<PromoCode[]>;
+  })) as AxiosResponse<GetPromocodesResponse>;
 };
 
 export const getPromocode = async (key: string) => {
@@ -106,7 +108,7 @@ export const getPromocode = async (key: string) => {
     data: {
       key,
     },
-  })) as AxiosResponse<PromoCode>;
+  })) as AxiosResponse<GetPromocodeResponse>;
 };
 
 export const getAddons = async (eventId: Event["id"]) => {

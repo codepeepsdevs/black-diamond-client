@@ -283,7 +283,7 @@ export default function EditEventDetailsDashboard({
           <tbody className="[&>td]:pt-6">
             {ticketTypeSales?.map((ticketType) => {
               return (
-                <tr>
+                <tr key={ticketType.id}>
                   <td>{ticketType.name}</td>
                   <td>
                     {ticketType._count.tickets}/{ticketType.quantity}

@@ -94,7 +94,7 @@ export default function AdminHomePage() {
                 {revenueQuery.isFetching ? (
                   <LoadingSvg />
                 ) : (
-                  <span>${revenueData?.revenue || 0}</span>
+                  <span>${revenueData?.revenue.toFixed(2) || 0}</span>
                 )}
               </div>
             </div>
