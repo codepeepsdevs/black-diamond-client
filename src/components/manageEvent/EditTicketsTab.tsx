@@ -184,19 +184,21 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                 >
                   <div className="flex-1">
                     <div className="font-medium text-xl">{ticketType.name}</div>
-                    <div className="flex items-center mt-2">
-                      <BsDot className="text-[#34C759] text-2xl -ml-2" />
-                      <p className="">
-                        On Sale · Ends{" "}
-                        {dateFns.format(
-                          dateFnsTz.toZonedTime(
-                            new Date(ticketType.endDate),
-                            newYorkTimeZone
-                          ),
-                          "MMM d, yyyy 'at' h:mm a"
-                        )}
-                      </p>
-                    </div>
+                    {ticketType.endDate ? (
+                      <div className="flex items-center mt-2">
+                        <BsDot className="text-[#34C759] text-2xl -ml-2" />
+                        <p className="">
+                          On Sale · Ends{" "}
+                          {dateFns.format(
+                            dateFnsTz.toZonedTime(
+                              new Date(ticketType.endDate),
+                              newYorkTimeZone
+                            ),
+                            "MMM d, yyyy 'at' h:mm a"
+                          )}
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                   <div>Sold: </div>
                   <div>
@@ -340,14 +342,24 @@ function EditTicketDialog({
 
   function onSubmit({
     startDate,
+    startTime,
     endDate,
+    endTime,
     ...values
   }: Yup.InferType<typeof editTicketFormSchema>) {
+    let dates = {};
+    if (values.visibility === "CUSTOM_SCHEDULE" && startDate && endDate) {
+      dates = {
+        startDate: new Date(startDate).toISOString(),
+        startTime,
+        endDate: new Date(endDate).toISOString(),
+        endTime,
+      };
+    }
     updateTicketType({
-      ...values,
-      startDate: new Date(startDate).toISOString(),
-      endDate: new Date(endDate).toISOString(),
       ticketTypeId: ticketTypeId,
+      ...values,
+      ...dates,
     });
   }
 
@@ -468,8 +480,8 @@ function EditTicketDialog({
               </div>
               <div
                 className={cn(
-                  "flex items-center gap-x-4 gap-y-4 transition overflow-hidden"
-                  // watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
                 )}
               >
                 <div className="flex-1">
@@ -502,8 +514,8 @@ function EditTicketDialog({
               </div>
               <div
                 className={cn(
-                  "flex items-center gap-x-4 gap-y-4 transition overflow-hidden"
-                  // watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
                 )}
               >
                 <div className="flex-1">

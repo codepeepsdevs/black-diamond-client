@@ -4,7 +4,6 @@ import { AxiosResponse } from "axios";
 
 export const checkoutRequest = async ({
   paymentMethod,
-  promotionalEmails,
   ...formdata
 }: CheckoutData) => {
   return await request({
@@ -17,7 +16,6 @@ export const checkoutRequest = async ({
 export const createPaymentIntent = async ({
   paymentMethod,
   eventUpdates,
-  promotionalEmails,
   ...formdata
 }: CheckoutData) => {
   const response = await request({

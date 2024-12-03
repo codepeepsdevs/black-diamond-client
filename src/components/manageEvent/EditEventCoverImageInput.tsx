@@ -76,7 +76,28 @@ const EditEventCoverImageInput: React.FC<{
         {/* END IMAGE PREVIEW */}
       </div>
 
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-end mt-5 gap-x-2">
+        {/* COVER IMAGE PREVIEW */}
+        {oldCoverImage && (
+          <div className="w-36 h-32 relative">
+            <Image
+              src={oldCoverImage}
+              alt=""
+              fill
+              quality={100}
+              className="object-fill"
+            />
+
+            <button
+              type="button"
+              className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+              onClick={() => removeImage()}
+            >
+              <FiTrash2 />
+            </button>
+          </div>
+        )}
+        {/* END COVER IMAGE PREVIEW */}
         {/* IMAGE PREVIEW */}
         {imagePreview && (
           <div className="w-36 h-32 relative">

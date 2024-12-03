@@ -20,8 +20,8 @@ import Link from "next/link";
 const tabsList = [
   { id: "details", title: "Details Page" },
   { id: "ticket", title: "Ticket" },
-  { id: "code", title: "Code" },
-  { id: "add-ons", title: "Add Ons" },
+  // { id: "code", title: "Code" },
+  // { id: "add-ons", title: "Add Ons" },
   { id: "dashboard", title: "Dashboard" },
 ] as const;
 
@@ -101,13 +101,13 @@ export default function NewEventPage() {
         )}
         {/* END TICKETS TAB */}
 
-        {currentTab === "code" && (
+        {/* {currentTab === "code" && (
           <PromoCodeTab isActive={currentTab === "code"} />
         )}
 
         {currentTab === "add-ons" && (
           <EventAddOnTab isActive={currentTab === "add-ons"} />
-        )}
+        )} */}
 
         {currentTab === "dashboard" && (
           <EventDetailsDashboard isActive={currentTab === "dashboard"} />

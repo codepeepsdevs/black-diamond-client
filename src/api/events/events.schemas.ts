@@ -1,5 +1,6 @@
 import * as Yup from "yup";
 import { dateStringSchema } from "../utility-schemas/datestring.schema";
+import { TicketTypeVisibility } from "@/constants/types";
 
 export const paymentMethods = ["creditCard", "applePay", "paypal"] as const;
 
@@ -111,10 +112,34 @@ export const newTicketFormSchema = Yup.object().shape({
   price: Yup.number()
     .typeError("Please enter a number")
     .required("Ticket price is required"),
-  startDate: dateStringSchema.required("Start date is required"),
-  startTime: Yup.string().required("Start time is required"),
-  endDate: dateStringSchema.required("End date is required"),
-  endTime: Yup.string().required("End time is required"),
+  startDate: Yup.string().when("visibility", (value, schema) => {
+    if (value[0] === "CUSTOM_SCHEDULE") {
+      return dateStringSchema.required("Start date is required");
+    } else {
+      return schema.notRequired();
+    }
+  }),
+  startTime: Yup.string().when("visibility", (value, schema) => {
+    if (value[0] === "CUSTOM_SCHEDULE") {
+      return schema.required("Start time is required");
+    } else {
+      return schema.notRequired();
+    }
+  }),
+  endDate: Yup.string().when("visibility", (value, schema) => {
+    if (value[0] === "CUSTOM_SCHEDULE") {
+      return dateStringSchema.required("End date is required");
+    } else {
+      return schema.notRequired();
+    }
+  }),
+  endTime: Yup.string().when("visibility", (value, schema) => {
+    if (value[0] === "CUSTOM_SCHEDULE") {
+      return schema.required("End time is required");
+    } else {
+      return schema.notRequired();
+    }
+  }),
   visibility: Yup.string()
     .oneOf(["VISIBLE", "HIDDEN", "HIDDEN_WHEN_NOT_ON_SALE", "CUSTOM_SCHEDULE"])
     .default("VISIBLE"),

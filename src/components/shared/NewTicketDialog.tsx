@@ -71,13 +71,23 @@ export function NewTicketDialog({
   function onSubmit({
     startDate,
     endDate,
+    startTime,
+    endTime,
     ...values
   }: Yup.InferType<typeof newTicketFormSchema>) {
+    let dates = {};
+    if (values.visibility === "CUSTOM_SCHEDULE" && startDate && endDate) {
+      dates = {
+        startDate: new Date(startDate).toISOString(),
+        startTime,
+        endDate: new Date(endDate).toISOString(),
+        endTime,
+      };
+    }
     createEventTicketType({
       ...values,
       eventId: eventId || "",
-      startDate: new Date(endDate).toISOString(),
-      endDate: new Date(endDate).toISOString(),
+      ...dates,
     });
   }
 
@@ -189,7 +199,12 @@ export function NewTicketDialog({
                 />
                 <FormError error={errors.visibility} />
               </div>
-              <div className="flex items-center gap-x-4 gap-y-4">
+              <div
+                className={cn(
+                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                )}
+              >
                 <div className="flex-1">
                   <label htmlFor="start-date">Start Date*</label>
                   <IconInputField
@@ -215,7 +230,12 @@ export function NewTicketDialog({
                   <FormError error={errors.startTime} />
                 </div>
               </div>
-              <div className="flex items-center gap-x-4">
+              <div
+                className={cn(
+                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                )}
+              >
                 <div className="flex-1">
                   <label htmlFor="end-date">End Date*</label>
                   <IconInputField

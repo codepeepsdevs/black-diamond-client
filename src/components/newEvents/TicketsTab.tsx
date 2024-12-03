@@ -122,23 +122,26 @@ export default function TicketsTab({ isActive }: { isActive: boolean }) {
               >
                 <div className="flex-1">
                   <div className="font-medium text-xl">{ticketType.name}</div>
-                  <div className="flex items-center mt-2">
-                    <BsDot className="text-[#34C759] text-2xl -ml-2" />
-                    <p className="">
-                      On Sale · Ends{" "}
-                      {dateFns.format(
-                        dateFnsTz.toZonedTime(
-                          new Date(ticketType.endDate),
-                          newYorkTimeZone
-                        ),
-                        "MMM d, yyyy 'at' h:mm a"
-                      )}
-                    </p>
-                  </div>
+                  {ticketType.endDate ? (
+                    <div className="flex items-center mt-2">
+                      <BsDot className="text-[#34C759] text-2xl -ml-2" />
+                      <p className="">
+                        On Sale · Ends{" "}
+                        {dateFns.format(
+                          dateFnsTz.toZonedTime(
+                            new Date(ticketType.endDate),
+                            newYorkTimeZone
+                          ),
+                          "MMM d, yyyy 'at' h:mm a"
+                        )}
+                      </p>
+                    </div>
+                  ) : null}
                 </div>
-                {/* TODO: Fix this data */}
                 <div>Sold: </div>
-                <div>0/24</div>
+                <div>
+                  {ticketType._count.tickets}/{ticketType.quantity}
+                </div>
                 <div>${ticketType.price.toFixed(2)}</div>
 
                 <ActionDropDown
