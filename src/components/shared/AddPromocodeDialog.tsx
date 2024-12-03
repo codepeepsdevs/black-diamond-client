@@ -71,7 +71,7 @@ export function AddPromoCodeDialog({
       description: "Event promocode successfully created",
     });
     reset();
-    props.onOpenChange(false);
+    props.onOpenChange?.(false);
   }
 
   const {
