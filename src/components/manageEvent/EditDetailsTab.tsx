@@ -156,6 +156,7 @@ export default function EditDetailsTab({
             }}
             oldCoverImage={defaultMedia.coverImage}
           />
+          <FormError error={errors.coverImage} />
         </div>
         {/* END UPLOAD COVER IMAGES SECTION */}
 
