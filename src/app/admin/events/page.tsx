@@ -187,7 +187,7 @@ export default function AdminEventsPage() {
                               <div className="bg-[#333333] rounded-full h-1 min-w-40 overflow-hidden">
                                 <div
                                   style={{
-                                    width: `${(event.totalSales / event.totalTickets) * 100}`,
+                                    width: `${(event.totalSales / event.totalTickets) * 100}%`,
                                   }}
                                   className="bg-[#A3A7AA] h-full"
                                 ></div>

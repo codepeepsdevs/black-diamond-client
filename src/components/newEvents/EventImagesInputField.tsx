@@ -73,7 +73,7 @@ const EventImagesInputField: React.FC<{
             className="absolute inset-0 w-full h-full [&>.swiper-wrapper]:h-full opacity-25"
           >
             {imagesPreview.map((image, index) => (
-              <SwiperSlide>
+              <SwiperSlide key={image}>
                 <Image
                   key={index}
                   src={image}

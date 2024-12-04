@@ -62,14 +62,23 @@ export const newEventSchema = Yup.object().shape({
     "imagesRequired",
     "Image slides is required",
     (value) => {
-      return !value || value?.length < 1;
+      if (!value) {
+        console.log("false-1");
+        return false;
+      } else if (value?.length < 1) {
+        console.log("false-2");
+        return false;
+      } else {
+        console.log("false-3");
+        return true;
+      }
     }
   ),
   coverImage: Yup.mixed<File>().test(
     "coverImageRequired",
     "Cover image is required",
     (value) => {
-      return !value;
+      return !!value;
     }
   ),
   locationType: Yup.string()
@@ -85,20 +94,8 @@ export const editEventDetailsSchema = Yup.object().shape({
   endTime: Yup.string().required(),
   location: Yup.string().required(),
   refundPolicy: Yup.string().required(),
-  images: Yup.mixed<File[]>().test(
-    "imagesRequired",
-    "Image slides is required",
-    (value) => {
-      return !value || value?.length < 1;
-    }
-  ),
-  coverImage: Yup.mixed<File>().test(
-    "coverImageRequired",
-    "Cover image is required",
-    (value) => {
-      return !value;
-    }
-  ),
+  images: Yup.mixed<File[]>(),
+  coverImage: Yup.mixed<File>(),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),

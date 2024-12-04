@@ -20,7 +20,7 @@ import IconInputField from "../shared/IconInputField";
 import EventImagesInputField from "./EventImagesInputField";
 import { newEventSchema } from "@/api/events/events.schemas";
 import { useCreateEventDetails } from "@/api/events/events.queries";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { CreateEventDetailsResponse } from "@/api/events/events.types";
 import { ErrorResponse } from "@/constants/types";
 import toast from "react-hot-toast";
@@ -34,6 +34,8 @@ import { newYorkTimeZone } from "@/utils/date-formatter";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import { FiTrash2 } from "react-icons/fi";
+import ErrorToast from "../toast/ErrorToast";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -73,10 +75,15 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     setCurrentTab("ticket");
   }
 
-  function onCreateEventDetailsError(error: ErrorResponse) {
-    toast.error(
-      error.message || "An error occurred while creating event details.."
+  function onCreateEventDetailsError(error: AxiosError<ErrorResponse>) {
+    const descriptions = getApiErrorMessage(
+      error,
+      "An error occrred while creating event details"
     );
+    ErrorToast({
+      title: "Error creating event",
+      descriptions: descriptions,
+    });
   }
 
   const { mutate: createEventDetails, isPending: createEventDetailsPending } =
@@ -141,12 +148,13 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       >
         {/* UPLOAD COVER IMAGES SECTION */}
         <div>
-          <label htmlFor="cover=image">Cover image</label>
+          <label htmlFor="cover-image">Cover image</label>
           <EventCoverImageInput
             onSelectFile={(file) => {
               setValue("coverImage", file);
             }}
           />
+          <FormError error={errors.coverImage} />
         </div>
         {/* END UPLOAD COVER IMAGES SECTION */}
 
