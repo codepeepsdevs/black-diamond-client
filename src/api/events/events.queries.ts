@@ -327,7 +327,10 @@ export const useUnpublishEvent = (eventId: Event["id"]) => {
   });
 };
 
-export const useRemoveImageFromSlide = () => {
+export const useRemoveImageFromSlide = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<RemoveSlideResponse>) => void
+) => {
   const queryClient = useQueryClient();
   return useMutation<
     AxiosResponse<RemoveSlideResponse>,
@@ -345,6 +348,7 @@ export const useRemoveImageFromSlide = () => {
         title: "Delete Error",
         descriptions: errorMessage,
       });
+      onError?.(e);
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
@@ -355,6 +359,8 @@ export const useRemoveImageFromSlide = () => {
         title: "Success",
         description: data.data.message,
       });
+
+      onSuccess?.(data);
     },
   });
 };

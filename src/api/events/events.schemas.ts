@@ -53,23 +53,21 @@ export const checkoutFormSchema = Yup.object().shape({
 export const newEventSchema = Yup.object().shape({
   name: Yup.string().required("Event title is required"),
   summary: Yup.string().required("Event summary is required"),
-  date: Yup.date().typeError("Please provide a valid date").required(),
-  startTime: Yup.string().required(),
-  endTime: Yup.string().required(),
-  location: Yup.string().required(),
-  refundPolicy: Yup.string().required(),
+  startDate: dateStringSchema.required("Start date is required"),
+  startTime: Yup.string().required("Start time is required"),
+  endDate: dateStringSchema.required("End date is required"),
+  endTime: Yup.string().required("End time is required"),
+  location: Yup.string().required("Location is required"),
+  refundPolicy: Yup.string().required("Refund policy"),
   images: Yup.mixed<File[]>().test(
     "imagesRequired",
     "Image slides is required",
     (value) => {
       if (!value) {
-        console.log("false-1");
         return false;
       } else if (value?.length < 1) {
-        console.log("false-2");
         return false;
       } else {
-        console.log("false-3");
         return true;
       }
     }
@@ -89,9 +87,10 @@ export const newEventSchema = Yup.object().shape({
 export const editEventDetailsSchema = Yup.object().shape({
   name: Yup.string().required("Event title is required"),
   summary: Yup.string().required("Event summary is required"),
-  date: Yup.date().typeError("Please provide a valid date").required(),
-  startTime: Yup.string().required(),
-  endTime: Yup.string().required(),
+  startDate: dateStringSchema.required("Start date is required"),
+  startTime: Yup.string().required("Start time is required"),
+  endDate: dateStringSchema.required("End date is required"),
+  endTime: Yup.string().required("End time is required"),
   location: Yup.string().required(),
   refundPolicy: Yup.string().required(),
   images: Yup.mixed<File[]>(),

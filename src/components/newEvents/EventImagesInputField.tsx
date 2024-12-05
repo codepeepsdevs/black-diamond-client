@@ -18,10 +18,16 @@ const EventImagesInputField: React.FC<{
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Handle the dropped files
-      const filePreviews = acceptedFiles.map((file) =>
+      const newFilePreviews = acceptedFiles.map((file) =>
         URL.createObjectURL(file)
       );
-      setImagesPreview(filePreviews);
+      setImagesPreview((prevPreviews) => {
+        if (prevPreviews) {
+          return [...prevPreviews, ...newFilePreviews];
+        } else {
+          return newFilePreviews;
+        }
+      });
       onSelectFile(acceptedFiles);
     },
     [onSelectFile, setImagesPreview]

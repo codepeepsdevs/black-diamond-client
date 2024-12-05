@@ -34,7 +34,7 @@ export default function AdminLayout({
   return (
     <>
       {userQuery.isPending && (
-        <div className="min-h-screen flex items-center container">
+        <div className="min-h-48 flex items-center container">
           <LoadingMessage className="text-4xl">
             Loading admin dashboard.
           </LoadingMessage>

@@ -9,6 +9,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 
 const EditEventImagesInputField: React.FC<{
+  // watchedImages: File[] | null;
   onSelectFile: (file: File[]) => void;
   imagesPreview: string[] | null;
   setImagesPreview: React.Dispatch<React.SetStateAction<string[] | null>>;
@@ -16,10 +17,16 @@ const EditEventImagesInputField: React.FC<{
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Handle the dropped files
-      const filePreviews = acceptedFiles.map((file) =>
+      const newFilePreviews = acceptedFiles.map((file) =>
         URL.createObjectURL(file)
       );
-      setImagesPreview(filePreviews);
+      setImagesPreview((prevPreviews) => {
+        if (prevPreviews) {
+          return [...prevPreviews, ...newFilePreviews];
+        } else {
+          return newFilePreviews;
+        }
+      });
       onSelectFile(acceptedFiles);
     },
     [onSelectFile, setImagesPreview]
