@@ -27,7 +27,7 @@ import {
   newTicketFormSchema,
   updateEventTicketTypeSchema,
 } from "@/api/events/events.schemas";
-import { FiMoreVertical } from "react-icons/fi";
+import { FiChevronUp, FiMoreVertical } from "react-icons/fi";
 import { BsDot } from "react-icons/bs";
 import Checkbox from "../shared/Checkbox";
 import { parseAsString, useQueryState } from "nuqs";
@@ -315,6 +315,7 @@ function EditTicketDialog({
   }, [defaultValues]);
 
   const [ticketCategory, setTicketCategory] = useState<"free" | "paid">("paid");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   function onUpdateTicketTypeSuccess(
     data: AxiosResponse<UpdateTicketTypeResponse>
@@ -442,104 +443,127 @@ function EditTicketDialog({
                 <FormError error={errors.price} />
               </div>
               <div>
-                <p>Tickets per order</p>
-                <div className="flex items-center gap-x-4 gap-y-4">
-                  <div className="flex-1">
-                    <label htmlFor="min-qty">Min Quantity</label>
-                    <Input
-                      variant="white"
-                      {...register("minQty")}
-                      id="min-qty"
-                      type="number"
-                      pattern="[0-9]"
-                      min={1}
-                    />
-                    <FormError error={errors.minQty} />
+                <button
+                  type="button"
+                  className="flex items-center gap-x-1"
+                  onClick={() => setAdvancedOpen((state) => !state)}
+                >
+                  <FiChevronUp
+                    className={cn(
+                      "text-xl transition-transform",
+                      advancedOpen && "rotate-180"
+                    )}
+                  />
+                  Advanced settings
+                </button>
+                <div
+                  className={cn(
+                    advancedOpen && "invisible h-0 overflow-hidden"
+                  )}
+                >
+                  <div>
+                    <p>Tickets per order</p>
+                    <div className="flex items-center gap-x-4 gap-y-4">
+                      <div className="flex-1">
+                        <label htmlFor="min-qty">Min Quantity</label>
+                        <Input
+                          variant="white"
+                          {...register("minQty")}
+                          id="min-qty"
+                          type="number"
+                          pattern="[0-9]"
+                          min={1}
+                        />
+                        <FormError error={errors.minQty} />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="max-qty">Max Qty</label>
+                        <Input
+                          variant="white"
+                          id="min-qty"
+                          type="number"
+                          {...register("maxQty")}
+                          pattern="[0-9]"
+                          min={1}
+                        />
+                        <FormError error={errors.maxQty} />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <label htmlFor="max-qty">Max Qty</label>
-                    <Input
-                      variant="white"
-                      id="min-qty"
-                      type="number"
-                      {...register("maxQty")}
-                      pattern="[0-9]"
-                      min={1}
+                  <div>
+                    <label htmlFor="visibility">Visibility*</label>
+                    <SelectVisibilityDropDown
+                      selected={watchedVisibility}
+                      setSelected={(value) => setValue("visibility", value)}
                     />
-                    <FormError error={errors.maxQty} />
+                    <FormError error={errors.visibility} />
                   </div>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="visibility">Visibility*</label>
-                <SelectVisibilityDropDown
-                  selected={watchedVisibility}
-                  setSelected={(value) => setValue("visibility", value)}
-                />
-                <FormError error={errors.visibility} />
-              </div>
-              <div
-                className={cn(
-                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
-                )}
-              >
-                <div className="flex-1">
-                  <label htmlFor="start-date">Start Date*</label>
-                  <IconInputField
-                    variant="white"
-                    value={
-                      new Date(watchedStartDate).toISOString().split("T")[0]
-                    }
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("startDate", { required: true })}
-                    id="start-date"
-                    type="date"
-                  />
-                  <FormError error={errors.startDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="start-time">Start Time*</label>
-                  <IconInputField
-                    variant="white"
-                    id="start-time"
-                    type="time"
-                    className="bg-input-bg"
-                    {...register("startTime", { required: true })}
-                    Icon={<FaRegClock />}
-                  />
-                  <FormError error={errors.startTime} />
-                </div>
-              </div>
-              <div
-                className={cn(
-                  "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                  watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
-                )}
-              >
-                <div className="flex-1">
-                  <label htmlFor="end-date">End Date*</label>
-                  <IconInputField
-                    variant="white"
-                    value={new Date(watchedEndDate).toISOString().split("T")[0]}
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("endDate", { required: true })}
-                    type="date"
-                  />
-                  <FormError error={errors.endDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="end-time">End Time*</label>
-                  <IconInputField
-                    variant="white"
-                    className="bg-input-bg"
-                    Icon={<FaRegClock />}
-                    type="time"
-                    {...register("endTime", { required: true })}
-                  />
-                  <FormError error={errors.endTime} />
+                  <div
+                    className={cn(
+                      "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                    )}
+                  >
+                    <div className="flex-1">
+                      <label htmlFor="start-date">Start Date*</label>
+                      <IconInputField
+                        variant="white"
+                        value={
+                          new Date(watchedStartDate).toISOString().split("T")[0]
+                        }
+                        className="bg-input-bg"
+                        Icon={<FaRegCalendar />}
+                        {...register("startDate", { required: true })}
+                        id="start-date"
+                        type="date"
+                      />
+                      <FormError error={errors.startDate} />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="start-time">Start Time*</label>
+                      <IconInputField
+                        variant="white"
+                        id="start-time"
+                        type="time"
+                        className="bg-input-bg"
+                        {...register("startTime", { required: true })}
+                        Icon={<FaRegClock />}
+                      />
+                      <FormError error={errors.startTime} />
+                    </div>
+                  </div>
+                  <div
+                    className={cn(
+                      "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
+                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                    )}
+                  >
+                    <div className="flex-1">
+                      <label htmlFor="end-date">End Date*</label>
+                      <IconInputField
+                        variant="white"
+                        value={
+                          new Date(watchedEndDate).toISOString().split("T")[0]
+                        }
+                        className="bg-input-bg"
+                        Icon={<FaRegCalendar />}
+                        {...register("endDate", { required: true })}
+                        type="date"
+                      />
+                      <FormError error={errors.endDate} />
+                    </div>
+                    <div className="flex-1">
+                      <label htmlFor="end-time">End Time*</label>
+                      <IconInputField
+                        variant="white"
+                        className="bg-input-bg"
+                        Icon={<FaRegClock />}
+                        type="time"
+                        {...register("endTime", { required: true })}
+                      />
+                      <FormError error={errors.endTime} />
+                    </div>
+                  </div>
                 </div>
               </div>
 
