@@ -95,14 +95,6 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     );
 
   function onSubmit(values: Yup.InferType<typeof newEventSchema>) {
-    const [startTimeHours, startTimeMinutes] = values.startTime
-      .split(":")
-      .map((value) => Number(value));
-
-    const [endTimeHours, endTimeMinutes] = values.endTime
-      .split(":")
-      .map((value) => Number(value));
-
     createEventDetails({
       name: values.name,
       summary: values.summary,
@@ -110,9 +102,9 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       refundPolicy: values.refundPolicy,
       coverImage: values.coverImage,
       images: values.images,
-      startDate: values.endDate,
+      startDate: new Date(values.startDate).toISOString(),
       startTime: values.startTime,
-      endDate: values.endDate,
+      endDate: new Date(values.endDate).toISOString(),
       endTime: values.endTime,
       locationType: values.locationType,
     });

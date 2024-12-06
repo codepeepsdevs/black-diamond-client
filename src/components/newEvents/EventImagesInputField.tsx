@@ -59,7 +59,7 @@ const EventImagesInputField: React.FC<{
             {isDragActive ? (
               <p>Drop the files here...</p>
             ) : imagesPreview ? (
-              <p>Change selected photos</p>
+              <p>Add more photos</p>
             ) : (
               <p>Upload photos</p>
             )}
