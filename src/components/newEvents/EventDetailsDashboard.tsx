@@ -10,6 +10,7 @@ import { parseAsString, useQueryState } from "nuqs";
 import {
   useGetEvent,
   useGetEventRevenue,
+  usePageView,
   usePublishEvent,
   useUnpublishEvent,
 } from "@/api/events/events.queries";
@@ -42,6 +43,9 @@ export default function EventDetailsDashboard({
 
   const eventRevenueQuery = useGetEventRevenue(eventId);
   const eventRevenue = eventRevenueQuery.data?.data.revenue || 0;
+
+  const viewCountQuery = usePageView(eventId);
+  const viewCountData = viewCountQuery.data?.data;
 
   const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
   const ticketTypeSales = ticketTypeSalesQuery.data?.data;
@@ -152,9 +156,13 @@ export default function EventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">
-              {totalTicketsSold}/{totalTickets}
-            </div>
+            {ticketTypeSalesQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                {totalTicketsSold}/{totalTickets}
+              </div>
+            )}
           </div>
           {/* END TICKETS SOLD */}
 
@@ -164,9 +172,13 @@ export default function EventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Revenue</span>
             </div>
-            <div className="text-white font-semibold text-6xl">
-              ${eventRevenue}
-            </div>
+            {eventRevenueQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                ${eventRevenue}
+              </div>
+            )}
           </div>
           {/* END REVENUE */}
 
@@ -176,7 +188,13 @@ export default function EventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Page Views</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0</div>
+            {viewCountQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                {viewCountData?.views}
+              </div>
+            )}
           </div>
           {/* END PAGE VIEWS */}
         </div>

@@ -17,8 +17,10 @@ const ShareEventModal: React.FC<ShareModalProps> = ({
   eventId,
 }) => {
   const [copyState, setCopyState] = useState(false);
-  const url = `${window.location.protocol}//${window.location.host}/events/${tab}/${eventId}`;
-
+  let url = "";
+  if (window) {
+    url = `${window.location.protocol}//${window.location.host}/events/${tab}/${eventId}`;
+  }
   const handleShareClick = async () => {
     if (navigator.share) {
       try {

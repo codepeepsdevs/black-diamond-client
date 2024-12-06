@@ -33,6 +33,7 @@ import ErrorToast from "@/components/toast/ErrorToast";
 import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
 import { GetPromocodeResponse } from "@/api/events/events.types";
+import { incPageView } from "@/api/events/events.apis";
 
 const UpComingEventDetailPage = () => {
   const order = useOrderStore();
@@ -76,6 +77,12 @@ const UpComingEventDetailPage = () => {
     eventAddonsQuery.isFetched,
     eventAddonsQuery.data?.data,
   ]);
+
+  // PAGE VIEW QUERY
+  useEffect(() => {
+    incPageView({ eventId: params.id });
+  }, []);
+  // END PAGE VIEW QUERY
 
   function handleBuyTicket() {
     const ticketsPlaced =

@@ -24,6 +24,7 @@ import {
   GetEventRevenueResponse,
   GetPromocodeResponse,
   GetPromocodesResponse,
+  PageViewResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -310,5 +311,20 @@ export const removeImageFromSlide = async (data: RemoveSlideData) => {
     data: {
       image: data.image,
     },
+  });
+};
+
+export const incPageView = async (data: { eventId: string }) => {
+  console.log("incpage");
+  return request<{}>({
+    url: `/events/inc-pageview/${data.eventId}`,
+    method: "get",
+  });
+};
+
+export const getViewCount = async (data: { eventId: string }) => {
+  return request<PageViewResponse>({
+    url: `/events/view-count/${data.eventId}`,
+    method: "get",
   });
 };

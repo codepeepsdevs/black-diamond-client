@@ -104,3 +104,11 @@ export type RemoveSlideData = {
 export type PublishEventResponse = Event;
 
 export type UnpublishEventResponse = Event;
+
+export type PageViewResponse = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  eventId: string;
+  views: number;
+};

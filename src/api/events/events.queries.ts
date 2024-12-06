@@ -23,6 +23,7 @@ import {
   publishEvent,
   unpublishEvent,
   EventWithSoldQuantity,
+  getViewCount,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -45,6 +46,7 @@ import {
   GetEvents,
   GetPromocodeResponse,
   GetPromocodesResponse,
+  PageViewResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -362,5 +364,12 @@ export const useRemoveImageFromSlide = (
 
       onSuccess?.(data);
     },
+  });
+};
+
+export const usePageView = (eventId: string) => {
+  return useQuery({
+    queryKey: ["s"],
+    queryFn: () => getViewCount({ eventId }),
   });
 };
