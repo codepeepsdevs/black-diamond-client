@@ -24,6 +24,8 @@ import {
   unpublishEvent,
   EventWithSoldQuantity,
   getViewCount,
+  deleteTicketType,
+  deleteEvent,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -42,6 +44,9 @@ import {
   CreateEventDetailsResponse,
   CreateEventPromocodeResponse,
   CreateEventTicketTypeResponse,
+  DeleteEventData,
+  DeleteEventResponse,
+  DeleteTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
   GetPromocodeResponse,
@@ -249,6 +254,40 @@ export const useUpdateTicketType = (
         queryKey: ["get-event-ticket-types", data.data.eventId],
       });
       onSuccess(data);
+    },
+  });
+};
+
+export const useDeleteTicketType = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<DeleteTicketTypeResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTicketType,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-event-ticket-types", data.data.eventId],
+      });
+      onSuccess?.(data);
+    },
+  });
+};
+
+export const useDeleteEvent = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<DeleteEventResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteEvent,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-get-events"],
+      });
+      onSuccess?.(data);
     },
   });
 };

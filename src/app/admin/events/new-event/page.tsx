@@ -19,10 +19,10 @@ import Link from "next/link";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
-  { id: "ticket", title: "Ticket" },
+  // { id: "ticket", title: "Ticket" },
   // { id: "code", title: "Code" },
   // { id: "add-ons", title: "Add Ons" },
-  { id: "dashboard", title: "Dashboard" },
+  // { id: "dashboard", title: "Dashboard" },
 ] as const;
 
 // const fillTypeOptions = ["new", "edit"] as const;
@@ -96,9 +96,9 @@ export default function NewEventPage() {
         {/* END TAB CONTENTS */}
 
         {/* TICKETS TAB */}
-        {currentTab === "ticket" && (
+        {/* {currentTab === "ticket" && (
           <TicketsTab isActive={currentTab === "ticket"} />
-        )}
+        )} */}
         {/* END TICKETS TAB */}
 
         {/* {currentTab === "code" && (
@@ -109,9 +109,9 @@ export default function NewEventPage() {
           <EventAddOnTab isActive={currentTab === "add-ons"} />
         )} */}
 
-        {currentTab === "dashboard" && (
+        {/* {currentTab === "dashboard" && (
           <EventDetailsDashboard isActive={currentTab === "dashboard"} />
-        )}
+        )} */}
       </div>
     </section>
   );

@@ -68,6 +68,25 @@ export type UpdateTicketTypeData = Omit<
   ticketTypeId: string;
 };
 
+export type DeleteTicketTypeData = {
+  ticketTypeId: string;
+};
+
+export type DeleteTicketTypeResponse = {
+  message: string;
+  ticketTypeId: string;
+  eventId: string;
+};
+
+export type DeleteEventData = {
+  eventId: string;
+};
+
+export type DeleteEventResponse = {
+  message: string;
+  eventId: string;
+};
+
 export type GetEventRevenueResponse = {
   revenue: string;
 };

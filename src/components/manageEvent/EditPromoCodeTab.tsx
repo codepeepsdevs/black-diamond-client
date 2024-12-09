@@ -153,12 +153,19 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
             </thead>
             <tbody className="[&_td]:p-4">
               {promocodesQuery.isPending ? (
-                <LoadingMessage>Loading promocodes..</LoadingMessage>
+                <tr>
+                  <td colSpan={6}>
+                    <LoadingMessage>Loading promocodes..</LoadingMessage>
+                  </td>
+                </tr>
               ) : null}
               {promocodesQuery.data?.data ? (
                 promocodesQuery.data?.data.map((promocode) => {
                   return (
-                    <tr className="border-b border-b-[#151515]">
+                    <tr
+                      className="border-b border-b-[#151515]"
+                      key={promocode.id}
+                    >
                       <td>{promocode.name}</td>
                       <td>{promocode.key}</td>
                       <td>

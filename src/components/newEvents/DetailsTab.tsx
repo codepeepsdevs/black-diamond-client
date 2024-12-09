@@ -36,6 +36,8 @@ import Image from "next/image";
 import { FiPlus, FiTrash2 } from "react-icons/fi";
 import ErrorToast from "../toast/ErrorToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { useRouter } from "next/navigation";
+import SuccessToast from "../toast/SuccessToast";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -51,6 +53,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       locationType: "VENUE",
     },
   });
+  const router = useRouter();
 
   const [currentTab, setCurrentTab] = useQueryState(
     "tab",
@@ -67,14 +70,19 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     parseAsString.withDefault("")
   );
 
-  function onCreateEventDetailsSuccess(
+  async function onCreateEventDetailsSuccess(
     data: AxiosResponse<CreateEventDetailsResponse>
   ) {
-    toast.success("Event details created successfully");
-    setEventId(data.data.id);
+    SuccessToast({
+      title: "Success",
+      description: "Event details created successfully",
+    });
+    await setEventId(data.data.id);
     reset();
+    setImagesPreview(null);
+    setActivePreviewImage(null);
 
-    setCurrentTab("ticket");
+    router.push(`/admin/events/${data.data.id}?tab=ticket`);
   }
 
   function onCreateEventDetailsError(error: AxiosError<ErrorResponse>) {
@@ -166,6 +174,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
               />
             </div>
           )}
+          <FormError error={errors.images?.[0]} />
           <Swiper
             slidesPerView={"auto"}
             spaceBetween={10}

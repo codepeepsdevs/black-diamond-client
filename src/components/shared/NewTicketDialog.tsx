@@ -26,6 +26,7 @@ import { FormError } from "./FormError";
 import IconInputField from "./IconInputField";
 import Input from "./Input";
 import { FiChevronUp } from "react-icons/fi";
+import SuccessToast from "../toast/SuccessToast";
 
 export function NewTicketDialog({
   ...props
@@ -51,7 +52,10 @@ export function NewTicketDialog({
   function onCreateEventTicketTypeSuccess(
     data: AxiosResponse<CreateEventTicketTypeResponse>
   ) {
-    toast.success(data?.data?.name + "Ticket type created successfully");
+    SuccessToast({
+      title: "Success",
+      description: `${data?.data?.name}  Ticket type created successfully`,
+    });
     // The new ticket types should be automatically fetched because the query cache has been invalidated
     props?.onOpenChange?.(false); // conditionally closing the modal dialog
     reset();
@@ -174,14 +178,14 @@ export function NewTicketDialog({
                   <FiChevronUp
                     className={cn(
                       "text-xl transition-transform",
-                      advancedOpen && "rotate-180"
+                      !advancedOpen && "rotate-180"
                     )}
                   />
                   Advanced settings
                 </button>
                 <div
                   className={cn(
-                    advancedOpen && "invisible h-0 overflow-hidden"
+                    !advancedOpen && "invisible h-0 overflow-hidden"
                   )}
                 >
                   <div>

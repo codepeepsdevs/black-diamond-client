@@ -13,6 +13,7 @@ import { MdGppBad } from "react-icons/md";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import { useGetUser } from "@/api/user/user.queries";
+import Loading from "../loading";
 
 export default function AdminLayout({
   children,
@@ -31,15 +32,18 @@ export default function AdminLayout({
       setShowDialog(true);
     }
   }, [userData, userQuery.isPending]);
+  if (userQuery.isPending) {
+    return <Loading />;
+  }
   return (
     <>
-      {userQuery.isPending && (
+      {/* {userQuery.isPending && (
         <div className="min-h-48 flex items-center container">
           <LoadingMessage className="text-4xl">
             Loading admin dashboard.
           </LoadingMessage>
         </div>
-      )}
+      )} */}
       {userData?.role === "admin" && (
         <div className={`flex min-h-[50vh] `}>
           <AdminSidebar />

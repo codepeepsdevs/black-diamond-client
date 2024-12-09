@@ -185,6 +185,7 @@ export default function EditDetailsTab({
               />
             </div>
           )}
+          <FormError error={errors.images?.[0]} />
           <Swiper
             slidesPerView={"auto"}
             spaceBetween={10}

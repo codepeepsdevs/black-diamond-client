@@ -21,6 +21,10 @@ import {
   CreateEventPromocodeResponse,
   CreateEventTicketTypeData,
   CreateEventTicketTypeResponse,
+  DeleteEventData,
+  DeleteEventResponse,
+  DeleteTicketTypeData,
+  DeleteTicketTypeResponse,
   GetEventRevenueResponse,
   GetPromocodeResponse,
   GetPromocodesResponse,
@@ -272,6 +276,26 @@ export const upateTicketTypeDetails = async ({
     method: "put",
     data: data,
   })) as AxiosResponse<UpdateTicketTypeResponse>;
+};
+
+export const deleteTicketType = async ({
+  ticketTypeId,
+}: DeleteTicketTypeData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/ticket-type/${ticketTypeId}`,
+    method: "delete",
+    data: ticketTypeId,
+  })) as AxiosResponse<DeleteTicketTypeResponse>;
+};
+
+export const deleteEvent = async ({ eventId }: DeleteEventData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/delete-event/${eventId}`,
+    method: "delete",
+    data: eventId,
+  })) as AxiosResponse<DeleteEventResponse>;
 };
 
 export const getEventRevenue = async (eventId: Event["id"]) => {

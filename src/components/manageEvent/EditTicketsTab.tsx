@@ -15,16 +15,10 @@ import Input from "../shared/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import IconInputField from "../shared/IconInputField";
-import {
-  FaCheck,
-  FaDollarSign,
-  FaRegCalendar,
-  FaRegClock,
-} from "react-icons/fa6";
+import { FaDollarSign, FaRegCalendar, FaRegClock } from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import {
   editTicketFormSchema,
-  newTicketFormSchema,
   updateEventTicketTypeSchema,
 } from "@/api/events/events.schemas";
 import { FiChevronUp, FiMoreVertical } from "react-icons/fi";
@@ -32,17 +26,17 @@ import { BsDot } from "react-icons/bs";
 import Checkbox from "../shared/Checkbox";
 import { parseAsString, useQueryState } from "nuqs";
 import {
-  useCreateEventTicketType,
+  useDeleteTicketType,
   useGetEventTicketTypes,
   useUpdateTicketType,
 } from "@/api/events/events.queries";
 import { AxiosError, AxiosResponse } from "axios";
-import { ErrorResponse, TicketTypeVisibility } from "@/constants/types";
+import { ErrorResponse } from "@/constants/types";
 import {
   CreateEventTicketTypeResponse,
+  DeleteTicketTypeResponse,
   UpdateTicketTypeResponse,
 } from "@/api/events/events.types";
-import toast from "react-hot-toast";
 import * as dateFns from "date-fns";
 import * as dateFnsTz from "date-fns-tz";
 import { FormError } from "../shared/FormError";
@@ -53,7 +47,6 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { MdGppBad } from "react-icons/md";
-import { Router } from "next/router";
 import { useParams, useRouter } from "next/navigation";
 import ErrorToast from "../toast/ErrorToast";
 import SuccessToast from "../toast/SuccessToast";
@@ -62,6 +55,7 @@ import { useGetTicketTypeSales } from "@/api/order/order.queries";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import { SelectVisibilityDropDown } from "../newEvents/TicketTypeVisibility";
 import { NewTicketDialog } from "../shared/NewTicketDialog";
+import toast from "react-hot-toast";
 
 export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -77,6 +71,26 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [ticketToEdit, setTicketToEdit] = useState<Yup.InferType<
     typeof editTicketFormSchema
   > | null>(null);
+
+  const onDeleteSuccess = async (
+    data: AxiosResponse<DeleteTicketTypeResponse>
+  ) => {
+    SuccessToast({
+      title: "Success",
+      description: data.data.message || "Ticket type deleted successfully",
+    });
+  };
+
+  const onDeleteError = async (e: AxiosError<ErrorResponse>) => {
+    const errorMessage = getApiErrorMessage(e, "Something went wrong");
+    ErrorToast({
+      title: "Error",
+      descriptions: errorMessage,
+    });
+  };
+
+  const { mutate: deleteTicketType, isPending: deleteTicketTypePending } =
+    useDeleteTicketType(onDeleteError, onDeleteSuccess);
 
   const {
     register,
@@ -99,6 +113,17 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const ticketTypes = useGetEventTicketTypes(eventId);
   const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
   const ticketTypeSalesData = ticketTypeSalesQuery.data?.data;
+
+  let loadingToastId: string;
+  useEffect(() => {
+    if (deleteTicketTypePending) {
+      loadingToastId = toast.loading("Deleting ticket type");
+    } else {
+      toast.dismiss(loadingToastId);
+    }
+
+    return () => toast.remove(loadingToastId);
+  }, [deleteTicketTypePending]);
 
   function handleAction(
     action: (typeof actions)[number],
@@ -141,7 +166,8 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
         setEditTicketDialogOpen(true);
         break;
       case "delete":
-      //   TODO: handle delete tickettype?
+        //   TODO: handle delete tickettype?
+        deleteTicketType({ ticketTypeId });
     }
   }
 
@@ -207,6 +233,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                   <div>${ticketType.price.toFixed(2)}</div>
 
                   <ActionDropDown
+                    disabled={deleteTicketTypePending}
                     handleAction={handleAction}
                     ticketTypeId={ticketType.id}
                   />
@@ -367,11 +394,6 @@ function EditTicketDialog({
   const watchedEndDate = watch("endDate");
   const watchedStartDate = watch("startDate");
   const watchedVisibility = watch("visibility");
-  // FIXME: Date not filling in on dialog dialog open
-  // useEffect(() => {
-  //   setValue("endDate", defaultValues.endDate);
-  //   setValue("startDate", defaultValues.startDate);
-  // }, [defaultValues]);
 
   return (
     <Dialog {...props}>
@@ -451,14 +473,14 @@ function EditTicketDialog({
                   <FiChevronUp
                     className={cn(
                       "text-xl transition-transform",
-                      advancedOpen && "rotate-180"
+                      !advancedOpen && "rotate-180"
                     )}
                   />
                   Advanced settings
                 </button>
                 <div
                   className={cn(
-                    advancedOpen && "invisible h-0 overflow-hidden"
+                    !advancedOpen && "invisible h-0 overflow-hidden"
                   )}
                 >
                   <div>
@@ -598,8 +620,10 @@ const actions = ["edit", "delete"] as const;
 function ActionDropDown({
   ticketTypeId,
   handleAction,
+  disabled,
 }: {
   ticketTypeId: string;
+  disabled?: boolean;
   handleAction: (
     action: (typeof actions)[number],
     ticketTypeId: string
@@ -629,12 +653,13 @@ function ActionDropDown({
             {actions.map((item) => {
               return (
                 <button
+                  disabled={disabled}
                   key={item}
                   onClick={() => {
                     handleAction(item, ticketTypeId);
                     setDropdownOpen(false);
                   }}
-                  className="px-6 py-3 hover:bg-[#2c2b2b] capitalize text-left"
+                  className="px-6 py-3 hover:bg-[#2c2b2b] capitalize text-left disabled:text-opacity-50"
                 >
                   {item.toLowerCase()}
                 </button>

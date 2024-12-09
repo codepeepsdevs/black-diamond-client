@@ -247,9 +247,8 @@ export const newAddOnSchema = Yup.object().shape({
   startTime: Yup.string().required("Start Time is required"),
 
   // End Date and Time (required and should be after the start date)
-  endDate: dateStringSchema
-    .required("End Date is required")
-    .min(Yup.ref("startDate"), "End Date must be after the Start Date"),
+  endDate: dateStringSchema.required("End Date is required"),
+  // .min(Yup.ref("startDate"), "End Date must be after the Start Date"),
 
   endTime: Yup.string().required("End Time is required"),
 

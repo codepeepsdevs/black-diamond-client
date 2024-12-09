@@ -36,6 +36,7 @@ import ErrorToast from "../toast/ErrorToast";
 import { AxiosError } from "axios";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import SuccessToast from "../toast/SuccessToast";
 
 export default function EditEventAddOnTab({ isActive }: { isActive: boolean }) {
   const [createAddOnDialogOpen, setCreateAddonDialogOpen] = useState(false);
@@ -140,6 +141,8 @@ function CreateAddonDialog({ ...props }: ComponentProps<typeof Dialog>) {
     resolver: yupResolver(newAddOnSchema),
     defaultValues: {},
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const params = useParams<{ id: string }>();
   const eventId = params.id;
   function onError(e: AxiosError<Error>) {
@@ -155,8 +158,13 @@ function CreateAddonDialog({ ...props }: ComponentProps<typeof Dialog>) {
   }
 
   function onSuccess() {
-    toast.success("Addon created successfully");
+    SuccessToast({
+      title: "Success",
+      description: "Addon created successfully",
+    });
     reset();
+    setImagePreview(null);
+    props.onOpenChange?.(false);
   }
 
   const { mutate: createAddon, isPending } = useCreateEventAddon(
@@ -210,6 +218,8 @@ function CreateAddonDialog({ ...props }: ComponentProps<typeof Dialog>) {
               </div>
               <div>
                 <AddonImageInput
+                  imagePreview={imagePreview}
+                  setImagePreview={setImagePreview}
                   onSelectFile={(file) => setValue("image", file)}
                 />
               </div>
