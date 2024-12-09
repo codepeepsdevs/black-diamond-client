@@ -251,7 +251,7 @@ const UpComingEventDetailPage = () => {
 
               {/* PROMO CODE INPUT */}
               {/* TODO: ENABLE PROMOCODE LATER */}
-              {/* <div className="border-white border flex items-center p-3 mb-11">
+              <div className="border-white border flex items-center p-3 mb-11">
                 <input
                   disabled={Boolean(order.promocode)}
                   value={promocode}
@@ -266,7 +266,7 @@ const UpComingEventDetailPage = () => {
                     {getPromocodeIsPending ? "Applying.." : "Apply"}
                   </button>
                 )}
-              </div> */}
+              </div>
               {/* END PROMO CODE INPUT */}
 
               <EventTickets />
