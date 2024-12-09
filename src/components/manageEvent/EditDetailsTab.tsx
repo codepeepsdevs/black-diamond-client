@@ -32,9 +32,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import Image from "next/image";
 import EditEventImagesInputField from "./EditEventImagesInputField";
-import { FiTrash2 } from "react-icons/fi";
+import { FiPlus, FiTrash2 } from "react-icons/fi";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
-import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EditDetailsTab({
@@ -69,6 +69,9 @@ export default function EditDetailsTab({
   ) as SearchQueryState<Tabs>;
 
   const [imagesPreview, setImagesPreview] = useState<string[] | null>([]);
+  const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
+    null
+  );
 
   function onEditDetailsSuccess(data: AxiosResponse<any>) {
     // Clear file input and image preview on success
@@ -95,35 +98,15 @@ export default function EditDetailsTab({
     useUpdateEventDetails(onEditDetailsError, onEditDetailsSuccess);
 
   function onSubmit(values: Yup.InferType<typeof editEventDetailsSchema>) {
-    const [startTimeHours, startTimeMinutes] = values.startTime
-      .split(":")
-      .map((value) => Number(value));
-
-    const [endTimeHours, endTimeMinutes] = values.endTime
-      .split(":")
-      .map((value) => Number(value));
-
     updateEventDetails({
       name: values.name,
       summary: values.summary,
       location: values.location,
       refundPolicy: values.refundPolicy,
-      startTime: fromZonedTime(
-        dateFns.add(dateFns.startOfDay(values.date), {
-          hours: startTimeHours,
-          minutes: startTimeMinutes,
-        }),
-        newYorkTimeZone
-      ) // convert to UTC from the user's local time
-        .toISOString(),
-      endTime: fromZonedTime(
-        dateFns.add(dateFns.startOfDay(values.date), {
-          hours: endTimeHours,
-          minutes: endTimeMinutes,
-        }),
-        newYorkTimeZone
-      ) // convert to UTC from the user's local time
-        .toISOString(),
+      startDate: new Date(values.startDate).toISOString(),
+      startTime: values.startTime,
+      endDate: new Date(values.endDate).toISOString(),
+      endTime: values.endTime,
       eventId: eventId,
       locationType: values.locationType,
       images: values.images,
@@ -132,14 +115,31 @@ export default function EditDetailsTab({
   }
 
   const { mutate: removeImage, isPending: removeImagePending } =
-    useRemoveImageFromSlide();
+    useRemoveImageFromSlide(
+      () => {},
+      () => {
+        setActivePreviewImage(null);
+      }
+    );
 
-  const watchedDate = watch("date");
+  const watchedStartDate = watch("startDate");
+  const watchedEndDate = watch("endDate");
   useEffect(() => {
-    setValue("date", defaultValues?.date || new Date());
+    const zonedStartDate = dateFnsTz.toZonedTime(
+      new Date(defaultValues.startDate || Date.now()),
+      newYorkTimeZone
+    );
+    const zonedEndDate = dateFnsTz.toZonedTime(
+      new Date(defaultValues.endDate || Date.now()),
+      newYorkTimeZone
+    );
+
+    setValue("startDate", dateFns.format(zonedStartDate, "yyyy-MM-dd"));
+    setValue("endDate", dateFns.format(zonedEndDate, "yyyy-MM-dd"));
   }, [defaultValues]);
 
   const watchedLocationType = watch("locationType");
+  const watchedImages = watch("images");
 
   return (
     <div className={isActive ? "block" : "hidden"}>
@@ -156,44 +156,74 @@ export default function EditDetailsTab({
             }}
             oldCoverImage={defaultMedia.coverImage}
           />
+          <FormError error={errors.coverImage} />
         </div>
         {/* END UPLOAD COVER IMAGES SECTION */}
 
         {/* UPLOAD IMAGES SECTION */}
         <div>
           <label htmlFor="image-slides">Event slides</label>
-          <EditEventImagesInputField
-            onSelectFile={(files) => {
-              setValue("images", files);
-            }}
-            imagesPreview={imagesPreview}
-            setImagesPreview={setImagesPreview}
-          />
+          {activePreviewImage == null || !defaultMedia.images ? (
+            <EditEventImagesInputField
+              onSelectFile={(files) => {
+                if (watchedImages) {
+                  setValue("images", [...files, ...watchedImages]);
+                } else {
+                  setValue("images", files);
+                }
+              }}
+              imagesPreview={imagesPreview}
+              setImagesPreview={setImagesPreview}
+            />
+          ) : (
+            <div className="relative h-96 ">
+              <Image
+                src={activePreviewImage}
+                alt=""
+                fill
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
+          <FormError error={errors.images?.[0]} />
           <Swiper
             slidesPerView={"auto"}
             spaceBetween={10}
-            className="[&_.swiper-slide]:w-40 mt-5 border border-[#121212]"
+            className="[&_.swiper-slide]:w-36 [&_.swiper-slide]:h-32 mt-5 border border-[#121212]"
           >
+            <SwiperSlide>
+              <button
+                onClick={() => setActivePreviewImage(null)}
+                type="button"
+                className="bg-white bg-opacity-50 grid place-items-center h-full w-full"
+              >
+                <FiPlus className="text-4xl" />
+              </button>
+            </SwiperSlide>
             {defaultMedia.images?.map((image: string) => {
               return (
-                <SwiperSlide key={image}>
-                  <div className="relative">
+                <SwiperSlide
+                  key={image}
+                  onClick={() => setActivePreviewImage(image)}
+                >
+                  <div className="relative h-full">
                     <Image
                       src={image}
                       width={150}
                       height={150}
+                      className="object-cover w-full h-full"
                       alt="Slide Image"
                       sizes=""
                     />
                     <button
                       type="button"
                       className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
-                      onClick={() =>
+                      onClick={() => {
                         removeImage({
                           eventId: eventId,
                           image: image,
-                        })
-                      }
+                        });
+                      }}
                     >
                       <FiTrash2 />
                     </button>
@@ -243,20 +273,24 @@ export default function EditDetailsTab({
           <div className="text-xl font-semibold mb-4">Date and time</div>
 
           <div className="flex flex-col lg:flex-row gap-y-4 items-center gap-x-4">
-            {/* EVENT DATE */}
+            {/* EVENT START DATE */}
             <div className="lg:flex-1 w-full">
-              <label htmlFor="date">Date</label>
+              <label htmlFor="start-date">Start Date</label>
               <IconInputField
                 variant="white"
-                id="date"
+                id="start-date"
                 type="date"
-                value={new Date(watchedDate).toISOString().split("T")[0]}
-                {...register("date", { required: true })}
+                value={
+                  new Date(watchedStartDate || new Date())
+                    .toISOString()
+                    .split("T")[0]
+                }
+                {...register("startDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />
-              <FormError error={errors.date} />
+              <FormError error={errors.startDate} />
             </div>
-            {/* END EVENT DATE */}
+            {/* END EVENT START DATE */}
 
             {/* EVENT START TIME */}
             <div className="lg:flex-1 w-full">
@@ -269,6 +303,25 @@ export default function EditDetailsTab({
               <FormError error={errors.startTime} />
             </div>
             {/* END EVENT START TIME */}
+
+            {/* EVENT END DATE */}
+            <div className="lg:flex-1 w-full">
+              <label htmlFor="end-date">End Date</label>
+              <IconInputField
+                variant="white"
+                id="end-date"
+                type="date"
+                value={
+                  new Date(watchedEndDate || new Date())
+                    .toISOString()
+                    .split("T")[0]
+                }
+                {...register("endDate", { required: true })}
+                Icon={<FaRegCalendar className="text-[#14171A]" />}
+              />
+              <FormError error={errors.startDate} />
+            </div>
+            {/* END EVENT END DATE */}
 
             {/* EVENT END TIME */}
             <div className="lg:flex-1 w-full">

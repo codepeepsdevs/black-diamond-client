@@ -32,6 +32,8 @@ import {
 import ErrorToast from "@/components/toast/ErrorToast";
 import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
+import { GetPromocodeResponse } from "@/api/events/events.types";
+import { incPageView } from "@/api/events/events.apis";
 
 const UpComingEventDetailPage = () => {
   const order = useOrderStore();
@@ -76,6 +78,12 @@ const UpComingEventDetailPage = () => {
     eventAddonsQuery.data?.data,
   ]);
 
+  // PAGE VIEW QUERY
+  useEffect(() => {
+    incPageView({ eventId: params.id });
+  }, []);
+  // END PAGE VIEW QUERY
+
   function handleBuyTicket() {
     const ticketsPlaced =
       order.ticketOrders?.reduce(
@@ -92,6 +100,10 @@ const UpComingEventDetailPage = () => {
     }
   }
 
+  function removePromocode() {
+    order.setPromocode(null);
+  }
+
   function onGetPromocodeError(error: AxiosError<Error>) {
     const errorMessage = getApiErrorMessage(error, "Error applying promocode");
     ErrorToast({
@@ -100,9 +112,13 @@ const UpComingEventDetailPage = () => {
     });
   }
 
-  function onGetPromocodeSuccess(data: AxiosResponse<PromoCode>) {
-    toast.success("Promocode applied successfully");
-    order.setPromocode(data.data);
+  function onGetPromocodeSuccess(data: AxiosResponse<GetPromocodeResponse>) {
+    if (data.data.isActive) {
+      toast.success("Promocode applied successfully");
+      order.setPromocode(data.data);
+    } else {
+      toast.error("Inactive promocode");
+    }
   }
 
   const { mutate: getPromocode, isPending: getPromocodeIsPending } =
@@ -235,17 +251,22 @@ const UpComingEventDetailPage = () => {
 
               {/* PROMO CODE INPUT */}
               {/* TODO: ENABLE PROMOCODE LATER */}
-              {/* <div className="border-white border flex items-center p-3 mb-11">
+              <div className="border-white border flex items-center p-3 mb-11">
                 <input
+                  disabled={Boolean(order.promocode)}
                   value={promocode}
                   onChange={(e) => setPromocode(e.target.value)}
                   className="flex-1 bg-transparent focus:outline-none"
                   placeholder="Enter code"
                 />
-                <button onClick={() => getPromocode(promocode)}>
-                  {getPromocodeIsPending ? "Applying.." : "Apply"}
-                </button>
-              </div> */}
+                {order.promocode ? (
+                  <button onClick={() => removePromocode()}>Remove</button>
+                ) : (
+                  <button onClick={() => getPromocode(promocode.trim())}>
+                    {getPromocodeIsPending ? "Applying.." : "Apply"}
+                  </button>
+                )}
+              </div>
               {/* END PROMO CODE INPUT */}
 
               <EventTickets />

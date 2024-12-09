@@ -20,7 +20,7 @@ import IconInputField from "../shared/IconInputField";
 import EventImagesInputField from "./EventImagesInputField";
 import { newEventSchema } from "@/api/events/events.schemas";
 import { useCreateEventDetails } from "@/api/events/events.queries";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { CreateEventDetailsResponse } from "@/api/events/events.types";
 import { ErrorResponse } from "@/constants/types";
 import toast from "react-hot-toast";
@@ -31,6 +31,13 @@ import { parseAsString, useQueryState } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { fromZonedTime } from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { Swiper, SwiperSlide } from "swiper/react";
+import Image from "next/image";
+import { FiPlus, FiTrash2 } from "react-icons/fi";
+import ErrorToast from "../toast/ErrorToast";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { useRouter } from "next/navigation";
+import SuccessToast from "../toast/SuccessToast";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -46,10 +53,15 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       locationType: "VENUE",
     },
   });
+  const router = useRouter();
 
   const [currentTab, setCurrentTab] = useQueryState(
     "tab",
     parseAsString.withDefault("details")
+  );
+  const [imagesPreview, setImagesPreview] = useState<string[] | null>([]);
+  const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
+    null
   );
 
   // const setEventId = useNewEventStore((state) => state.setEventId);
@@ -58,20 +70,30 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     parseAsString.withDefault("")
   );
 
-  function onCreateEventDetailsSuccess(
+  async function onCreateEventDetailsSuccess(
     data: AxiosResponse<CreateEventDetailsResponse>
   ) {
-    toast.success("Event details created successfully");
-    setEventId(data.data.id);
+    SuccessToast({
+      title: "Success",
+      description: "Event details created successfully",
+    });
+    await setEventId(data.data.id);
     reset();
+    setImagesPreview(null);
+    setActivePreviewImage(null);
 
-    setCurrentTab("ticket");
+    router.push(`/admin/events/${data.data.id}?tab=ticket`);
   }
 
-  function onCreateEventDetailsError(error: ErrorResponse) {
-    toast.error(
-      error.message || "An error occurred while creating event details.."
+  function onCreateEventDetailsError(error: AxiosError<ErrorResponse>) {
+    const descriptions = getApiErrorMessage(
+      error,
+      "An error occrred while creating event details"
     );
+    ErrorToast({
+      title: "Error creating event",
+      descriptions: descriptions,
+    });
   }
 
   const { mutate: createEventDetails, isPending: createEventDetailsPending } =
@@ -81,14 +103,6 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     );
 
   function onSubmit(values: Yup.InferType<typeof newEventSchema>) {
-    const [startTimeHours, startTimeMinutes] = values.startTime
-      .split(":")
-      .map((value) => Number(value));
-
-    const [endTimeHours, endTimeMinutes] = values.endTime
-      .split(":")
-      .map((value) => Number(value));
-
     createEventDetails({
       name: values.name,
       summary: values.summary,
@@ -96,25 +110,24 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       refundPolicy: values.refundPolicy,
       coverImage: values.coverImage,
       images: values.images,
-      startTime: fromZonedTime(
-        dateFns.add(dateFns.startOfDay(values.date), {
-          hours: startTimeHours,
-          minutes: startTimeMinutes,
-        }),
-        newYorkTimeZone
-      ) // convert to UTC from the user's local time
-        .toISOString(),
-      endTime: fromZonedTime(
-        dateFns.add(dateFns.startOfDay(values.date), {
-          hours: endTimeHours,
-          minutes: endTimeMinutes,
-        }),
-        newYorkTimeZone
-      ) // convert to UTC from the user's local time
-        .toISOString(),
+      startDate: new Date(values.startDate).toISOString(),
+      startTime: values.startTime,
+      endDate: new Date(values.endDate).toISOString(),
+      endTime: values.endTime,
       locationType: values.locationType,
     });
   }
+
+  const watchedImages = watch("images");
+  const removeImage = (index: number) => {
+    const newImages = watchedImages?.filter((_, i) => i !== index);
+    setValue("images", newImages);
+    setImagesPreview((prevImages) => {
+      const images = prevImages?.filter((_, i) => i !== index);
+      return images || null;
+    });
+    setActivePreviewImage(null);
+  };
 
   const watchedLocationType = watch("locationType");
 
@@ -126,23 +139,86 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
       >
         {/* UPLOAD COVER IMAGES SECTION */}
         <div>
-          <label htmlFor="cover=image">Cover image</label>
+          <label htmlFor="cover-image">Cover image</label>
           <EventCoverImageInput
             onSelectFile={(file) => {
               setValue("coverImage", file);
             }}
           />
+          <FormError error={errors.coverImage} />
         </div>
         {/* END UPLOAD COVER IMAGES SECTION */}
 
         {/* UPLOAD IMAGES SECTION */}
         <div>
           <label htmlFor="image-slides">Event slides</label>
-          <EventImagesInputField
-            onSelectFile={(files) => {
-              setValue("images", files);
-            }}
-          />
+          {activePreviewImage == null || !imagesPreview ? (
+            <EventImagesInputField
+              onSelectFile={(files) => {
+                if (watchedImages && files) {
+                  setValue("images", [...watchedImages, ...files]);
+                } else {
+                  setValue("images", files);
+                }
+              }}
+              imagesPreview={imagesPreview}
+              setImagesPreview={setImagesPreview}
+            />
+          ) : (
+            <div className="relative h-96 ">
+              <Image
+                src={activePreviewImage}
+                alt=""
+                fill
+                className="object-cover w-full h-full"
+              />
+            </div>
+          )}
+          <FormError error={errors.images?.[0]} />
+          <Swiper
+            slidesPerView={"auto"}
+            spaceBetween={10}
+            className="[&_.swiper-slide]:w-36 [&_.swiper-slide]:h-32 mt-5 border border-[#121212]"
+          >
+            <SwiperSlide>
+              <button
+                onClick={() => setActivePreviewImage(null)}
+                type="button"
+                className="bg-white bg-opacity-50 grid place-items-center h-full w-full"
+              >
+                <FiPlus className="text-4xl" />
+              </button>
+            </SwiperSlide>
+            {imagesPreview?.map((image, index) => {
+              return (
+                <SwiperSlide
+                  key={image}
+                  onClick={() => setActivePreviewImage(image)}
+                >
+                  <div className="relative h-full w-full">
+                    <Image
+                      src={image}
+                      width={150}
+                      height={150}
+                      alt="Slide Image"
+                      sizes=""
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImage(index);
+                      }}
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
         </div>
         {/* END UPLOAD IMAGES SECTION */}
 
@@ -176,18 +252,18 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
           <div className="text-xl font-semibold mb-4">Date and time</div>
 
           <div className="flex flex-col lg:flex-row gap-y-4 items-center gap-x-4">
-            {/* EVENT DATE */}
+            {/* EVENT START DATE */}
             <div className="w-full sm:flex-1">
-              <label htmlFor="date">Date</label>
+              <label htmlFor="start-date">Start Date</label>
               <IconInputField
-                id="date"
+                id="start-date"
                 type="date"
-                {...register("date", { required: true })}
+                {...register("startDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />
-              <FormError error={errors.date} />
+              <FormError error={errors.startDate} />
             </div>
-            {/* END EVENT DATE */}
+            {/* END EVENT START DATE */}
 
             {/* EVENT START TIME */}
             <div className="w-full sm:flex-1">
@@ -200,6 +276,19 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
               <FormError error={errors.startTime} />
             </div>
             {/* END EVENT START TIME */}
+
+            {/* EVENT END DATE */}
+            <div className="w-full sm:flex-1">
+              <label htmlFor="end-date">End Date</label>
+              <IconInputField
+                id="end-date"
+                type="date"
+                {...register("endDate", { required: true })}
+                Icon={<FaRegCalendar className="text-[#14171A]" />}
+              />
+              <FormError error={errors.endDate} />
+            </div>
+            {/* END EVENT END DATE */}
 
             {/* EVENT END TIME */}
             <div className="w-full sm:flex-1">
@@ -326,11 +415,12 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
         {/* END ADDITIONAL INFORMATION */}
 
         <AdminButton
+          disabled={createEventDetailsPending}
           variant="ghost"
           className="font-medium flex items-center gap-x-2 px-6 mt-12"
         >
           {createEventDetailsPending ? (
-            <LoadingMessage />
+            <LoadingMessage>Creating...</LoadingMessage>
           ) : (
             <>
               <FaSave />

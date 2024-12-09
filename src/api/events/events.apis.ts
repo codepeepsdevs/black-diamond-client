@@ -21,7 +21,14 @@ import {
   CreateEventPromocodeResponse,
   CreateEventTicketTypeData,
   CreateEventTicketTypeResponse,
+  DeleteEventData,
+  DeleteEventResponse,
+  DeleteTicketTypeData,
+  DeleteTicketTypeResponse,
   GetEventRevenueResponse,
+  GetPromocodeResponse,
+  GetPromocodesResponse,
+  PageViewResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -96,7 +103,7 @@ export const getEventPromocodes = async (eventId: Event["id"]) => {
   return (await request({
     url: `/events/${eventId}/get-promocodes`,
     method: "get",
-  })) as AxiosResponse<PromoCode[]>;
+  })) as AxiosResponse<GetPromocodesResponse>;
 };
 
 export const getPromocode = async (key: string) => {
@@ -106,7 +113,7 @@ export const getPromocode = async (key: string) => {
     data: {
       key,
     },
-  })) as AxiosResponse<PromoCode>;
+  })) as AxiosResponse<GetPromocodeResponse>;
 };
 
 export const getAddons = async (eventId: Event["id"]) => {
@@ -271,6 +278,26 @@ export const upateTicketTypeDetails = async ({
   })) as AxiosResponse<UpdateTicketTypeResponse>;
 };
 
+export const deleteTicketType = async ({
+  ticketTypeId,
+}: DeleteTicketTypeData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/ticket-type/${ticketTypeId}`,
+    method: "delete",
+    data: ticketTypeId,
+  })) as AxiosResponse<DeleteTicketTypeResponse>;
+};
+
+export const deleteEvent = async ({ eventId }: DeleteEventData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/delete-event/${eventId}`,
+    method: "delete",
+    data: eventId,
+  })) as AxiosResponse<DeleteEventResponse>;
+};
+
 export const getEventRevenue = async (eventId: Event["id"]) => {
   if (!eventId) {
     throw new Error("Unable to get event revenue");
@@ -308,5 +335,20 @@ export const removeImageFromSlide = async (data: RemoveSlideData) => {
     data: {
       image: data.image,
     },
+  });
+};
+
+export const incPageView = async (data: { eventId: string }) => {
+  console.log("incpage");
+  return request<{}>({
+    url: `/events/inc-pageview/${data.eventId}`,
+    method: "get",
+  });
+};
+
+export const getViewCount = async (data: { eventId: string }) => {
+  return request<PageViewResponse>({
+    url: `/events/view-count/${data.eventId}`,
+    method: "get",
   });
 };

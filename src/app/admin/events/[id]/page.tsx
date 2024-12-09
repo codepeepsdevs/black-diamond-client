@@ -69,24 +69,21 @@ export default function ManageEventPage() {
   }, [eventId, currentTab]);
 
   useEffect(() => {
-    const date = dateFnsTz.toZonedTime(
+    const zonedStartTime = dateFnsTz.toZonedTime(
       new Date(event?.startTime || Date.now()),
       newYorkTimeZone
     );
-    const endTime = dateFnsTz.toZonedTime(
+    const zonedEndTime = dateFnsTz.toZonedTime(
       new Date(event?.endTime || Date.now()),
-      newYorkTimeZone
-    );
-    const startTime = dateFnsTz.toZonedTime(
-      new Date(event?.startTime || Date.now()),
       newYorkTimeZone
     );
 
     if (eventQuery.isSuccess) {
       setDetailsDefault({
-        date: date,
-        endTime: endTime.toTimeString().slice(0, 5),
-        startTime: startTime.toTimeString().slice(0, 5),
+        startDate: dateFns.format(zonedStartTime, "yyyy-MM-dd"),
+        startTime: dateFns.format(zonedStartTime, "HH:mm"),
+        endDate: dateFns.format(zonedEndTime, "yyyy-MM-dd"),
+        endTime: dateFns.format(zonedEndTime, "HH:mm"),
         location: event?.location || "",
         name: event?.name || "",
         refundPolicy: event?.refundPolicy || "",

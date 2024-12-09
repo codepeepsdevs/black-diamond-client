@@ -70,15 +70,25 @@ const EventTickets = () => {
               })}
             >
               Sales end on{" "}
-              {order.event?.endTime
-                ? dateFnsTz.format(
-                    dateFnsTz.toZonedTime(
-                      order.event?.endTime,
-                      newYorkTimeZone
-                    ),
-                    "MMM dd, yyyy"
-                  )
-                : "N/A"}
+              {ticketType.visibility === "CUSTOM_SCHEDULE"
+                ? ticketType.endDate
+                  ? dateFnsTz.format(
+                      dateFnsTz.toZonedTime(
+                        ticketType.endDate,
+                        newYorkTimeZone
+                      ),
+                      "MMM dd, yyyy"
+                    )
+                  : "N/A"
+                : order.event?.endTime
+                  ? dateFnsTz.format(
+                      dateFnsTz.toZonedTime(
+                        order.event?.endTime,
+                        newYorkTimeZone
+                      ),
+                      "MMM dd, yyyy"
+                    )
+                  : "N/A"}
             </p>
           </div>
         );
@@ -102,10 +112,10 @@ const EventTickets = () => {
             );
           })}
 
-        {/* <p className="text-end text-white p-2">
+        <p className="text-end text-white p-2">
           $<span className="font-bold">{order.totalDiscount} </span>
           {""}Discount
-        </p> */}
+        </p>
         <p className="text-end text-white p-2">
           $
           <span className="font-bold">
@@ -115,7 +125,7 @@ const EventTickets = () => {
               0
             ) || 0) - (order.totalDiscount || 0)}{" "}
           </span>
-          total
+          Total
         </p>
       </div>
       {/* ORDER DETAILS */}

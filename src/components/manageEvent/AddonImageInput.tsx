@@ -10,8 +10,9 @@ import { Next, Prev } from "../../../public/icons";
 
 const AddonImageInput: React.FC<{
   onSelectFile: (file: File) => void;
-}> = ({ onSelectFile }) => {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  imagePreview: string | null;
+  setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
+}> = ({ onSelectFile, imagePreview, setImagePreview }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Handle the dropped files

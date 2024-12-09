@@ -10,6 +10,7 @@ import { useParams } from "next/navigation";
 import {
   useGetEvent,
   useGetEventRevenue,
+  usePageView,
   usePublishEvent,
   useUnpublishEvent,
 } from "@/api/events/events.queries";
@@ -75,6 +76,9 @@ export default function EditEventDetailsDashboard({
 
   const eventRevenueQuery = useGetEventRevenue(eventId);
   const eventRevenue = eventRevenueQuery.data?.data;
+
+  const viewCountQuery = usePageView(eventId);
+  const viewCountData = viewCountQuery.data?.data;
 
   const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // const eventLink = `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
@@ -195,9 +199,13 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
-            <div className="text-white font-semibold text-6xl">
-              {totalTicketsSold}/{totalTickets}
-            </div>
+            {ticketTypeSalesQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                {totalTicketsSold}/{totalTickets}
+              </div>
+            )}
           </div>
           {/* END TICKETS SOLD */}
 
@@ -207,9 +215,13 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Revenue</span>
             </div>
-            <div className="text-white font-semibold text-6xl">
-              ${Number(eventRevenue?.revenue).toFixed(2)}
-            </div>
+            {eventRevenueQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                ${Number(eventRevenue?.revenue).toFixed(2)}
+              </div>
+            )}
           </div>
           {/* END REVENUE */}
 
@@ -219,7 +231,13 @@ export default function EditEventDetailsDashboard({
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Page Views</span>
             </div>
-            <div className="text-white font-semibold text-6xl">0</div>
+            {viewCountQuery.isPending ? (
+              <LoadingSvg />
+            ) : (
+              <div className="text-white font-semibold text-6xl">
+                {viewCountData?.views}
+              </div>
+            )}
           </div>
           {/* END PAGE VIEWS */}
         </div>
@@ -283,7 +301,7 @@ export default function EditEventDetailsDashboard({
           <tbody className="[&>td]:pt-6">
             {ticketTypeSales?.map((ticketType) => {
               return (
-                <tr>
+                <tr key={ticketType.id}>
                   <td>{ticketType.name}</td>
                   <td>
                     {ticketType._count.tickets}/{ticketType.quantity}

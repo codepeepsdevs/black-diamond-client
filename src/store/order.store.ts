@@ -39,7 +39,7 @@ interface Actions {
   updateAddonOrders: (addonId: string, type: "increment" | "decrement") => void;
   setOrderId: (orderId: string) => void;
   setClientSecret: (value: string) => void;
-  setPromocode: (value: PromoCode) => void;
+  setPromocode: (value: PromoCode | null) => void;
   clearOrder: () => void;
   updateDiscount: () => void;
 }
@@ -48,10 +48,10 @@ export const useOrderStore = create(
   devtools(
     persist<OrderStates & Actions>(
       (set) => ({
-        event: null,
-        ticketOrders: null,
-        orderId: null,
-        promocode: null,
+        // event: null,
+        // ticketOrders: null,
+        // orderId: null,
+        // promocode: null,
         totalDiscount: 0,
 
         setEvent: (event) =>
@@ -139,12 +139,8 @@ export const useOrderStore = create(
             clientSecret: value,
           })),
 
-        setPromocode: (value: PromoCode) => {
-          set((prevState) => {
-            return {
-              promocode: value,
-            };
-          });
+        setPromocode: (value: PromoCode | null) => {
+          set({ promocode: value });
         },
         updateDiscount: () => {
           set((prevState) => {
@@ -198,7 +194,7 @@ export const useOrderStore = create(
 
       {
         name: "order",
-        storage: createJSONStorage(() => sessionStorage),
+        storage: createJSONStorage(() => localStorage),
       }
     )
   )

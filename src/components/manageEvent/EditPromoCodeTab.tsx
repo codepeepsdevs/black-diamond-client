@@ -46,8 +46,9 @@ import { parseAsString, useQueryState } from "nuqs";
 import { MdGppBad } from "react-icons/md";
 import { Tabs } from "@/app/admin/events/new-event/page";
 import { useParams } from "next/navigation";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
-import ErrorToast from "../toast/ErrorToast";
+import { SelectTicketsDropDown } from "../shared/PromocodeTicketsDropdown";
+import { AddPromoCodeDialog } from "../shared/AddPromocodeDialog";
+import LoadingMessage from "../shared/Loader/LoadingMessage";
 // import * as Dialog from '@radix-ui/react-dialog'
 
 export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
@@ -143,6 +144,7 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
             <thead className="bg-[#A3A7AA] text-black leading-10 font-medium [&_th]:px-4">
               <tr>
                 <th>Name</th>
+                <th>Key</th>
                 <th>Discount </th>
                 <th>Uses/Limit</th>
                 <th>Status</th>
@@ -150,18 +152,40 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
               </tr>
             </thead>
             <tbody className="[&_td]:p-4">
+              {promocodesQuery.isPending ? (
+                <tr>
+                  <td colSpan={6}>
+                    <LoadingMessage>Loading promocodes..</LoadingMessage>
+                  </td>
+                </tr>
+              ) : null}
               {promocodesQuery.data?.data ? (
                 promocodesQuery.data?.data.map((promocode) => {
                   return (
-                    <tr className="border-b border-b-[#151515]">
+                    <tr
+                      className="border-b border-b-[#151515]"
+                      key={promocode.id}
+                    >
                       <td>{promocode.name}</td>
+                      <td>{promocode.key}</td>
                       <td>
-                        {`${promocode.absoluteDiscountAmount.toFixed(2)}` ||
+                        {`$${promocode.absoluteDiscountAmount.toFixed(2)}` ||
                           `${promocode.percentageDiscountAmount}%`}
                       </td>
                       {/* TODO: work on this */}
-                      <td>{promocode.limit}</td>
-                      <td></td>{" "}
+                      <td>
+                        {promocode.used}/{promocode.limit}
+                      </td>
+                      <td>
+                        <span
+                          className={cn(
+                            "px-1 text-white text-sm rounded-sm",
+                            isActive === true ? "bg-green-500" : "#ef4444"
+                          )}
+                        >
+                          {promocode.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>{" "}
                       {/* TODO: display status showing if promocode is still active */}
                       <td>
                         <FiMoreVertical />
@@ -171,7 +195,7 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                 })
               ) : (
                 <tr>
-                  <td className="text-white py-4" colSpan={5}>
+                  <td className="text-white py-4" colSpan={6}>
                     Promo codes list is empty
                   </td>
                 </tr>
@@ -203,219 +227,6 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
         />
       )}
     </>
-  );
-}
-
-function AddPromoCodeDialog({
-  ticketTypes,
-  ...props
-}: ComponentProps<typeof Dialog> & {
-  ticketTypes: TicketType[];
-}) {
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    watch,
-    setValue,
-    reset,
-  } = useForm<Yup.InferType<typeof newPromocodeFormSchema>>({
-    resolver: yupResolver(newPromocodeFormSchema),
-    defaultValues: {
-      applyToTicketIds: ticketTypes.map((ticketType) => ticketType.id),
-    },
-  });
-
-  const params = useParams<{ id: string }>();
-  const eventId = params.id;
-  const [pickType, setPickType] = useState<"all" | "selected">("all");
-
-  function onError(error: AxiosError<ErrorResponse>) {
-    const errorMessage = getApiErrorMessage(
-      error,
-      "Unable to create promocode"
-    );
-    ErrorToast({
-      title: "Error",
-      descriptions: errorMessage,
-    });
-  }
-
-  function onSuccess(data: AxiosResponse<CreateEventPromocodeResponse>) {
-    toast.success("Event promocode successfully created");
-    reset();
-  }
-
-  const {
-    mutate: createEventPromoCode,
-    isPending: createEventPromoCodeIspending,
-  } = useCreateEventPromocode(onError, onSuccess, eventId);
-
-  const selectedTicketTypeIds = watch("applyToTicketIds");
-  const setSelectedTicketTypeIds = (value: string[]) =>
-    setValue("applyToTicketIds", value);
-
-  function onSubmit(values: Yup.InferType<typeof newPromocodeFormSchema>) {
-    createEventPromoCode(values);
-  }
-
-  return (
-    <Dialog {...props}>
-      <DialogPortal>
-        <DialogOverlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
-          <DialogContent className="bg-[#333333] text-[#A3A7AA] p-6 max-w-md">
-            <DialogTitle className="text-xl font-semibold">
-              Add Code
-            </DialogTitle>
-            <DialogDescription className="hidden">
-              Add new promo code
-            </DialogDescription>
-            <DialogClose />
-
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              <div>
-                <label htmlFor="name">Code Name*</label>
-                <Input {...register("name")} />
-                <FormError error={errors.name} />
-              </div>
-              <div>
-                <label htmlFor="code-key">Code Key*</label>
-                <div className="text-xs">
-                  Secret key that applies the discount
-                </div>
-                <Input {...register("key")} />
-                <FormError error={errors.key} />
-              </div>
-              <div>
-                <label htmlFor="ticket-limit">Ticket Limit*</label>
-                <Input {...register("limit")} />
-                <FormError error={errors.limit} />
-              </div>
-              <label htmlFor="discount-amount">Discount Amount</label>
-              <div className="flex items-center gap-x-4 gap-y-4">
-                <div className="flex-1">
-                  <IconInputField
-                    className="bg-input-bg"
-                    Icon={<FaDollarSign />}
-                    {...register("absoluteDiscountAmount")}
-                  />
-                  <FormError error={errors.absoluteDiscountAmount} />
-                </div>
-                <div>or</div>
-                <div className="flex-1">
-                  <IconInputField
-                    className="bg-input-bg"
-                    Icon={<AiOutlinePercentage />}
-                    {...register("percentageDiscountAmount")}
-                  />
-                  <FormError error={errors.percentageDiscountAmount} />
-                </div>
-              </div>
-              <div className="flex items-center gap-x-4 gap-y-4">
-                <div className="flex-1">
-                  <label htmlFor="quantity">Start Date*</label>
-                  <IconInputField
-                    type="date"
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("startDate")}
-                  />
-                  <FormError error={errors.startDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="quantity">Start Time*</label>
-                  <IconInputField
-                    type="time"
-                    className="bg-input-bg"
-                    Icon={<FaRegClock />}
-                    {...register("startTime")}
-                  />
-                  <FormError error={errors.startTime} />
-                </div>
-              </div>
-              <div className="flex items-center gap-x-4">
-                <div className="flex-1">
-                  <label htmlFor="end-date">End Date*</label>
-                  <IconInputField
-                    type="date"
-                    className="bg-input-bg"
-                    Icon={<FaRegCalendar />}
-                    {...register("endDate")}
-                  />
-                  <FormError error={errors.endDate} />
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="end-time">End Time*</label>
-                  <IconInputField
-                    type="time"
-                    className="bg-input-bg"
-                    Icon={<FaRegClock />}
-                    {...register("endTime")}
-                  />
-                  <FormError error={errors.endTime} />
-                </div>
-              </div>
-
-              <div className="space-y-4 mt-6">
-                <div>Apply code to:</div>
-                <div className="flex items-center gap-x-3">
-                  <RadioButton
-                    selected={pickType === "all"}
-                    value={"all"}
-                    onSelect={() => {
-                      setSelectedTicketTypeIds(
-                        ticketTypes.map((ticketType) => ticketType.id)
-                      );
-                      setPickType("all");
-                    }}
-                  />
-                  <div>All visible tickets</div>
-                </div>
-                <div className="flex items-center gap-x-3">
-                  <RadioButton
-                    value={"selected"}
-                    selected={pickType === "selected"}
-                    onSelect={() => {
-                      setSelectedTicketTypeIds(
-                        ticketTypes.map((ticketType) => ticketType.id)
-                      );
-                      setPickType("selected");
-                    }}
-                  />
-                  <div className="flex w-full">
-                    <div>Only certain visible tickets</div>
-                    <SelectTicketsDropDown
-                      disabled={pickType === "all"}
-                      ticketTypes={ticketTypes}
-                      selectedTicketTypeIds={selectedTicketTypeIds}
-                      setSelectedTicketTypeIds={setSelectedTicketTypeIds}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-x-12 mt-4 gap-y-4">
-                <AdminButton
-                  type="button"
-                  onClick={() => props?.onOpenChange?.(false)}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  Cancel
-                </AdminButton>
-                <AdminButton
-                  disabled={createEventPromoCodeIspending}
-                  variant="ghost"
-                  className="flex-1"
-                >
-                  {createEventPromoCodeIspending ? "Saving.." : "Save"}
-                </AdminButton>
-              </div>
-            </form>
-          </DialogContent>
-        </DialogOverlay>
-      </DialogPortal>
-    </Dialog>
   );
 }
 
@@ -624,80 +435,6 @@ function EditPromoCodeDialog({
         </DialogOverlay>
       </DialogPortal>
     </Dialog>
-  );
-}
-
-function SelectTicketsDropDown({
-  disabled,
-  ticketTypes,
-  selectedTicketTypeIds,
-  setSelectedTicketTypeIds,
-}: {
-  disabled: boolean;
-  ticketTypes: TicketType[];
-  selectedTicketTypeIds: TicketType["id"][];
-  setSelectedTicketTypeIds: (value: string[]) => void;
-}) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  function handleSelectTicketTypeId(ticketTypeId: string) {
-    // setSelectedTicketTypeIds((prevState) => {
-    const ticketTypeIdExists = selectedTicketTypeIds.includes(ticketTypeId);
-    if (ticketTypeIdExists) {
-      setSelectedTicketTypeIds(
-        selectedTicketTypeIds.filter((selectedId) => {
-          if (ticketTypeId === selectedId) {
-            return false;
-          } else {
-            return true;
-          }
-        })
-      );
-    } else {
-      setSelectedTicketTypeIds([...selectedTicketTypeIds, ticketTypeId]);
-    }
-    // });
-  }
-
-  return (
-    <div className="relative ml-auto">
-      {/* ACTION BUTTON */}
-      <button
-        disabled={disabled}
-        type="button"
-        className="text-[#4267B2] disabled:text-[#BDBDBD]"
-        onClick={() => setDropdownOpen((state) => !state)}
-      >
-        Select
-      </button>
-      {/* ACTION BUTTON */}
-      <div
-        className={cn(
-          "bg-[#151515] flex-col inline-flex divide-y divide-[#151515] min-w-56 absolute z-[1] top-8 mt-2 right-0 overflow-hidden",
-          dropdownOpen ? "h-max" : "h-0"
-        )}
-      >
-        {ticketTypes?.map((ticketType) => {
-          return (
-            <button
-              key={ticketType.id}
-              onClick={() => {
-                handleSelectTicketTypeId(ticketType.id);
-              }}
-              className="px-6 py-3 hover:bg-[#2c2b2b] capitalize flex items-center gap-x-2"
-            >
-              <FaCheck
-                className={cn(
-                  "text-[#34C759] invisible",
-                  selectedTicketTypeIds.includes(ticketType.id) && "visible"
-                )}
-              />
-              <span>{ticketType.name.toLowerCase()}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

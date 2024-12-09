@@ -23,6 +23,9 @@ import {
   publishEvent,
   unpublishEvent,
   EventWithSoldQuantity,
+  getViewCount,
+  deleteTicketType,
+  deleteEvent,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -41,8 +44,14 @@ import {
   CreateEventDetailsResponse,
   CreateEventPromocodeResponse,
   CreateEventTicketTypeResponse,
+  DeleteEventData,
+  DeleteEventResponse,
+  DeleteTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
+  GetPromocodeResponse,
+  GetPromocodesResponse,
+  PageViewResponse,
   PublishEventResponse,
   RemoveSlideData,
   RemoveSlideResponse,
@@ -117,7 +126,10 @@ export const useGetEventTicketTypes = (eventId: Event["id"]) => {
 };
 
 export const useGetPromocodes = (eventId: Event["id"]) => {
-  return useQuery<AxiosResponse<PromoCode[]>, AxiosError<ErrorResponse>>({
+  return useQuery<
+    AxiosResponse<GetPromocodesResponse>,
+    AxiosError<ErrorResponse>
+  >({
     queryKey: ["get-event-promocode", eventId],
     queryFn: () => getEventPromocodes(eventId),
     // enabled: false,
@@ -136,7 +148,7 @@ export const useGetAddons = (eventId: Event["id"]) => {
 
 export const useGetPromocode = (
   onError: (error: AxiosError<Error>) => void,
-  onSuccess: (data: AxiosResponse<PromoCode>) => void
+  onSuccess: (data: AxiosResponse<GetPromocodeResponse>) => void
 ) => {
   return useMutation({
     mutationFn: getPromocode,
@@ -246,6 +258,40 @@ export const useUpdateTicketType = (
   });
 };
 
+export const useDeleteTicketType = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<DeleteTicketTypeResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTicketType,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-event-ticket-types", data.data.eventId],
+      });
+      onSuccess?.(data);
+    },
+  });
+};
+
+export const useDeleteEvent = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<DeleteEventResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteEvent,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-get-events"],
+      });
+      onSuccess?.(data);
+    },
+  });
+};
+
 export const useGetEventRevenue = (eventId: Event["id"]) => {
   return useQuery<
     AxiosResponse<GetEventRevenueResponse>,
@@ -322,7 +368,10 @@ export const useUnpublishEvent = (eventId: Event["id"]) => {
   });
 };
 
-export const useRemoveImageFromSlide = () => {
+export const useRemoveImageFromSlide = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<RemoveSlideResponse>) => void
+) => {
   const queryClient = useQueryClient();
   return useMutation<
     AxiosResponse<RemoveSlideResponse>,
@@ -340,6 +389,7 @@ export const useRemoveImageFromSlide = () => {
         title: "Delete Error",
         descriptions: errorMessage,
       });
+      onError?.(e);
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
@@ -350,6 +400,15 @@ export const useRemoveImageFromSlide = () => {
         title: "Success",
         description: data.data.message,
       });
+
+      onSuccess?.(data);
     },
+  });
+};
+
+export const usePageView = (eventId: string) => {
+  return useQuery({
+    queryKey: ["s"],
+    queryFn: () => getViewCount({ eventId }),
   });
 };

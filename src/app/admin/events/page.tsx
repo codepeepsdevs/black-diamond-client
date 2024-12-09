@@ -1,17 +1,32 @@
 "use client";
 
-import { useAdminGetEvents, useGetEvents } from "@/api/events/events.queries";
+import {
+  useAdminGetEvents,
+  useDeleteEvent,
+  useGetEvents,
+} from "@/api/events/events.queries";
+import { DeleteEventResponse } from "@/api/events/events.types";
 import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
-import { Event, EventStatus, OptionProps } from "@/constants/types";
+import ErrorToast from "@/components/toast/ErrorToast";
+import SuccessToast from "@/components/toast/SuccessToast";
+import {
+  ErrorResponse,
+  Event,
+  EventStatus,
+  OptionProps,
+} from "@/constants/types";
 import { cn } from "@/utils/cn";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { AxiosError, AxiosResponse } from "axios";
 // import { formatEventDate } from "@/utils/date-formatter";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { FaSortDown } from "react-icons/fa6";
 import {
   FiChevronsLeft,
@@ -29,6 +44,28 @@ export default function AdminEventsPage() {
   const eventsQuery = useAdminGetEvents({ page, eventStatus });
   const eventsData = eventsQuery.data?.data;
   const router = useRouter();
+  const loadingToastId = useRef("");
+
+  const { mutate: deleteEvent, isPending: deleteEventPending } = useDeleteEvent(
+    onDeleteError,
+    onDeleteSuccess
+  );
+  function onDeleteError(e: AxiosError<ErrorResponse>) {
+    toast.dismiss(loadingToastId.current);
+    const errorMessage = getApiErrorMessage(e, "Something went wrong");
+    ErrorToast({
+      title: "Error",
+      descriptions: errorMessage,
+    });
+  }
+
+  function onDeleteSuccess(data: AxiosResponse<DeleteEventResponse>) {
+    toast.dismiss(loadingToastId.current);
+    SuccessToast({
+      title: "Success",
+      description: "Event deleted successfully",
+    });
+  }
 
   const isLast = eventsData?.eventsCount
     ? page * 10 >= eventsData.eventsCount
@@ -53,6 +90,7 @@ export default function AdminEventsPage() {
         const eventLink = "/admin/events/" + eventId;
         router.push(eventLink);
       case "delete":
+        deleteEvent({ eventId });
     }
   }
 
@@ -102,11 +140,13 @@ export default function AdminEventsPage() {
           <table className="w-full mt-12 overflow-x-auto min-w-max">
             {/* LIST HEAEDER */}
             <thead className="bg-[#A3A7AA] leading-10 text-left [&>th]:px-4">
-              <th>Event</th>
-              <th>Sold</th>
-              <th>Gross</th>
-              <th>Status</th>
-              <th></th>
+              <tr>
+                <th>Event</th>
+                <th>Sold</th>
+                <th>Gross</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
             </thead>
             {/* END LIST HEAEDER */}
             {/* LIST BODY */}
@@ -187,7 +227,7 @@ export default function AdminEventsPage() {
                               <div className="bg-[#333333] rounded-full h-1 min-w-40 overflow-hidden">
                                 <div
                                   style={{
-                                    width: `${(event.totalSales / event.totalTickets) * 100}`,
+                                    width: `${(event.totalSales / event.totalTickets) * 100}%`,
                                   }}
                                   className="bg-[#A3A7AA] h-full"
                                 ></div>
