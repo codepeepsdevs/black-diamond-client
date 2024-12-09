@@ -71,7 +71,7 @@ const EventCoverImageInput: React.FC<{
         {/* END IMAGE PREVIEW */}
       </div>
 
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-start mt-5">
         {/* IMAGE PREVIEW */}
         {imagePreview && (
           <div className="w-36 h-32 relative">

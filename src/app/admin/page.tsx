@@ -6,7 +6,7 @@ import {
   useGetRevenue,
   useGetTicketsSoldStats,
 } from "@/api/order/order.queries";
-import { useUsersStats } from "@/api/user/user.queries";
+import { useGetUser, useUsersStats } from "@/api/user/user.queries";
 import RecentOrdersTable from "@/components/dashboard/RecentOrders";
 import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
@@ -20,6 +20,8 @@ export default function AdminHomePage() {
     from: subMonths(new Date(), 1),
     to: new Date(),
   });
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
 
   const upcomingEventsQuery = useAdminGetEvents({
     eventStatus: "upcoming",
@@ -47,7 +49,9 @@ export default function AdminHomePage() {
     <section>
       <div className="mx-8 mt-20 pt-10 text-[#A3A7AA]">
         <h1 className="text-3xl font-semibold text-white">Dashboard</h1>
-        <p className="text-sm text-[#A3A7AA] mb-5">Welcome Liam</p>
+        <p className="text-sm text-[#A3A7AA] mb-5">
+          Welcome {userQuery.isPending ? <LoadingSvg /> : userData?.firstname}
+        </p>
 
         <div className="flex gap-x-2 justify-end items-center">
           <DatePickerWithRange

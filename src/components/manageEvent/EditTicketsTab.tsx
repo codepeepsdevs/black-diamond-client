@@ -1,4 +1,4 @@
-import React, { ComponentProps, useEffect, useState } from "react";
+import React, { ComponentProps, useEffect, useRef, useState } from "react";
 import AdminButton from "../buttons/AdminButton";
 import { FaSave } from "react-icons/fa";
 import {
@@ -56,6 +56,7 @@ import { newYorkTimeZone } from "@/utils/date-formatter";
 import { SelectVisibilityDropDown } from "../newEvents/TicketTypeVisibility";
 import { NewTicketDialog } from "../shared/NewTicketDialog";
 import toast from "react-hot-toast";
+import LoadingMessage from "../shared/Loader/LoadingMessage";
 
 export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -68,6 +69,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
 
   const params = useParams<{ id: string }>();
   const eventId = params.id;
+  let loadingToastId = useRef("");
   const [ticketToEdit, setTicketToEdit] = useState<Yup.InferType<
     typeof editTicketFormSchema
   > | null>(null);
@@ -79,6 +81,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
       title: "Success",
       description: data.data.message || "Ticket type deleted successfully",
     });
+    toast.dismiss(loadingToastId.current);
   };
 
   const onDeleteError = async (e: AxiosError<ErrorResponse>) => {
@@ -87,6 +90,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
       title: "Error",
       descriptions: errorMessage,
     });
+    toast.dismiss(loadingToastId.current);
   };
 
   const { mutate: deleteTicketType, isPending: deleteTicketTypePending } =
@@ -113,17 +117,6 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const ticketTypes = useGetEventTicketTypes(eventId);
   const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
   const ticketTypeSalesData = ticketTypeSalesQuery.data?.data;
-
-  let loadingToastId: string;
-  useEffect(() => {
-    if (deleteTicketTypePending) {
-      loadingToastId = toast.loading("Deleting ticket type");
-    } else {
-      toast.dismiss(loadingToastId);
-    }
-
-    return () => toast.remove(loadingToastId);
-  }, [deleteTicketTypePending]);
 
   function handleAction(
     action: (typeof actions)[number],
@@ -168,6 +161,8 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
       case "delete":
         //   TODO: handle delete tickettype?
         deleteTicketType({ ticketTypeId });
+
+        loadingToastId.current = toast.loading("Deleting ticket type");
     }
   }
 
@@ -196,51 +191,135 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
         )}
 
         {/* TICKET TYPE LIST */}
-        <div className="font-medium mt-12">
-          {ticketTypes.isPending ? (
-            <div>Loading ticket types..</div>
-          ) : ticketTypes.isError ? (
-            <div>Error loading ticket types..</div>
-          ) : (
-            ticketTypes.data?.data.map((ticketType) => {
-              return (
-                <div
-                  key={ticketType.id}
-                  className="flex gap-x-24 py-4 whitespace-nowrap overflow-x-auto"
-                >
-                  <div className="flex-1">
-                    <div className="font-medium text-xl">{ticketType.name}</div>
-                    {ticketType.endDate ? (
-                      <div className="flex items-center mt-2">
-                        <BsDot className="text-[#34C759] text-2xl -ml-2" />
-                        <p className="">
-                          On Sale · Ends{" "}
-                          {dateFns.format(
-                            dateFnsTz.toZonedTime(
-                              new Date(ticketType.endDate),
-                              newYorkTimeZone
-                            ),
-                            "MMM d, yyyy 'at' h:mm a"
+        {/* <table>
+          <thead className="bg-[#A3A7AA] text-black leading-10 font-medium [&_th]:px-4">
+            <tr>
+              <th>Name</th>
+              <th>Sold/Total Quantity</th>
+              <th>Price </th>
+              <th></th>
+            </tr>
+          </thead>
+          <div className="font-medium mt-12">
+            {ticketTypes.isPending ? (
+              <div>Loading ticket types..</div>
+            ) : ticketTypes.isError ? (
+              <div>Error loading ticket types..</div>
+            ) : (
+              ticketTypes.data?.data.map((ticketType) => {
+                return (
+                  <div
+                    key={ticketType.id}
+                    className="flex gap-x-24 py-4 whitespace-nowrap overflow-x-auto"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium text-xl">
+                        {ticketType.name}
+                      </div>
+                      {ticketType.endDate ? (
+                        <div className="flex items-center mt-2">
+                          <BsDot className="text-[#34C759] text-2xl -ml-2" />
+                          <p className="">
+                            On Sale · Ends{" "}
+                            {dateFns.format(
+                              dateFnsTz.toZonedTime(
+                                new Date(ticketType.endDate),
+                                newYorkTimeZone
+                              ),
+                              "MMM d, yyyy 'at' h:mm a"
+                            )}
+                          </p>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div>Sold: </div>
+                    <div>
+                      {ticketType._count.tickets}/{ticketType.quantity}
+                    </div>
+                    <div>${ticketType.price.toFixed(2)}</div>
+
+                    <ActionDropDown
+                      disabled={deleteTicketTypePending}
+                      handleAction={handleAction}
+                      ticketTypeId={ticketType.id}
+                    />
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </table> */}
+        <div className="overflow-x-auto text-[#A3A7AA] mt-10">
+          <table className="w-full text-left">
+            <thead className="bg-[#A3A7AA] text-black leading-10 font-medium [&_th]:px-4">
+              <tr>
+                <th>Name</th>
+                <th>Sale Ends</th>
+                <th>Sold/Total</th>
+                <th>Price </th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody className="[&_td]:p-4">
+              {ticketTypes.isPending ? (
+                <tr>
+                  <td colSpan={5}>
+                    <LoadingMessage>Loading ticket types..</LoadingMessage>
+                  </td>
+                </tr>
+              ) : null}
+              {ticketTypes.data?.data ? (
+                ticketTypes.data?.data.map((ticketType) => {
+                  return (
+                    <tr
+                      className="border-b border-b-[#151515]"
+                      key={ticketType.id}
+                    >
+                      <td>{ticketType.name}</td>
+                      <td>
+                        <p>
+                          {ticketType.endDate ? (
+                            <div className="flex items-center mt-2">
+                              <BsDot className="text-[#34C759] text-2xl -ml-2" />
+                              <p className="">
+                                On Sale · Ends{" "}
+                                {dateFns.format(
+                                  dateFnsTz.toZonedTime(
+                                    new Date(ticketType.endDate),
+                                    newYorkTimeZone
+                                  ),
+                                  "MMM d, yyyy 'at' h:mm a"
+                                )}
+                              </p>
+                            </div>
+                          ) : (
+                            "N/A"
                           )}
                         </p>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>Sold: </div>
-                  <div>
-                    {ticketType._count.tickets}/{ticketType.quantity}
-                  </div>
-                  <div>${ticketType.price.toFixed(2)}</div>
-
-                  <ActionDropDown
-                    disabled={deleteTicketTypePending}
-                    handleAction={handleAction}
-                    ticketTypeId={ticketType.id}
-                  />
-                </div>
-              );
-            })
-          )}
+                      </td>
+                      <td>
+                        {ticketType._count.tickets}/{ticketType.quantity}
+                      </td>
+                      <td>${ticketType.price.toFixed(2)}</td>
+                      <td>
+                        <ActionDropDown
+                          disabled={deleteTicketTypePending}
+                          handleAction={handleAction}
+                          ticketTypeId={ticketType.id}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td className="text-white py-4" colSpan={5}>
+                    No ticket type created
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
         {/* END TICKET TYPE LIST */}
 

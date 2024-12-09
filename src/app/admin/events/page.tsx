@@ -25,7 +25,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaSortDown } from "react-icons/fa6";
 import {
@@ -44,12 +44,14 @@ export default function AdminEventsPage() {
   const eventsQuery = useAdminGetEvents({ page, eventStatus });
   const eventsData = eventsQuery.data?.data;
   const router = useRouter();
+  const loadingToastId = useRef("");
 
   const { mutate: deleteEvent, isPending: deleteEventPending } = useDeleteEvent(
     onDeleteError,
     onDeleteSuccess
   );
   function onDeleteError(e: AxiosError<ErrorResponse>) {
+    toast.dismiss(loadingToastId.current);
     const errorMessage = getApiErrorMessage(e, "Something went wrong");
     ErrorToast({
       title: "Error",
@@ -58,20 +60,12 @@ export default function AdminEventsPage() {
   }
 
   function onDeleteSuccess(data: AxiosResponse<DeleteEventResponse>) {
+    toast.dismiss(loadingToastId.current);
     SuccessToast({
       title: "Success",
       description: "Event deleted successfully",
     });
   }
-
-  let loadingToastId: string;
-  useEffect(() => {
-    if (deleteEventPending) {
-      loadingToastId = toast.loading("Deleting event");
-    } else {
-      toast.dismiss(loadingToastId);
-    }
-  }, [deleteEventPending]);
 
   const isLast = eventsData?.eventsCount
     ? page * 10 >= eventsData.eventsCount

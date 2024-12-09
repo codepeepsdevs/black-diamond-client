@@ -76,7 +76,7 @@ const EditEventCoverImageInput: React.FC<{
         {/* END IMAGE PREVIEW */}
       </div>
 
-      <div className="flex justify-end mt-5 gap-x-2">
+      <div className="flex justify-start mt-5 gap-x-2">
         {/* COVER IMAGE PREVIEW */}
         {oldCoverImage && (
           <div className="w-36 h-32 relative">
