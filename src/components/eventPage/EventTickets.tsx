@@ -113,7 +113,7 @@ const EventTickets = () => {
           })}
 
         <p className="text-end text-white p-2">
-          $<span className="font-bold">{order.totalDiscount} </span>
+          -$<span className="font-bold">{order.totalDiscount} </span>
           {""}Discount
         </p>
         <p className="text-end text-white p-2">

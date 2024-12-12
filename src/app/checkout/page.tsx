@@ -117,6 +117,8 @@ function CheckoutForm() {
   }: AxiosResponse<CheckoutResponse>) => {
     if (stripe) {
       // setOrderId(data.data.id);
+      order.setPromocode(null);
+      order.setOrder(null);
       const response = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
@@ -350,7 +352,7 @@ function CheckoutForm() {
                           <div className="flex justify-between font-medium text-sm text-white">
                             <span>Discount</span>
                             <span className="text-[#DADADA]">
-                              ${order.totalDiscount}
+                              -${order.totalDiscount}
                             </span>
                           </div>
 
