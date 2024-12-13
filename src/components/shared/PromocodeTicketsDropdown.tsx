@@ -56,6 +56,7 @@ export function SelectTicketsDropDown({
         {ticketTypes?.map((ticketType) => {
           return (
             <button
+              type="button"
               key={ticketType.id}
               onClick={() => {
                 handleSelectTicketTypeId(ticketType.id);

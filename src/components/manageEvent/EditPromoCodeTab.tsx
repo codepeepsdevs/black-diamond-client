@@ -1,4 +1,4 @@
-import React, { ComponentProps, useEffect, useState } from "react";
+import React, { ComponentProps, useEffect, useRef, useState } from "react";
 import AdminButton from "../buttons/AdminButton";
 import { FaPercentage, FaSave } from "react-icons/fa";
 import { useForm } from "react-hook-form";
@@ -33,14 +33,19 @@ import {
 } from "@/constants/types";
 import {
   useCreateEventPromocode,
+  useDeletePromocode,
   useGetEventTicketTypes,
   useGetPromocodes,
+  useUpdatePromocode,
 } from "@/api/events/events.queries";
 import toast from "react-hot-toast";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
 import { newPromocodeFormSchema } from "@/api/events/events.schemas";
 import { AxiosError, AxiosResponse } from "axios";
-import { CreateEventPromocodeResponse } from "@/api/events/events.types";
+import {
+  CreateEventPromocodeResponse,
+  DeletePromocodeResponse,
+} from "@/api/events/events.types";
 import { FormError } from "../shared/FormError";
 import { parseAsString, useQueryState } from "nuqs";
 import { MdGppBad } from "react-icons/md";
@@ -49,6 +54,18 @@ import { useParams } from "next/navigation";
 import { SelectTicketsDropDown } from "../shared/PromocodeTicketsDropdown";
 import { AddPromoCodeDialog } from "../shared/AddPromocodeDialog";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
+import {
+  Popover,
+  PopoverContent,
+  PopoverPortal,
+  PopoverTrigger,
+} from "@radix-ui/react-popover";
+import ErrorToast from "../toast/ErrorToast";
+import * as dateFnsTz from "date-fns-tz";
+import * as dateFns from "date-fns";
+import { newYorkTimeZone } from "@/utils/date-formatter";
+import SuccessToast from "../toast/SuccessToast";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
 // import * as Dialog from '@radix-ui/react-dialog'
 
 export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
@@ -58,8 +75,12 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
   const [promocodeToEdit, setPromoCodeToEdit] = useState<Yup.InferType<
     typeof newPromocodeFormSchema
   > | null>(null);
+  const [promocodeToEditId, setPromoCodeToEditId] = useState<string | null>(
+    null
+  );
   const params = useParams<{ id: string }>();
   const eventId = params.id;
+  let loadingToastId = useRef("");
 
   const ticketTypesQuery = useGetEventTicketTypes(eventId);
   const ticketTypes = ticketTypesQuery.data?.data;
@@ -79,6 +100,28 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
       setNoTicketsDialogOpen(true);
     }
   }, [ticketTypes]);
+
+  const onDeleteSuccess = async (
+    data: AxiosResponse<DeletePromocodeResponse>
+  ) => {
+    SuccessToast({
+      title: "Success",
+      description: data.data.message || "Promocode deleted successfully",
+    });
+    toast.dismiss(loadingToastId.current);
+  };
+
+  const onDeleteError = async (e: AxiosError<ErrorResponse>) => {
+    const errorMessage = getApiErrorMessage(e, "Something went wrong");
+    ErrorToast({
+      title: "Error",
+      descriptions: errorMessage,
+    });
+    toast.dismiss(loadingToastId.current);
+  };
+
+  const { mutate: deletePromocode, isPending: deletePromocodePending } =
+    useDeletePromocode(onDeleteError, onDeleteSuccess);
 
   if (ticketTypesQuery.isPending) {
     return (
@@ -119,6 +162,51 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
         Ticket types not available
       </div>
     );
+  }
+
+  function handleAction(action: (typeof actions)[number], promocodeId: string) {
+    switch (action) {
+      case "edit":
+        const promocodeToEdit = promocodesQuery.data?.data.find(
+          (promocode) => promocode.id === promocodeId
+        );
+        if (!promocodeToEdit) {
+          // show
+          ErrorToast({
+            title: "Error editing promocode",
+            descriptions: ["Cannot find details of ticket to edit"],
+          });
+          return;
+        }
+        const zonedStartDate = dateFnsTz.toZonedTime(
+          new Date(promocodeToEdit.promoStartDate || Date.now()),
+          newYorkTimeZone
+        );
+        const zonedEndDate = dateFnsTz.toZonedTime(
+          new Date(promocodeToEdit.promoEndDate || Date.now()),
+          newYorkTimeZone
+        );
+        setPromoCodeToEdit({
+          applyToTicketIds: promocodeToEdit.ticketTypeIds,
+          startDate: dateFns.format(zonedStartDate, "yyyy-MM-dd"),
+          startTime: dateFns.format(zonedStartDate, "HH:mm"),
+          endDate: dateFns.format(zonedEndDate, "yyyy-MM-dd"),
+          endTime: dateFns.format(zonedEndDate, "HH:mm"),
+          key: promocodeToEdit.key,
+          limit: promocodeToEdit.limit,
+          name: promocodeToEdit.name,
+          absoluteDiscountAmount: promocodeToEdit.absoluteDiscountAmount,
+          percentageDiscountAmount: promocodeToEdit.percentageDiscountAmount,
+        });
+        setPromoCodeToEditId(promocodeToEdit.id);
+        setEditPromocodeDialogOpen(true);
+        break;
+      case "delete":
+        //   TODO: handle delete tickettype?
+        deletePromocode({ promocodeId });
+
+        loadingToastId.current = toast.loading("Deleting ticket type");
+    }
   }
 
   return (
@@ -188,7 +276,11 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                       </td>
                       {/* TODO: display status showing if promocode is still active */}
                       <td>
-                        <FiMoreVertical />
+                        <ActionDropDown
+                          disabled={deletePromocodePending}
+                          handleAction={handleAction}
+                          promocodeId={promocode.id}
+                        />
                       </td>
                     </tr>
                   );
@@ -220,6 +312,8 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
       />
       {promocodeToEdit && (
         <EditPromoCodeDialog
+          key={promocodeToEditId}
+          promocodeId={promocodeToEditId}
           ticketTypes={ticketTypes}
           defaultValues={promocodeToEdit}
           open={editPromocodeDialogOpen}
@@ -230,13 +324,70 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
   );
 }
 
+const actions = ["edit", "delete"] as const;
+
+function ActionDropDown({
+  promocodeId,
+  handleAction,
+  disabled,
+}: {
+  promocodeId: string;
+  disabled?: boolean;
+  handleAction: (action: (typeof actions)[number], promocodeId: string) => void;
+}) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  return (
+    <Popover open={dropdownOpen} onOpenChange={setDropdownOpen}>
+      {/* <div className="relative"> */}
+      {/* ACTION BUTTON */}
+      <PopoverTrigger asChild>
+        <button
+          className="flex items-start mt-1"
+          onClick={() => setDropdownOpen((state) => !state)}
+        >
+          <FiMoreVertical />
+        </button>
+      </PopoverTrigger>
+      {/* ACTION BUTTON */}
+      <PopoverPortal>
+        <PopoverContent>
+          <div
+            className={cn(
+              "bg-[#151515] text-white flex-col inline-flex divide-y divide-[#151515] min-w-36"
+            )}
+          >
+            {actions.map((item) => {
+              return (
+                <button
+                  disabled={disabled}
+                  key={item}
+                  onClick={() => {
+                    handleAction(item, promocodeId);
+                    setDropdownOpen(false);
+                  }}
+                  className="px-6 py-3 hover:bg-[#2c2b2b] capitalize text-left disabled:text-opacity-50"
+                >
+                  {item.toLowerCase()}
+                </button>
+              );
+            })}
+          </div>
+        </PopoverContent>
+      </PopoverPortal>
+      {/* </div> */}
+    </Popover>
+  );
+}
+
 function EditPromoCodeDialog({
   ticketTypes,
   defaultValues,
+  promocodeId,
   ...props
 }: ComponentProps<typeof Dialog> & {
   ticketTypes: TicketType[];
   defaultValues: Yup.InferType<typeof newPromocodeFormSchema>;
+  promocodeId: string | null;
 }) {
   const {
     register,
@@ -247,35 +398,47 @@ function EditPromoCodeDialog({
     reset,
   } = useForm<Yup.InferType<typeof newPromocodeFormSchema>>({
     resolver: yupResolver(newPromocodeFormSchema),
-    defaultValues: {
-      applyToTicketIds: ticketTypes.map((ticketType) => ticketType.id),
-    },
+    defaultValues,
   });
 
   const params = useParams<{ id: string }>();
-  const eventId = params.id;
-  const [pickType, setPickType] = useState<"all" | "selected">("all");
+  const [pickType, setPickType] = useState<"all" | "selected">("selected");
 
   function onError(error: AxiosError<ErrorResponse>) {
-    toast.error("Unable to create promocode");
+    const errorMessage = getApiErrorMessage(
+      error,
+      "Unable to create promocode"
+    );
+    ErrorToast({
+      title: "Error",
+      descriptions: errorMessage,
+    });
   }
 
   function onSuccess(data: AxiosResponse<CreateEventPromocodeResponse>) {
-    toast.success("Event promocode successfully created");
-    reset();
+    SuccessToast({
+      title: "Success",
+      description: "Event promocode successfully created",
+    });
+    props.onOpenChange?.(false);
   }
 
-  const {
-    mutate: createEventPromoCode,
-    isPending: createEventPromoCodeIspending,
-  } = useCreateEventPromocode(onError, onSuccess, eventId);
+  const { mutate: updatePromocode, isPending: updatePromoCodeIspending } =
+    useUpdatePromocode(onError, onSuccess);
 
   const selectedTicketTypeIds = watch("applyToTicketIds");
   const setSelectedTicketTypeIds = (value: string[]) =>
     setValue("applyToTicketIds", value);
 
   function onSubmit(values: Yup.InferType<typeof newPromocodeFormSchema>) {
-    createEventPromoCode(values);
+    if (!promocodeId) {
+      ErrorToast({
+        title: "Error",
+        descriptions: ["Promocode to delete not specified"],
+      });
+      return;
+    }
+    updatePromocode({ ...values, promocodeId });
   }
 
   return (
@@ -284,7 +447,7 @@ function EditPromoCodeDialog({
         <DialogOverlay className="bg-black bg-opacity-50 backdrop-blur-sm z-[99] fixed inset-0 grid place-items-center overflow-y-auto pt-36 pb-20">
           <DialogContent className="bg-[#333333] text-[#A3A7AA] p-6 max-w-md">
             <DialogTitle className="text-xl font-semibold">
-              Add Code
+              Edit Code
             </DialogTitle>
             <DialogDescription className="hidden">
               Add new promo code
@@ -423,11 +586,11 @@ function EditPromoCodeDialog({
                   Cancel
                 </AdminButton>
                 <AdminButton
-                  disabled={createEventPromoCodeIspending}
+                  disabled={updatePromoCodeIspending}
                   variant="ghost"
                   className="flex-1"
                 >
-                  {createEventPromoCodeIspending ? "Saving.." : "Save"}
+                  {updatePromoCodeIspending ? "Updating.." : "Update"}
                 </AdminButton>
               </div>
             </form>

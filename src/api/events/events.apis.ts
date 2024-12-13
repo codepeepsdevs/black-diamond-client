@@ -23,6 +23,8 @@ import {
   CreateEventTicketTypeResponse,
   DeleteEventData,
   DeleteEventResponse,
+  DeletePromocodeData,
+  DeletePromocodeResponse,
   DeleteTicketTypeData,
   DeleteTicketTypeResponse,
   GetEventRevenueResponse,
@@ -35,6 +37,8 @@ import {
   UnpublishEventResponse,
   UpdateEventDetailsData,
   UpdateEventDetailsResponse,
+  UpdatePromocodeData,
+  UpdatePromocodeResponse,
   UpdateTicketTypeData,
   UpdateTicketTypeResponse,
 } from "./events.types";
@@ -206,37 +210,13 @@ export const createEventAddon = async ({
 };
 
 export const createEventPromocode = async ({
-  startDate,
-  startTime,
-  endDate,
-  endTime,
   ...data
 }: CreateEventPromocodeData) => {
-  const [startTimeHours, startTimeMinutes] = startTime
-    .split(":")
-    .map((value) => Number(value));
-
-  const [endTimeHours, endTimeMinutes] = endTime
-    .split(":")
-    .map((value) => Number(value));
-
   return (await request({
     url: "/events/create-event-promocode",
     method: "post",
     data: {
       ...data,
-      promoEndDate: dateFns
-        .add(startDate, {
-          hours: startTimeHours,
-          minutes: startTimeMinutes,
-        })
-        .toISOString(),
-      promoStartDate: dateFns
-        .add(endDate, {
-          hours: endTimeHours,
-          minutes: endTimeMinutes,
-        })
-        .toISOString(),
     },
   })) as AxiosResponse<CreateEventPromocodeResponse>;
 };
@@ -278,6 +258,18 @@ export const upateTicketTypeDetails = async ({
   })) as AxiosResponse<UpdateTicketTypeResponse>;
 };
 
+export const updatePromocode = async ({
+  promocodeId,
+  ...data
+}: UpdatePromocodeData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/promocode/${promocodeId}`,
+    method: "put",
+    data: data,
+  })) as AxiosResponse<UpdatePromocodeResponse>;
+};
+
 export const deleteTicketType = async ({
   ticketTypeId,
 }: DeleteTicketTypeData) => {
@@ -287,6 +279,15 @@ export const deleteTicketType = async ({
     method: "delete",
     data: ticketTypeId,
   })) as AxiosResponse<DeleteTicketTypeResponse>;
+};
+
+export const deletePromocode = async ({ promocodeId }: DeletePromocodeData) => {
+  // const formData = jsonToFormData(data);
+  return (await request({
+    url: `/events/promocode/${promocodeId}`,
+    method: "delete",
+    data: promocodeId,
+  })) as AxiosResponse<DeletePromocodeResponse>;
 };
 
 export const deleteEvent = async ({ eventId }: DeleteEventData) => {

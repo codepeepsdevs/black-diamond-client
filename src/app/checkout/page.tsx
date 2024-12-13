@@ -369,10 +369,12 @@ function CheckoutForm() {
                 </Dialog.Portal>
                 {/* END ORDER DETAILS MODAL */}
 
-                <div className="flex justify-between font-bold text-base">
-                  <span>Discount</span>
-                  <span className="text-[#DADADA]">${order.totalDiscount}</span>
-                </div>
+                {order.totalDiscount ? (
+                  <div className="flex text-[#DADADA] justify-between font-bold text-base">
+                    <span>Discount</span>
+                    <span className="">-${order.totalDiscount}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between font-bold text-white text-base">
                   <span>Total</span>
                   <span className="text-[#DADADA]"> ${total}</span>
