@@ -324,7 +324,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
         {/* END TICKET TYPE LIST */}
 
         {/* DISPLAY SETTINGS */}
-        <form className="mt-12" onSubmit={handleSubmit(onSubmit)}>
+        {/* <form className="mt-12" onSubmit={handleSubmit(onSubmit)}>
           <div className="font-medium text-xl text-[#BDBDBD]">
             Display Settings
           </div>
@@ -382,7 +382,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
             <FaSave />
             <span>Save and continue</span>
           </AdminButton>
-        </form>
+        </form> */}
         {/* END DISPLAY SETTINGS */}
       </div>
       {/* <NoTicketsToEditDialog  /> */}
