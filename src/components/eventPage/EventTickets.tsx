@@ -112,11 +112,13 @@ const EventTickets = () => {
             );
           })}
 
-        <p className="text-end text-white p-2">
-          -$<span className="font-bold">{order.totalDiscount} </span>
-          {""}Discount
-        </p>
-        <p className="text-end text-white p-2">
+        {order.totalDiscount ? (
+          <p className="text-end p-2">
+            -$<span className="">{order.totalDiscount} </span>
+            {""}Discount
+          </p>
+        ) : null}
+        <p className="text-end p-2">
           $
           <span className="font-bold">
             {(order.ticketOrders?.reduce(

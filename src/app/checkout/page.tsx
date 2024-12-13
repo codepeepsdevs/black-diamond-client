@@ -349,12 +349,14 @@ function CheckoutForm() {
                             </div>
                           ) : null}
 
-                          <div className="flex justify-between font-medium text-sm text-white">
-                            <span>Discount</span>
-                            <span className="text-[#DADADA]">
-                              -${order.totalDiscount}
-                            </span>
-                          </div>
+                          {order.totalDiscount ? (
+                            <div className="flex justify-between text-sm">
+                              <span>Discount</span>
+                              <span className="text-[#DADADA]">
+                                -${order.totalDiscount}
+                              </span>
+                            </div>
+                          ) : null}
 
                           <div className="flex justify-between font-medium text-sm text-white">
                             <span>Total</span>
@@ -367,7 +369,7 @@ function CheckoutForm() {
                 </Dialog.Portal>
                 {/* END ORDER DETAILS MODAL */}
 
-                <div className="flex justify-between font-bold text-white text-base">
+                <div className="flex justify-between font-bold text-base">
                   <span>Discount</span>
                   <span className="text-[#DADADA]">${order.totalDiscount}</span>
                 </div>
@@ -453,10 +455,12 @@ function CheckoutForm() {
               </div>
             ) : null}
 
-            <div className="flex justify-between font-bold text-white">
-              <span>Discount</span>
-              <span className="text-[#DADADA]"> ${order.totalDiscount}</span>
-            </div>
+            {order.totalDiscount ? (
+              <div className="flex justify-between text-white">
+                <span>Discount</span>
+                <span className="text-[#DADADA]"> -${order.totalDiscount}</span>
+              </div>
+            ) : null}
 
             <div className="flex justify-between font-bold text-white">
               <span>Total</span>

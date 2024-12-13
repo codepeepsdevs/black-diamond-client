@@ -81,6 +81,7 @@ const UpComingEventDetailPage = () => {
   // PAGE VIEW QUERY
   useEffect(() => {
     incPageView({ eventId: params.id });
+    removePromocode();
   }, []);
   // END PAGE VIEW QUERY
 
@@ -250,7 +251,6 @@ const UpComingEventDetailPage = () => {
               <div className="text-white mb-8 text-xl font-bold">Tickets</div>
 
               {/* PROMO CODE INPUT */}
-              {/* TODO: ENABLE PROMOCODE LATER */}
               <div className="border-white border flex items-center p-3 mb-11">
                 <input
                   disabled={Boolean(order.promocode)}

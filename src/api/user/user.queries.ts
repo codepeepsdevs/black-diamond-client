@@ -34,10 +34,10 @@ export const useGetUser = () => {
   });
 };
 
-export const useGetUsers = (page?: PageData) => {
+export const useGetUsers = (options?: PageData & { search: string }) => {
   return useQuery<AxiosResponse<GetUserData>, AxiosError<ErrorResponse>>({
-    queryKey: ["users", page],
-    queryFn: () => getUsers(page),
+    queryKey: ["users", options],
+    queryFn: () => getUsers(options),
     placeholderData: keepPreviousData,
     // refetchOnWindowFocus: true,
     // refetchOnReconnect: true,

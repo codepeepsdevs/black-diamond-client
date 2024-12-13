@@ -185,7 +185,7 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                         >
                           {promocode.isActive ? "Active" : "Inactive"}
                         </span>
-                      </td>{" "}
+                      </td>
                       {/* TODO: display status showing if promocode is still active */}
                       <td>
                         <FiMoreVertical />

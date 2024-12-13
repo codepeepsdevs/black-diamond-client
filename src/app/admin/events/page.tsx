@@ -89,6 +89,7 @@ export default function AdminEventsPage() {
       case "edit":
         const eventLink = "/admin/events/" + eventId;
         router.push(eventLink);
+        break;
       case "delete":
         deleteEvent({ eventId });
     }
@@ -139,7 +140,7 @@ export default function AdminEventsPage() {
         <div className="overflow-x-auto whitespace-nowrap min-w-0">
           <table className="w-full mt-12 overflow-x-auto min-w-max">
             {/* LIST HEAEDER */}
-            <thead className="bg-[#A3A7AA] leading-10 text-left [&>th]:px-4">
+            <thead className="bg-[#A3A7AA] leading-10 text-left [&_th]:px-4">
               <tr>
                 <th>Event</th>
                 <th>Sold</th>
