@@ -370,7 +370,7 @@ function CheckoutForm() {
                 {/* END ORDER DETAILS MODAL */}
 
                 {order.totalDiscount ? (
-                  <div className="flex text-[#DADADA] justify-between font-bold text-base">
+                  <div className="flex text-[#A3A7AA] justify-between font-bold text-base">
                     <span>Discount</span>
                     <span className="">-${order.totalDiscount}</span>
                   </div>
@@ -458,7 +458,7 @@ function CheckoutForm() {
             ) : null}
 
             {order.totalDiscount ? (
-              <div className="flex justify-between text-white">
+              <div className="flex justify-between text-[#A3A7AA]">
                 <span>Discount</span>
                 <span className="text-[#DADADA]"> -${order.totalDiscount}</span>
               </div>

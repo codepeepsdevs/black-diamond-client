@@ -118,7 +118,7 @@ const EventTickets = () => {
             {""}Discount
           </p>
         ) : null}
-        <p className="text-end p-2">
+        <p className="text-end p-2 text-white">
           $
           <span className="font-bold">
             {(order.ticketOrders?.reduce(

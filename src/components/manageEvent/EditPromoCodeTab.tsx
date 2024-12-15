@@ -32,7 +32,6 @@ import {
   TicketType,
 } from "@/constants/types";
 import {
-  useCreateEventPromocode,
   useDeletePromocode,
   useGetEventTicketTypes,
   useGetPromocodes,
@@ -205,7 +204,7 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
         //   TODO: handle delete tickettype?
         deletePromocode({ promocodeId });
 
-        loadingToastId.current = toast.loading("Deleting ticket type");
+        loadingToastId.current = toast.loading("Deleting promocode");
     }
   }
 
@@ -257,8 +256,9 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                       <td>{promocode.name}</td>
                       <td>{promocode.key}</td>
                       <td>
-                        {`$${promocode.absoluteDiscountAmount.toFixed(2)}` ||
-                          `${promocode.percentageDiscountAmount}%`}
+                        {promocode.absoluteDiscountAmount
+                          ? `$${promocode.absoluteDiscountAmount.toFixed(2)}`
+                          : `${promocode.percentageDiscountAmount}%`}
                       </td>
                       {/* TODO: work on this */}
                       <td>

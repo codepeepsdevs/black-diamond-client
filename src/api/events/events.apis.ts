@@ -110,12 +110,19 @@ export const getEventPromocodes = async (eventId: Event["id"]) => {
   })) as AxiosResponse<GetPromocodesResponse>;
 };
 
-export const getPromocode = async (key: string) => {
+export const getPromocode = async ({
+  key,
+  eventId,
+}: {
+  key: string;
+  eventId: string;
+}) => {
   return (await request({
     url: `/events/apply-promocode`,
     method: "post",
     data: {
       key,
+      eventId,
     },
   })) as AxiosResponse<GetPromocodeResponse>;
 };
@@ -210,10 +217,11 @@ export const createEventAddon = async ({
 };
 
 export const createEventPromocode = async ({
+  eventId,
   ...data
 }: CreateEventPromocodeData) => {
   return (await request({
-    url: "/events/create-event-promocode",
+    url: `/events/create-event-promocode/${eventId}`,
     method: "post",
     data: {
       ...data,

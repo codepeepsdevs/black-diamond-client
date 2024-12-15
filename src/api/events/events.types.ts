@@ -46,7 +46,9 @@ export type CreateEventAddonResponse = EventAddon;
 
 export type CreateEventPromocodeData = Yup.InferType<
   typeof newPromocodeFormSchema
->;
+> & {
+  eventId: string;
+};
 
 export type CreateEventPromocodeResponse = PromoCode;
 
