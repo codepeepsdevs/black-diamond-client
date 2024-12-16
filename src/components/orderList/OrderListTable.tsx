@@ -190,7 +190,7 @@ const OrderListTable = ({
                 : "text-[#E1306C]"
             )}
           >
-            {row.original.paymentStatus === "SUCCESSFUL" ? "Successful" : "Pending"}
+            {row.original.paymentStatus === "SUCCESSFUL" ? "Paid" : "Not Paid"}
           </span>
         ),
       },
@@ -207,12 +207,10 @@ const OrderListTable = ({
             className={cn(
               row.original.status === "COMPLETED"
                 ? "text-[#34C759]"
-                : "text-[#E1306C]"
+                : "text-yellow-500"
             )}
           >
-            {row.original.status === "COMPLETED"
-              ? "REGISTERED"
-              : "NOT REGISTERED"}
+            {row.original.status === "COMPLETED" ? "Successful" : "Pending"}
           </span>
         ),
       },
