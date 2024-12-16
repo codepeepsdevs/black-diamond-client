@@ -115,13 +115,14 @@ function CheckoutForm() {
   const onCheckoutSuccess = async ({
     data,
   }: AxiosResponse<CheckoutResponse>) => {
+    console.log(data);
     if (stripe) {
       // setOrderId(data.data.id);
       order.setPromocode(null);
       order.setOrder(null);
       if (!data.sessionId) {
         return router.push(
-          `${window.location.protocol}//${window.location.host}/tickets/${data.data.id}/fill-details`
+          `${window.location.protocol}//${window.location.host}/tickets/${data.id}/fill-details`
         );
       }
       const response = await stripe.redirectToCheckout({
@@ -150,6 +151,7 @@ function CheckoutForm() {
   };
 
   const onCheckoutError = (e: AxiosError<ErrorResponse>) => {
+    console.log(e);
     const errorMessage = getApiErrorMessage(e, "Error placing order");
     ErrorToast({
       title: "Error",

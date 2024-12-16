@@ -29,9 +29,16 @@ export type CreateIntentResponse = {
 //   data: Order;
 // } & CreateIntentResponse;
 
-export type CheckoutResponse = {
-  message: string;
-  data: Order;
-  sessionId: string | null;
-  sessionUrl: string;
-};
+export type CheckoutResponse = Order &
+  (
+    | {
+        message: string;
+        sessionId: null;
+        sessionUrl: null;
+      }
+    | {
+        message: string;
+        sessionId: string;
+        sessionUrl: string;
+      }
+  );

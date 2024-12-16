@@ -28,9 +28,11 @@ export default function UpcomingEventsList() {
             eventsCount === 1 && "px-4"
           )}
         >
-          <h2 className="text-base md:text-xl text-white font-semibold">
-            Upcoming Events
-          </h2>
+          {eventsCount && eventsCount > 0 ? (
+            <h2 className="text-base md:text-xl text-white font-semibold">
+              Upcoming Events
+            </h2>
+          ) : null}
 
           <Swiper autoplay={true} draggable={true} className="w-full">
             {upcomingEventsQuery.isPending && !upcomingEventsQuery.isError ? (
