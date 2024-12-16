@@ -190,7 +190,7 @@ const OrderListTable = ({
                 : "text-[#E1306C]"
             )}
           >
-            {row.original.paymentStatus === "SUCCESSFUL" ? "PAID" : "NOT PAID"}
+            {row.original.paymentStatus === "SUCCESSFUL" ? "Successful" : "Pending"}
           </span>
         ),
       },
