@@ -15,11 +15,12 @@ export const getUser = () => {
   return request({ url: `/users/get-user` }) as Promise<AxiosResponse<User>>;
 };
 
-export const getUsers = (_page?: PageData) => {
-  const page = _page?.page;
-  const limit = _page?.limit;
+export const getUsers = (options?: PageData & { search: string }) => {
+  const page = options?.page;
+  const limit = options?.limit;
+  const search = options?.search;
   return request<GetUserData>({
-    url: `/users/get-users?page=${page || ""}&limit=${limit || ""}`,
+    url: `/users/get-users?page=${page || ""}&limit=${limit || ""}&search=${search || ""}`,
   });
 };
 

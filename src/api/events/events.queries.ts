@@ -26,6 +26,8 @@ import {
   getViewCount,
   deleteTicketType,
   deleteEvent,
+  deletePromocode,
+  updatePromocode,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -46,6 +48,7 @@ import {
   CreateEventTicketTypeResponse,
   DeleteEventData,
   DeleteEventResponse,
+  DeletePromocodeResponse,
   DeleteTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
@@ -57,6 +60,7 @@ import {
   RemoveSlideResponse,
   UnpublishEventResponse,
   UpdateEventDetailsResponse,
+  UpdatePromocodeResponse,
   UpdateTicketTypeResponse,
 } from "./events.types";
 import toast from "react-hot-toast";
@@ -258,6 +262,23 @@ export const useUpdateTicketType = (
   });
 };
 
+export const useUpdatePromocode = (
+  onError: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess: (data: AxiosResponse<UpdatePromocodeResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatePromocode,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-event-promocode"],
+      });
+      onSuccess(data);
+    },
+  });
+};
+
 export const useDeleteTicketType = (
   onError?: (error: AxiosError<ErrorResponse>) => void,
   onSuccess?: (data: AxiosResponse<DeleteTicketTypeResponse>) => void
@@ -269,6 +290,23 @@ export const useDeleteTicketType = (
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: ["get-event-ticket-types", data.data.eventId],
+      });
+      onSuccess?.(data);
+    },
+  });
+};
+
+export const useDeletePromocode = (
+  onError?: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess?: (data: AxiosResponse<DeletePromocodeResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deletePromocode,
+    onError,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["get-event-promocode"], // TODO: Figure out what to invalidate
       });
       onSuccess?.(data);
     },

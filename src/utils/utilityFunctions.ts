@@ -149,3 +149,20 @@ export function formatPurchaseDate(date: Date) {
     return `${dateFns.format(date, dateFormat)} at ${formattedTime}`;
   }
 }
+
+export function debounce<T extends (...args: any[]) => void>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout>;
+
+  return function (...args: Parameters<T>): void {
+    // Clear the previous timeout
+    clearTimeout(timeoutId);
+
+    // Set a new timeout to invoke the function after the specified delay
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+}

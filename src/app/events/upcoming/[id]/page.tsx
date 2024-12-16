@@ -37,7 +37,7 @@ import { incPageView } from "@/api/events/events.apis";
 
 const UpComingEventDetailPage = () => {
   const order = useOrderStore();
-  const [promocode, setPromocode] = useState<string>(
+  const [promocodeKey, setPromocodeKey] = useState<string>(
     order.promocode?.key || ""
   );
 
@@ -81,6 +81,7 @@ const UpComingEventDetailPage = () => {
   // PAGE VIEW QUERY
   useEffect(() => {
     incPageView({ eventId: params.id });
+    removePromocode();
   }, []);
   // END PAGE VIEW QUERY
 
@@ -102,6 +103,7 @@ const UpComingEventDetailPage = () => {
 
   function removePromocode() {
     order.setPromocode(null);
+    setPromocodeKey("");
   }
 
   function onGetPromocodeError(error: AxiosError<Error>) {
@@ -127,6 +129,7 @@ const UpComingEventDetailPage = () => {
   // update total discount anytime promocode or order is updated
   useEffect(() => {
     order.updateDiscount();
+    console.log("computing discount");
   }, [order.promocode, order.ticketOrders]);
 
   if (eventQuery.isPending) {
@@ -250,19 +253,25 @@ const UpComingEventDetailPage = () => {
               <div className="text-white mb-8 text-xl font-bold">Tickets</div>
 
               {/* PROMO CODE INPUT */}
-              {/* TODO: ENABLE PROMOCODE LATER */}
               <div className="border-white border flex items-center p-3 mb-11">
                 <input
                   disabled={Boolean(order.promocode)}
-                  value={promocode}
-                  onChange={(e) => setPromocode(e.target.value)}
+                  value={promocodeKey}
+                  onChange={(e) => setPromocodeKey(e.target.value)}
                   className="flex-1 bg-transparent focus:outline-none"
                   placeholder="Enter code"
                 />
                 {order.promocode ? (
                   <button onClick={() => removePromocode()}>Remove</button>
                 ) : (
-                  <button onClick={() => getPromocode(promocode.trim())}>
+                  <button
+                    onClick={() =>
+                      getPromocode({
+                        key: promocodeKey.trim(),
+                        eventId: params.id,
+                      })
+                    }
+                  >
                     {getPromocodeIsPending ? "Applying.." : "Apply"}
                   </button>
                 )}

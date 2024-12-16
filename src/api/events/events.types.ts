@@ -46,7 +46,9 @@ export type CreateEventAddonResponse = EventAddon;
 
 export type CreateEventPromocodeData = Yup.InferType<
   typeof newPromocodeFormSchema
->;
+> & {
+  eventId: string;
+};
 
 export type CreateEventPromocodeResponse = PromoCode;
 
@@ -61,11 +63,15 @@ export type GetPromocodeResponse = PromoCode & {
 
 export type UpdateTicketTypeResponse = TicketType;
 
-export type UpdateTicketTypeData = Omit<
-  Yup.InferType<typeof newTicketFormSchema>,
-  "startTime" | "endTime"
-> & {
+export type UpdateTicketTypeData = Yup.InferType<typeof newTicketFormSchema> & {
   ticketTypeId: string;
+};
+
+export type UpdatePromocodeResponse = PromoCode;
+export type UpdatePromocodeData = Yup.InferType<
+  typeof newPromocodeFormSchema
+> & {
+  promocodeId: string;
 };
 
 export type DeleteTicketTypeData = {
@@ -76,6 +82,15 @@ export type DeleteTicketTypeResponse = {
   message: string;
   ticketTypeId: string;
   eventId: string;
+};
+
+export type DeletePromocodeData = {
+  promocodeId: string;
+};
+
+export type DeletePromocodeResponse = {
+  message: string;
+  promocodeId: string;
 };
 
 export type DeleteEventData = {

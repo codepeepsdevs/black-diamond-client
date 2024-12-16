@@ -117,6 +117,8 @@ function CheckoutForm() {
   }: AxiosResponse<CheckoutResponse>) => {
     if (stripe) {
       // setOrderId(data.data.id);
+      order.setPromocode(null);
+      order.setOrder(null);
       const response = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
@@ -347,12 +349,14 @@ function CheckoutForm() {
                             </div>
                           ) : null}
 
-                          <div className="flex justify-between font-medium text-sm text-white">
-                            <span>Discount</span>
-                            <span className="text-[#DADADA]">
-                              ${order.totalDiscount}
-                            </span>
-                          </div>
+                          {order.totalDiscount ? (
+                            <div className="flex justify-between text-sm">
+                              <span>Discount</span>
+                              <span className="text-[#DADADA]">
+                                -${order.totalDiscount}
+                              </span>
+                            </div>
+                          ) : null}
 
                           <div className="flex justify-between font-medium text-sm text-white">
                             <span>Total</span>
@@ -365,10 +369,12 @@ function CheckoutForm() {
                 </Dialog.Portal>
                 {/* END ORDER DETAILS MODAL */}
 
-                <div className="flex justify-between font-bold text-white text-base">
-                  <span>Discount</span>
-                  <span className="text-[#DADADA]">${order.totalDiscount}</span>
-                </div>
+                {order.totalDiscount ? (
+                  <div className="flex text-[#A3A7AA] justify-between font-bold text-base">
+                    <span>Discount</span>
+                    <span className="">-${order.totalDiscount}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between font-bold text-white text-base">
                   <span>Total</span>
                   <span className="text-[#DADADA]"> ${total}</span>
@@ -451,10 +457,12 @@ function CheckoutForm() {
               </div>
             ) : null}
 
-            <div className="flex justify-between font-bold text-white">
-              <span>Discount</span>
-              <span className="text-[#DADADA]"> ${order.totalDiscount}</span>
-            </div>
+            {order.totalDiscount ? (
+              <div className="flex justify-between text-[#A3A7AA]">
+                <span>Discount</span>
+                <span className="text-[#DADADA]"> -${order.totalDiscount}</span>
+              </div>
+            ) : null}
 
             <div className="flex justify-between font-bold text-white">
               <span>Total</span>

@@ -42,10 +42,10 @@ export default function UserListPage() {
 
         {/* TABLE ACTION BUTTONS */}
         <div className="flex items-center gap-x-6 justify-end my-4">
-          <AdminButton variant="ghost" className="flex items-center gap-x-2">
+          {/* <AdminButton variant="ghost" className="flex items-center gap-x-2">
             <FiPlusCircle />
             <span>New User</span>
-          </AdminButton>
+          </AdminButton> */}
           <AdminButton
             onClick={() => handleDownloadUsers()}
             disabled={isPending}

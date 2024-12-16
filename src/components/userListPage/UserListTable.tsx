@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,11 +35,13 @@ import { PiEyeBold } from "react-icons/pi";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { GetUserData } from "@/api/user/user.types";
+import { debounce } from "@/utils/utilityFunctions";
 
 const UserListTable = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [search, setSearch] = useState<string>("");
 
-  const usersQuery = useGetUsers({ page: page, limit: 10 });
+  const usersQuery = useGetUsers({ page: page, limit: 10, search });
   const usersData = usersQuery.data?.data;
   const newUsersTodayStatsQuery = useNewUsersTodayStats();
   const newUsersTodayStats = newUsersTodayStatsQuery.data?.data;
@@ -162,27 +164,27 @@ const UserListTable = () => {
       //       </div>
       //     ),
       //   },
-      {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-          const payment = row.original;
+      // {
+      //   id: "actions",
+      //   enableHiding: false,
+      //   cell: ({ row }) => {
+      //     const payment = row.original;
 
-          return (
-            <div className="flex items-center gap-x-4">
-              <button>
-                <PiEyeBold />
-              </button>
-              <button>
-                <FiTrash2 />
-              </button>
-              <button>
-                <FiDownload />
-              </button>
-            </div>
-          );
-        },
-      },
+      //     return (
+      //       <div className="flex items-center gap-x-4">
+      //         <button>
+      //           <PiEyeBold />
+      //         </button>
+      //         <button>
+      //           <FiTrash2 />
+      //         </button>
+      //         <button>
+      //           <FiDownload />
+      //         </button>
+      //       </div>
+      //     );
+      //   },
+      // },
     ],
     []
   );
@@ -213,6 +215,8 @@ const UserListTable = () => {
       rowSelection,
     },
   });
+
+  const debouncedHandleSearch = debounce((e) => setSearch(e.target.value), 250);
 
   return (
     <div className="text-[#A3A7AA]">
@@ -264,7 +268,12 @@ const UserListTable = () => {
 
       {/* SEARCH USER INPUT FIELD */}
       <div className="mt-10">
-        <IconInputField Icon={<FiSearch />} placeholder="Search user" />
+        <IconInputField
+          value={search}
+          onChange={debouncedHandleSearch}
+          Icon={<FiSearch />}
+          placeholder="Search user"
+        />
       </div>
       {/* END SEARCH USER INPUT FIELD */}
 

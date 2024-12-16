@@ -84,7 +84,7 @@ export function AddPromoCodeDialog({
     setValue("applyToTicketIds", value);
 
   function onSubmit(values: Yup.InferType<typeof newPromocodeFormSchema>) {
-    createEventPromoCode(values);
+    createEventPromoCode({ ...values, eventId });
   }
 
   return (
@@ -224,6 +224,7 @@ export function AddPromoCodeDialog({
                       selectedTicketTypeIds={selectedTicketTypeIds}
                       setSelectedTicketTypeIds={setSelectedTicketTypeIds}
                     />
+                    <FormError error={errors.applyToTicketIds?.[0]} />
                   </div>
                 </div>
               </div>

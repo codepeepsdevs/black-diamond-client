@@ -223,7 +223,7 @@ function AddPromoCodeDialog({
     setValue("applyToTicketIds", value);
 
   function onSubmit(values: Yup.InferType<typeof newPromocodeFormSchema>) {
-    createEventPromoCode(values);
+    createEventPromoCode({ ...values, eventId });
   }
 
   return (

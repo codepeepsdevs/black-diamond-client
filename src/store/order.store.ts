@@ -156,7 +156,7 @@ export const useOrderStore = create(
               );
               // check if the ticket includes the promocode id
               if (
-                ticketTypeDetails?.promoCodeIds.includes(promocode?.id || "") &&
+                ticketTypeDetails?.promoCodeIds.includes(promocode?.id) &&
                 ticketOrder.quantity > 0
               ) {
                 let discount = 0; // calculate the discount amount using either absolute or percentage discount amount
@@ -165,13 +165,14 @@ export const useOrderStore = create(
                     promocode.absoluteDiscountAmount * ticketOrder.quantity;
                 } else if (promocode?.percentageDiscountAmount) {
                   discount =
+                    ticketOrder.price *
                     promocode.percentageDiscountAmount *
                     0.01 *
                     ticketOrder.quantity;
                 }
                 // Discount must never be more than ticket price.. at most it can be equal to
-                if (discount > ticketOrder.price) {
-                  discount = ticketOrder.price;
+                if (discount > ticketOrder.price * ticketOrder.quantity) {
+                  discount = ticketOrder.price * ticketOrder.quantity;
                 }
                 totalDiscount += discount;
               }
