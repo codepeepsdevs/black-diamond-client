@@ -39,6 +39,7 @@ import { debounce } from "@/utils/utilityFunctions";
 
 const UserListTable = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [searchInput, setSearchInput] = useState<string>("");
   const [search, setSearch] = useState<string>("");
 
   const usersQuery = useGetUsers({ page: page, limit: 10, search });
@@ -216,7 +217,9 @@ const UserListTable = () => {
     },
   });
 
-  const debouncedHandleSearch = debounce((e) => setSearch(e.target.value), 250);
+  const debouncedHandleSearch = debounce((e) => {
+    setSearch(e.target.value);
+  }, 250);
 
   return (
     <div className="text-[#A3A7AA]">
@@ -269,7 +272,6 @@ const UserListTable = () => {
       {/* SEARCH USER INPUT FIELD */}
       <div className="mt-10">
         <IconInputField
-          value={search}
           onChange={debouncedHandleSearch}
           Icon={<FiSearch />}
           placeholder="Search user"
