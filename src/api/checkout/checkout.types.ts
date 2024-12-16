@@ -32,6 +32,6 @@ export type CreateIntentResponse = {
 export type CheckoutResponse = {
   message: string;
   data: Order;
-  sessionId: string;
+  sessionId: string | null;
   sessionUrl: string;
 };

@@ -119,6 +119,11 @@ function CheckoutForm() {
       // setOrderId(data.data.id);
       order.setPromocode(null);
       order.setOrder(null);
+      if (!data.sessionId) {
+        return router.push(
+          `${window.location.protocol}//${window.location.host}/tickets/${data.data.id}/fill-details`
+        );
+      }
       const response = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
