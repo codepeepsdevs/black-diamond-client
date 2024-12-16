@@ -258,6 +258,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
               <IconInputField
                 id="start-date"
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 {...register("startDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />
@@ -283,6 +284,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
               <IconInputField
                 id="end-date"
                 type="date"
+                min={new Date().toISOString().split("T")[0]}
                 {...register("endDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />

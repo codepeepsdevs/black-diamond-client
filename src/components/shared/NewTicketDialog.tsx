@@ -240,6 +240,7 @@ export function NewTicketDialog({
                         {...register("startDate", { required: true })}
                         id="start-date"
                         type="date"
+                        min={new Date().toISOString().split("T")[0]}
                       />
                       <FormError error={errors.startDate} />
                     </div>
@@ -270,6 +271,7 @@ export function NewTicketDialog({
                         Icon={<FaRegCalendar />}
                         {...register("endDate", { required: true })}
                         type="date"
+                        min={new Date().toISOString().split("T")[0]}
                       />
                       <FormError error={errors.endDate} />
                     </div>
