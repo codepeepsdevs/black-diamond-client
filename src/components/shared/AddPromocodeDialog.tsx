@@ -224,6 +224,7 @@ export function AddPromoCodeDialog({
                       selectedTicketTypeIds={selectedTicketTypeIds}
                       setSelectedTicketTypeIds={setSelectedTicketTypeIds}
                     />
+                    <FormError error={errors.applyToTicketIds?.[0]} />
                   </div>
                 </div>
               </div>

@@ -572,6 +572,7 @@ function EditPromoCodeDialog({
                       selectedTicketTypeIds={selectedTicketTypeIds}
                       setSelectedTicketTypeIds={setSelectedTicketTypeIds}
                     />
+                    <FormError error={errors.applyToTicketIds?.[0]} />
                   </div>
                 </div>
               </div>

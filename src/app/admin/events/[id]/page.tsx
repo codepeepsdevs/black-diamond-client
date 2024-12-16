@@ -26,7 +26,7 @@ const tabsList = [
   { id: "details", title: "Details Page" },
   { id: "ticket", title: "Ticket" },
   { id: "code", title: "Code" },
-  { id: "add-ons", title: "Add Ons" },
+  // { id: "add-ons", title: "Add Ons" },
   { id: "dashboard", title: "Dashboard" },
 ] as const;
 
@@ -166,9 +166,9 @@ export default function ManageEventPage() {
             <EditPromoCodeTab isActive={currentTab === "code"} />
           )}
 
-          {currentTab === "add-ons" && (
+          {/* {currentTab === "add-ons" && (
             <EditEventAddOnTab isActive={currentTab === "add-ons"} />
-          )}
+          )} */}
 
           {currentTab === "dashboard" && (
             <EditEventDetailsDashboard isActive={currentTab === "dashboard"} />
