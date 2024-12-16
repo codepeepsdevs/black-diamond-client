@@ -177,26 +177,42 @@ const OrderListTable = ({
       {
         header: () => (
           <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Status</span>
+            <span>Payment Status</span>
             <FaSort className="text-xs" />
           </div>
         ),
-        id: "status",
+        id: "payment-status",
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              row.original.paymentStatus === "SUCCESSFUL"
+                ? "text-[#34C759]"
+                : "text-[#E1306C]"
+            )}
+          >
+            {row.original.paymentStatus === "SUCCESSFUL" ? "PAID" : "NOT PAID"}
+          </span>
+        ),
+      },
+      {
+        header: () => (
+          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
+            <span>Order Status</span>
+            <FaSort className="text-xs" />
+          </div>
+        ),
+        id: "order-status",
         cell: ({ row }) => (
           <span
             className={cn(
               row.original.status === "COMPLETED"
                 ? "text-[#34C759]"
-                : row.original.status === "PENDING"
-                  ? "text-yellow-500"
-                  : "text-[#E1306C]"
+                : "text-[#E1306C]"
             )}
           >
             {row.original.status === "COMPLETED"
-              ? "Success"
-              : row.original.status === "PENDING"
-                ? "Pending"
-                : "Failed"}
+              ? "REGISTERED"
+              : "NOT REGISTERED"}
           </span>
         ),
       },
