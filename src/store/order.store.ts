@@ -154,6 +154,10 @@ export const useOrderStore = create(
               const ticketTypeDetails = prevState.event?.ticketTypes.find(
                 (t) => t.id === ticketOrder.ticketTypeId
               );
+              console.log(ticketTypeDetails?.name);
+              console.table(ticketTypeDetails);
+              console.table(ticketOrder);
+              console.table(promocode);
               // check if the ticket includes the promocode id
               if (
                 ticketTypeDetails?.promoCodeIds.includes(promocode?.id) &&
