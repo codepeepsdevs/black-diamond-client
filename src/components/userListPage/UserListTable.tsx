@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
-  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -12,18 +11,8 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import Checkbox from "../shared/Checkbox";
-import {
-  FiChevronsLeft,
-  FiChevronsRight,
-  FiDelete,
-  FiDownload,
-  FiEye,
-  FiMoreHorizontal,
-  FiSearch,
-  FiTrash2,
-} from "react-icons/fi";
-import { Order, User } from "@/constants/types";
-import { FaEye, FaSort } from "react-icons/fa6";
+import { FiChevronsLeft, FiChevronsRight, FiSearch } from "react-icons/fi";
+import { FaSort } from "react-icons/fa6";
 import {
   useAdminUsersStats,
   useGetUsers,
@@ -31,15 +20,14 @@ import {
 } from "@/api/user/user.queries";
 import { VscTriangleDown, VscTriangleUp } from "react-icons/vsc";
 import IconInputField from "../shared/IconInputField";
-import { PiEyeBold } from "react-icons/pi";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { GetUserData } from "@/api/user/user.types";
 import { debounce } from "@/utils/utilityFunctions";
+import * as dateFns from "date-fns";
 
 const UserListTable = () => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [searchInput, setSearchInput] = useState<string>("");
   const [search, setSearch] = useState<string>("");
 
   const usersQuery = useGetUsers({ page: page, limit: 10, search });
@@ -55,168 +43,6 @@ const UserListTable = () => {
       : false
     : true;
 
-  const columns: ColumnDef<GetUserData["users"][number]>[] = React.useMemo(
-    () => [
-      {
-        id: "id",
-        header: ({ table }) => (
-          <Checkbox
-            // @ts-expect-error TODO: handle indeterminate state
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        id: "userId",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>User ID</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => <div className="">{row.original.id}</div>,
-      },
-      {
-        id: "name",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Name</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">
-            {row.original.firstname} {row.original.lastname}
-          </div>
-        ),
-      },
-      {
-        id: "email",
-        header: () => (
-          <div className="inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Email</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => <div className="">{row.original.email}</div>,
-      },
-      {
-        id: "phoneNumber",
-        header: () => (
-          <div className="inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Phone Number</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="">{row.original.phone || "N/A"}</div>
-        ),
-      },
-      {
-        header: () => (
-          <div className="inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Amount Spent</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        id: "amount-spent",
-        cell: ({ row }) => (
-          <div className="">{row.original.amountSpent || "N/A"}</div>
-        ),
-      },
-      {
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Role</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        id: "role",
-        cell: ({ row }) => (
-          <div className="capitalize">{row.original.role}</div>
-        ),
-      },
-      //   {
-      //     header: () => (
-      //       <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-      //         <span>Role</span>
-      //         <FaSort className="text-xs" />
-      //       </div>
-      //     ),
-      //     id: "role",
-      //     cell: ({ row }) => (
-      //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-      //         <span>Role</span>
-      //         <FaSort className="text-xs" />
-      //       </div>
-      //     ),
-      //   },
-      // {
-      //   id: "actions",
-      //   enableHiding: false,
-      //   cell: ({ row }) => {
-      //     const payment = row.original;
-
-      //     return (
-      //       <div className="flex items-center gap-x-4">
-      //         <button>
-      //           <PiEyeBold />
-      //         </button>
-      //         <button>
-      //           <FiTrash2 />
-      //         </button>
-      //         <button>
-      //           <FiDownload />
-      //         </button>
-      //       </div>
-      //     );
-      //   },
-      // },
-    ],
-    []
-  );
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data: usersData?.users || [],
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
-
   const debouncedHandleSearch = debounce((e) => {
     setSearch(e.target.value);
   }, 250);
@@ -225,7 +51,7 @@ const UserListTable = () => {
     <div className="text-[#A3A7AA]">
       {/* INFO CARDS */}
       <div className="overflow-x-auto">
-        <div className="flex gap-x-8 justify-between whitespace-nowrap mt-12">
+        <div className="flex gap-x-8 whitespace-nowrap mt-12">
           {/* NEW USERS */}
           <div className="flex flex-col shrink-0 justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
             <div className="flex items-center justify-center gap-x-1">
@@ -282,49 +108,50 @@ const UserListTable = () => {
       <div className="mt-6 whitespace-nowrap overflow-x-auto">
         <table className="w-full bg-[#151515]">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr
-                key={headerGroup.id}
-                className="border-b border-b-[#A3A7AA] text-white"
-              >
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <th key={header.id} className="p-4 m-4">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </th>
-                  );
-                })}
-              </tr>
-            ))}
+            <tr className="border-b border-b-[#A3A7AA] text-white">
+              {/* <th className="p-4 m-4">
+                <Checkbox
+                  // TODO: Fix the checking of rows
+                  checked={}
+                  onChange={}
+                  aria-label="Select all"
+                />
+              </th> */}
+              <th className="p-4 m-4 text-left">User #</th>
+              <th className="p-4 m-4 text-left">Name</th>
+              <th className="p-4 m-4 text-left">Email</th>
+              <th className="p-4 m-4 text-left">Phone Number</th>
+              <th className="p-4 m-4 text-left">Amount Spent</th>
+              <th className="p-4 m-4 text-left">Role</th>
+              <th className="p-4 m-4 text-left">Date Joined</th>
+            </tr>
           </thead>
           <tbody>
             {usersQuery.isPending ? (
               <tr>
-                <td colSpan={columns.length} className="h-24 text-center">
+                <td colSpan={7} className="h-24 text-center">
                   Loading list of users..
                 </td>
               </tr>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id} data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-4 m-4">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
+            ) : usersData?.users ? (
+              usersData.users.map((user) => (
+                <tr key={user.id} className="odd:bg-black">
+                  <td className="p-4 m-4">{user.id}</td>
+                  <td className="p-4 m-4 capitalize">
+                    {user.firstname} {user.lastname}
+                  </td>
+                  <td className="p-4 m-4">{user.email}</td>
+                  <td className="p-4 m-4">{user.phone}</td>
+                  <td className="p-4 m-4">{user.amountSpent}</td>
+                  <td className="p-4 m-4 uppercase font-medium">{user.role}</td>
+                  <td className="p-4 m-4">
+                    {dateFns.format(new Date(user.createdAt), "MMM d, yyyy")}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="h-24 text-center">
+                <td colSpan={7} className="h-24 text-center">
                   No results.
                 </td>
               </tr>
@@ -334,37 +161,31 @@ const UserListTable = () => {
       </div>
       {/* TABLE PAGINATION */}
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="space-x-2 flex items-center">
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() =>
-                setPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
-                  }
-                  return prev - 1;
-                })
-              }
-              disabled={page == 1}
-            >
-              <FiChevronsLeft />
-            </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-              {page}
-            </div>
-            <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-              onClick={() => setPage((prev) => prev + 1)}
-              disabled={isLast}
-            >
-              <FiChevronsRight />
-            </button>
+        <div className="space-x-2 flex items-center">
+          <button
+            className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+            onClick={() =>
+              setPage((prev) => {
+                if (prev <= 1) {
+                  return 1;
+                }
+                return prev - 1;
+              })
+            }
+            disabled={page == 1}
+          >
+            <FiChevronsLeft />
+          </button>
+          <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+            {page}
           </div>
+          <button
+            className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={isLast}
+          >
+            <FiChevronsRight />
+          </button>
         </div>
       </div>
       <div className="text-white">

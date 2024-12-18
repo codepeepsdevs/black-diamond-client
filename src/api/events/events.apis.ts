@@ -28,6 +28,7 @@ import {
   DeleteTicketTypeData,
   DeleteTicketTypeResponse,
   GetEventRevenueResponse,
+  GetEventTicketTypesResponse,
   GetPromocodeResponse,
   GetPromocodesResponse,
   PageViewResponse,
@@ -42,7 +43,6 @@ import {
   UpdateTicketTypeData,
   UpdateTicketTypeResponse,
 } from "./events.types";
-import toast from "react-hot-toast";
 import * as dateFns from "date-fns";
 
 // export const getUpcomingEvents = async (_page?: PageData) => {
@@ -83,9 +83,17 @@ export type EventWithSoldQuantity = Omit<Event, "ticketTypes"> &
       soldQuantity: number;
     })[];
   };
+
 export const getEvent = async (eventId: Event["id"]) => {
   return await request<EventWithSoldQuantity>({
     url: `/events/get-event/${eventId}`,
+    method: "get",
+  });
+};
+
+export const adminGetEvent = async (eventId: Event["id"]) => {
+  return await request<EventWithSoldQuantity>({
+    url: `/events/admin-get-event/${eventId}`,
     method: "get",
   });
 };
@@ -97,7 +105,7 @@ export const getEventTicketTypes = async (eventId: Event["id"]) => {
   return (await request({
     url: `/events/${eventId}/get-ticket-types`,
     method: "get",
-  })) as AxiosResponse<(TicketType & TicketCount)[]>;
+  })) as AxiosResponse<GetEventTicketTypesResponse>;
 };
 
 export const getEventPromocodes = async (eventId: Event["id"]) => {

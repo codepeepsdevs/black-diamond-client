@@ -240,7 +240,7 @@ export type SearchQueryState<T = string> = [
 export interface OptionProps {
   page?: number;
   limit?: number;
-  eventStatus?: "upcoming" | "past" | "all" | undefined;
+  eventStatus?: "upcoming" | "past" | "all" | "draft" | undefined;
   search?: string;
 }
 

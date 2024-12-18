@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { useParams } from "next/navigation";
 import {
-  useGetEvent,
+  useAdminGetEvent,
   useGetEventRevenue,
   usePageView,
   usePublishEvent,
@@ -61,7 +61,7 @@ export default function EditEventDetailsDashboard({
   const { mutate: generatePartyList, isPending: generatePartyListPending } =
     useGeneratePartyList(onError, onSuccess);
 
-  const eventQuery = useGetEvent(eventId);
+  const eventQuery = useAdminGetEvent(eventId);
   const event = eventQuery.data?.data;
 
   const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
@@ -192,7 +192,7 @@ export default function EditEventDetailsDashboard({
 
       {/* EVENT METRICS */}
       <div className="overflow-x-auto">
-        <div className="flex gap-x-8 justify-between whitespace-nowrap mt-12">
+        <div className="flex gap-x-8 whitespace-nowrap mt-12">
           {/* TICKETS SOLD */}
           <div className="flex flex-col shrink-0 justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
             <div className="flex items-center justify-center gap-x-1">

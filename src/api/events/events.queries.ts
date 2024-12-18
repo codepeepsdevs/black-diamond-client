@@ -28,6 +28,7 @@ import {
   deleteEvent,
   deletePromocode,
   updatePromocode,
+  adminGetEvent,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -52,6 +53,7 @@ import {
   DeleteTicketTypeResponse,
   GetEventRevenueResponse,
   GetEvents,
+  GetEventTicketTypesResponse,
   GetPromocodeResponse,
   GetPromocodesResponse,
   PageViewResponse,
@@ -117,9 +119,18 @@ export const useGetEvent = (eventId: Event["id"]) => {
   });
 };
 
+export const useAdminGetEvent = (eventId: Event["id"]) => {
+  return useQuery<AxiosResponse<EventWithSoldQuantity>>({
+    queryKey: ["admin-get-event", eventId],
+    queryFn: () => adminGetEvent(eventId),
+    // enabled: false,
+    // refetchInterval: 0,
+  });
+};
+
 export const useGetEventTicketTypes = (eventId: Event["id"]) => {
   return useQuery<
-    AxiosResponse<(TicketType & TicketCount)[]>,
+    AxiosResponse<GetEventTicketTypesResponse>,
     AxiosError<ErrorResponse>
   >({
     queryKey: ["get-event-ticket-types", eventId],
@@ -363,7 +374,9 @@ export const usePublishEvent = (eventId: Event["id"]) => {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-get-event", eventId],
+      });
       SuccessToast({
         title: "Success",
         description: "Event successfully published",
@@ -395,7 +408,9 @@ export const useUnpublishEvent = (eventId: Event["id"]) => {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["get-event", eventId] });
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-get-event", eventId],
+      });
       SuccessToast({
         title: "Success",
         description: "Event successfully unpublished",
@@ -431,7 +446,7 @@ export const useRemoveImageFromSlide = (
     },
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["get-event", data.data.eventId],
+        queryKey: ["admin-get-event", data.data.eventId],
       });
 
       SuccessToast({

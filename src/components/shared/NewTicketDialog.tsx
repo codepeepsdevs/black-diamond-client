@@ -1,5 +1,5 @@
 import { useCreateEventTicketType } from "@/api/events/events.queries";
-import { newTicketFormSchema } from "@/api/events/events.schemas";
+import { ticketFormSchema } from "@/api/events/events.schemas";
 import { CreateEventTicketTypeResponse } from "@/api/events/events.types";
 import { ErrorResponse } from "@/constants/types";
 import { cn } from "@/utils/cn";
@@ -38,8 +38,8 @@ export function NewTicketDialog({
     watch,
     setValue,
     reset,
-  } = useForm<Yup.InferType<typeof newTicketFormSchema>>({
-    resolver: yupResolver(newTicketFormSchema),
+  } = useForm<Yup.InferType<typeof ticketFormSchema>>({
+    resolver: yupResolver(ticketFormSchema),
     defaultValues: {
       visibility: "VISIBLE",
     },
@@ -80,9 +80,14 @@ export function NewTicketDialog({
     startTime,
     endTime,
     ...values
-  }: Yup.InferType<typeof newTicketFormSchema>) {
+  }: Yup.InferType<typeof ticketFormSchema>) {
     let dates = {};
-    if (values.visibility === "CUSTOM_SCHEDULE" && startDate && endDate) {
+    if (
+      (values.visibility === "CUSTOM_SCHEDULE" ||
+        values.visibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+      startDate &&
+      endDate
+    ) {
       dates = {
         startDate: new Date(startDate).toISOString(),
         startTime,
@@ -228,7 +233,9 @@ export function NewTicketDialog({
                   <div
                     className={cn(
                       "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                      (watchedVisibility === "CUSTOM_SCHEDULE" ||
+                        watchedVisibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+                        "flex"
                     )}
                   >
                     <div className="flex-1">
@@ -260,7 +267,9 @@ export function NewTicketDialog({
                   <div
                     className={cn(
                       "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                      (watchedVisibility === "CUSTOM_SCHEDULE" ||
+                        watchedVisibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+                        "flex"
                     )}
                   >
                     <div className="flex-1">

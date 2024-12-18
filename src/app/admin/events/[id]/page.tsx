@@ -6,7 +6,7 @@ import React, { ComponentProps, useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa6";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import { useGetEvent } from "@/api/events/events.queries";
+import { useAdminGetEvent } from "@/api/events/events.queries";
 import { SearchQueryState } from "@/constants/types";
 import * as Dialog from "@radix-ui/react-dialog";
 import { MdGppBad } from "react-icons/md";
@@ -52,7 +52,7 @@ export default function ManageEventPage() {
 
   const eventId = params.id;
 
-  const eventQuery = useGetEvent(eventId);
+  const eventQuery = useAdminGetEvent(eventId);
   const event = eventQuery.data?.data;
 
   useEffect(() => {

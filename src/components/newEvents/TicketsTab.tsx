@@ -23,7 +23,7 @@ import {
 } from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import {
-  newTicketFormSchema,
+  ticketFormSchema,
   updateEventTicketTypeSchema,
 } from "@/api/events/events.schemas";
 import { FiMoreVertical } from "react-icons/fi";

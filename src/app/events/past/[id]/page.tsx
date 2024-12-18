@@ -8,24 +8,21 @@ import { Share, TicketCalander, Location } from "../../../../../public/icons";
 import PastEventCard from "@/components/eventPage/PastEventCard";
 import ShareEventModal from "@/components/shared/Modals/ShareEventModal";
 import { useParams, useRouter } from "next/navigation";
-import { useGetEvent } from "@/api/events/events.queries";
 import * as dateFns from "date-fns";
 import * as Dialog from "@radix-ui/react-dialog";
 import { MdFmdBad } from "react-icons/md";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
-import { newYorkTimeZone } from "@/utils/date-formatter";
-import * as dateFnsTz from "date-fns-tz";
 import { getTimeZoneDateRange } from "@/utils/utilityFunctions";
+import { useAdminGetEvent } from "@/api/events/events.queries";
 
 const PastEventsDetailPage = () => {
   const [eventModalState, setEventModalState] = useState<boolean>(false);
   const [eventNotFoundDialogOpen, setEventNotFoundDialogOpen] = useState(false);
   const params = useParams<{ id: string }>();
 
-  const pastEventQuery = useGetEvent(params.id);
+  const pastEventQuery = useAdminGetEvent(params.id);
   const pastEvent = pastEventQuery.data?.data;
 
   useEffect(() => {

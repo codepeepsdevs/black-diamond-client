@@ -57,8 +57,14 @@ export const newEventSchema = Yup.object().shape({
   startTime: Yup.string().required("Start time is required"),
   endDate: dateStringSchema.required("End date is required"),
   endTime: Yup.string().required("End time is required"),
-  location: Yup.string().required("Location is required"),
-  refundPolicy: Yup.string().required("Refund policy"),
+  location: Yup.string().when("locationType", (value, schema) => {
+    if (value[0] === "TO_BE_ANNOUNCED") {
+      return schema;
+    } else {
+      return schema.required("Location/Venue is required");
+    }
+  }),
+  refundPolicy: Yup.string(),
   images: Yup.mixed<File[]>().test(
     "imagesRequired",
     "Image slides is required",
@@ -91,8 +97,14 @@ export const editEventDetailsSchema = Yup.object().shape({
   startTime: Yup.string().required("Start time is required"),
   endDate: dateStringSchema.required("End date is required"),
   endTime: Yup.string().required("End time is required"),
-  location: Yup.string().required(),
-  refundPolicy: Yup.string().required(),
+  location: Yup.string().when("locationType", (value, schema) => {
+    if (value[0] === "TO_BE_ANNOUNCED") {
+      return schema;
+    } else {
+      return schema.required("Location/Venue is required");
+    }
+  }),
+  refundPolicy: Yup.string(),
   images: Yup.mixed<File[]>(),
   coverImage: Yup.mixed<File>(),
   locationType: Yup.string()
@@ -100,7 +112,7 @@ export const editEventDetailsSchema = Yup.object().shape({
     .default("VENUE"),
 });
 
-export const newTicketFormSchema = Yup.object().shape({
+export const ticketFormSchema = Yup.object().shape({
   name: Yup.string().required("Ticket name is required"),
   quantity: Yup.number()
     .typeError("Please enter a number")
@@ -109,28 +121,40 @@ export const newTicketFormSchema = Yup.object().shape({
     .typeError("Please enter a number")
     .required("Ticket price is required"),
   startDate: Yup.string().when("visibility", (value, schema) => {
-    if (value[0] === "CUSTOM_SCHEDULE") {
+    if (
+      value[0] === "CUSTOM_SCHEDULE" ||
+      value[0] === "HIDDEN_WHEN_NOT_ON_SALE"
+    ) {
       return dateStringSchema.required("Start date is required");
     } else {
       return schema.notRequired();
     }
   }),
   startTime: Yup.string().when("visibility", (value, schema) => {
-    if (value[0] === "CUSTOM_SCHEDULE") {
+    if (
+      value[0] === "CUSTOM_SCHEDULE" ||
+      value[0] === "HIDDEN_WHEN_NOT_ON_SALE"
+    ) {
       return schema.required("Start time is required");
     } else {
       return schema.notRequired();
     }
   }),
   endDate: Yup.string().when("visibility", (value, schema) => {
-    if (value[0] === "CUSTOM_SCHEDULE") {
+    if (
+      value[0] === "CUSTOM_SCHEDULE" ||
+      value[0] === "HIDDEN_WHEN_NOT_ON_SALE"
+    ) {
       return dateStringSchema.required("End date is required");
     } else {
       return schema.notRequired();
     }
   }),
   endTime: Yup.string().when("visibility", (value, schema) => {
-    if (value[0] === "CUSTOM_SCHEDULE") {
+    if (
+      value[0] === "CUSTOM_SCHEDULE" ||
+      value[0] === "HIDDEN_WHEN_NOT_ON_SALE"
+    ) {
       return schema.required("End time is required");
     } else {
       return schema.notRequired();
@@ -159,46 +183,46 @@ export const newTicketFormSchema = Yup.object().shape({
     .default(undefined),
 });
 
-export const editTicketFormSchema = Yup.object().shape({
-  name: Yup.string().required("Ticket name is required"),
-  quantity: Yup.number()
-    .typeError("Please enter a number")
-    .required("Ticket quantity is required"),
-  price: Yup.number()
-    .typeError("Please enter a number")
-    .required("Ticket price is required"),
-  startDate: Yup.string()
-    // .typeError("Please provide a valid date")
-    .required("Start date is required"),
-  startTime: Yup.string()
-    // .typeError("Please provide a valid date")
-    .required("Start time is required"),
-  endDate: Yup.string().required("End date is required"),
-  endTime: Yup.string().required("End time is required"),
-  visibility: Yup.string()
-    .oneOf(["VISIBLE", "HIDDEN", "HIDDEN_WHEN_NOT_ON_SALE", "CUSTOM_SCHEDULE"])
-    .default("VISIBLE"),
-  minQty: Yup.number()
-    .integer("Enter a whole number")
-    .typeError("Please enter a number")
-    .min(1, "Please enter a minimum of 1")
-    .transform((value, originalValue) =>
-      originalValue === "" ? undefined : value
-    )
-    .optional()
-    .nullable()
-    .default(1),
-  maxQty: Yup.number()
-    .integer("Enter a whole number")
-    .typeError("Please enter a number")
-    .min(1, "Please enter a minimum of 1s")
-    .transform((value, originalValue) =>
-      originalValue === "" ? undefined : value
-    )
-    .optional()
-    .nullable()
-    .default(undefined),
-});
+// export const editTicketFormSchema = Yup.object().shape({
+//   name: Yup.string().required("Ticket name is required"),
+//   quantity: Yup.number()
+//     .typeError("Please enter a number")
+//     .required("Ticket quantity is required"),
+//   price: Yup.number()
+//     .typeError("Please enter a number")
+//     .required("Ticket price is required"),
+//   startDate: Yup.string()
+//     // .typeError("Please provide a valid date")
+//     .required("Start date is required"),
+//   startTime: Yup.string()
+//     // .typeError("Please provide a valid date")
+//     .required("Start time is required"),
+//   endDate: Yup.string().required("End date is required"),
+//   endTime: Yup.string().required("End time is required"),
+//   visibility: Yup.string()
+//     .oneOf(["VISIBLE", "HIDDEN", "HIDDEN_WHEN_NOT_ON_SALE", "CUSTOM_SCHEDULE"])
+//     .default("VISIBLE"),
+//   minQty: Yup.number()
+//     .integer("Enter a whole number")
+//     .typeError("Please enter a number")
+//     .min(1, "Please enter a minimum of 1")
+//     .transform((value, originalValue) =>
+//       originalValue === "" ? undefined : value
+//     )
+//     .optional()
+//     .nullable()
+//     .default(1),
+//   maxQty: Yup.number()
+//     .integer("Enter a whole number")
+//     .typeError("Please enter a number")
+//     .min(1, "Please enter a minimum of 1s")
+//     .transform((value, originalValue) =>
+//       originalValue === "" ? undefined : value
+//     )
+//     .optional()
+//     .nullable()
+//     .default(undefined),
+// });
 
 // Define the Yup schema
 export const newAddOnSchema = Yup.object().shape({

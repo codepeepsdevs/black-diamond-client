@@ -48,7 +48,9 @@ export default function AdminLayout({
         <div className={`flex min-h-[50vh] `}>
           <AdminSidebar />
           {/* The min-w-0 is to prevent the contents of the container from overflowing */}
-          <div className="flex-1 min-w-0">{children}</div>
+          <div className="flex-1 min-w-0 max-w-screen-xl mx-auto">
+            {children}
+          </div>
         </div>
       )}
 

@@ -84,9 +84,9 @@ export const useUserUpcomingEventsOrders = (page?: PageData) => {
   });
 };
 
-export type ExtendedOrder = Order & {
-  orderAmount: number;
-};
+// export type ExtendedOrder = Order & {
+//   orderAmount: number;
+// };
 
 export const useGetOrders = (options?: OptionProps & DateRangeData) => {
   return useQuery<AxiosResponse<GetOrders>>({
