@@ -1,5 +1,4 @@
 import { DateRangeData, Order, TicketType } from "@/constants/types";
-import { ExtendedOrder } from "./order.queries";
 
 export type GetUserOrders = {
   userOrders: Order[];
@@ -40,7 +39,7 @@ export type GetTicketSoldStatsResponse = {
 };
 
 export type GetOrders = {
-  orders: ExtendedOrder[];
+  orders: Order[];
   ordersCount: number;
 };
 

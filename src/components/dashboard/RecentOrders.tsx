@@ -12,7 +12,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import Checkbox from "../shared/Checkbox";
-import { ExtendedOrder, useGetOrders } from "@/api/order/order.queries";
+import { useGetOrders } from "@/api/order/order.queries";
 import { FaSort, FaSortDown } from "react-icons/fa6";
 import * as dateFns from "date-fns";
 import { cn } from "@/utils/cn";
@@ -42,234 +42,86 @@ const RecentOrdersTable = ({
     };
   }, [orderListQuery.isFetching]);
 
-  const columns: ColumnDef<ExtendedOrder>[] = React.useMemo(
-    () => [
-      {
-        id: "id",
-        header: ({ table }) => (
-          <Checkbox
-            // @ts-expect-error TODO: handle indeterminate state
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
-        id: "date",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Date</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">
-            <div>
-              {dateFns.format(new Date(row.original.createdAt), "dd/MM/yyyy")}
-            </div>
-            <div>
-              {dateFns.format(new Date(row.original.createdAt), "hh:mm a")}
-            </div>
-          </div>
-        ),
-      },
-      {
-        id: "eventName",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Event Name</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.original.event.name}</div>
-        ),
-      },
-      {
-        id: "customerName",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Customer name</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">
-            {row.original.user?.firstname} {row.original.user?.lastname}
-          </div>
-        ),
-      },
-      {
-        id: "ticketQuantity",
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Tickets</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.original.tickets.length}</div>
-        ),
-      },
-      {
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Amount</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        id: "price",
-        cell: ({ row }) => (
-          <div className="capitalize">${row.original.orderAmount}</div>
-        ),
-      },
-      {
-        header: () => (
-          <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-            <span>Status</span>
-            <FaSort className="text-xs" />
-          </div>
-        ),
-        id: "status",
-        cell: ({ row }) => (
-          <span
-            className={cn(
-              row.original.status === "COMPLETED"
-                ? "text-[#34C759]"
-                : row.original.status === "PENDING"
-                  ? "text-yellow-500"
-                  : "text-[#E1306C]"
-            )}
-          >
-            {row.original.status === "COMPLETED"
-              ? "Success"
-              : row.original.status === "PENDING"
-                ? "Pending"
-                : "Failed"}
-          </span>
-        ),
-      },
-      // {
-      //   id: "actions",
-      //   enableHiding: false,
-      //   cell: ({ row }) => {
-      //     const payment = row.original;
-
-      //     return (
-      //       <Popover>
-      //         <PopoverTrigger asChild>
-      //           <FiMoreHorizontal className="h-4 w-4" />
-      //         </PopoverTrigger>
-      //         <PopoverContent align="end">
-      //           <button
-      //             onClick={() => navigator.clipboard.writeText(payment.id)}
-      //           >
-      //             Copy payment ID
-      //           </button>
-      //           <button>View customer</button>
-      //           <button>View payment details</button>
-      //         </PopoverContent>
-      //       </Popover>
-      //     );
-      //   },
-      // },
-    ],
-    []
-  );
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  const table = useReactTable({
-    data: orderListData?.orders || [],
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
-
   return (
     <>
       <div className="text-[#A3A7AA] overflow-x-auto">
-        {/* TODO: Bring the table action buttons here */}
         <div className="mt-6">
           <table className="w-full bg-[#151515] whitespace-nowrap overflow-x-auto">
             <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="border-b border-b-[#A3A7AA] text-white"
-                >
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <th key={header.id} className="p-4 m-4">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ))}
+              <tr className="border-b border-b-[#A3A7AA] text-white">
+                <th className="p-4 m-4 text-left">Date</th>
+                <th className="p-4 m-4 text-left">Event Name</th>
+                <th className="p-4 m-4 text-left">Order #</th>
+                <th className="p-4 m-4 text-left">Customer Name</th>
+                <th className="p-4 m-4 text-left">Ticket Qty</th>
+                <th className="p-4 m-4 text-left">Amount</th>
+                <th className="p-4 m-4 text-left">Payment Status</th>
+                <th className="p-4 m-4 text-left">Order Status</th>
+                {/* <th className="p-4 m-4"></th> */}
+              </tr>
             </thead>
             <tbody>
               {orderListQuery.isPending ? (
                 <tr>
-                  <td colSpan={columns.length} className="h-24 text-center">
+                  <td colSpan={8} className="h-24 text-center">
                     Loading orders..
                   </td>
                 </tr>
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="p-4 m-4">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
+              ) : orderListData?.orders ? (
+                orderListData.orders.map((order) => (
+                  <tr key={order.id} className="odd:bg-black">
+                    <td className="p-4 m-4">
+                      <div className="capitalize">
+                        <div>
+                          {dateFns.format(
+                            new Date(order.createdAt),
+                            "dd/MM/yyyy"
+                          )}
+                        </div>
+                        <div>
+                          {dateFns.format(new Date(order.createdAt), "hh:mm a")}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 m-4">{order.event.name}</td>
+                    <td className="p-4 m-4">{order.id}</td>
+                    <td className="p-4 m-4">
+                      {order.firstName} {order.lastName}
+                    </td>
+                    <td className="p-4 m-4">{order.tickets.length}</td>
+                    <td className="p-4 m-4">{order.amountPaid}</td>
+                    <td className="p-4 m-4">
+                      <span
+                        className={cn(
+                          order.paymentStatus === "SUCCESSFUL"
+                            ? "text-[#34C759]"
+                            : "text-[#E1306C]"
                         )}
-                      </td>
-                    ))}
+                      >
+                        {order.paymentStatus === "SUCCESSFUL"
+                          ? "Paid"
+                          : "Not Paid"}
+                      </span>
+                    </td>
+                    <td className="p-4 m-4">
+                      {" "}
+                      <span
+                        className={cn(
+                          order.status === "COMPLETED"
+                            ? "text-[#34C759]"
+                            : "text-yellow-500"
+                        )}
+                      >
+                        {order.status === "COMPLETED"
+                          ? "Successful"
+                          : "Pending"}
+                      </span>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={columns.length} className="h-24 text-center">
+                  <td colSpan={8} className="h-24 text-center">
                     No results.
                   </td>
                 </tr>
