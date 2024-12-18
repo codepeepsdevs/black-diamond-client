@@ -25,7 +25,7 @@ const RecentOrdersTable = ({
   startDate: Date | undefined;
   endDate: Date | undefined;
 }) => {
-  const orderListQuery = useGetOrders({ startDate, endDate });
+  const orderListQuery = useGetOrders({ startDate, endDate, limit: 10 });
   const orderListData = orderListQuery.data?.data;
 
   useEffect(() => {
