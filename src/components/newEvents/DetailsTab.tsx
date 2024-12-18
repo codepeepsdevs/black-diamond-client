@@ -38,6 +38,8 @@ import ErrorToast from "../toast/ErrorToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 import { useRouter } from "next/navigation";
 import SuccessToast from "../toast/SuccessToast";
+import { cn } from "@/utils/cn";
+import Checkbox from "../shared/Checkbox";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -63,6 +65,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
     null
   );
+  const [refundPolicy, setRefundPolicy] = useState(false);
 
   // const setEventId = useNewEventStore((state) => state.setEventId);
   const [eventId, setEventId] = useQueryState(
@@ -130,6 +133,16 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
   };
 
   const watchedLocationType = watch("locationType");
+
+  const toggleRefundPolicy = () => {
+    setRefundPolicy((state) => {
+      // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
+      if (state === true) {
+        setValue("refundPolicy", undefined);
+      }
+      return !state;
+    });
+  };
 
   return (
     <div className={isActive ? "block" : "hidden"}>
@@ -348,7 +361,12 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
           {/* END TABS */}
 
           {/* INPUT FIELD */}
-          <div className="mt-4">
+          <div
+            className={cn(
+              "mt-4",
+              watchedLocationType === "TO_BE_ANNOUNCED" && "hidden"
+            )}
+          >
             <label htmlFor="location">Location</label>
             <IconInputField
               {...register("location")}
@@ -410,8 +428,15 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
           <div className="text-xl font-semibold">Additional Information</div>
 
           <div className="mt-4">
-            <label htmlFor="refund-policy">Refund Policy</label>
-            <Input variant="white" {...register("refundPolicy")} />
+            <div className="flex items-center gap-x-2">
+              <Checkbox checked={refundPolicy} onClick={toggleRefundPolicy} />
+              <label htmlFor="refund-policy">Refund Policy</label>
+            </div>
+            <Input
+              variant="white"
+              className={!refundPolicy ? "hidden" : ""}
+              {...register("refundPolicy")}
+            />
           </div>
         </div>
         {/* END ADDITIONAL INFORMATION */}
@@ -419,7 +444,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
         <AdminButton
           disabled={createEventDetailsPending}
           variant="ghost"
-          className="font-medium flex items-center gap-x-2 px-6 mt-12"
+          className="font-medium flex items-center gap-x-2 px-6 mt-12 disabled:opacity-50"
         >
           {createEventDetailsPending ? (
             <LoadingMessage>Creating...</LoadingMessage>

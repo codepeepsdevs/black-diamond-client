@@ -4,13 +4,14 @@ import {
   TicketType,
   PromoCode,
   EventStatus,
+  TicketCount,
 } from "@/constants/types";
 import {
   editEventDetailsSchema,
   newAddOnSchema,
   newEventSchema,
   newPromocodeFormSchema,
-  newTicketFormSchema,
+  ticketFormSchema,
 } from "./events.schemas";
 import * as Yup from "yup";
 
@@ -31,7 +32,7 @@ export type CreateEventDetailsResponse = Event;
 export type UpdateEventDetailsResponse = Event;
 
 export type CreateEventTicketTypeData = Yup.InferType<
-  typeof newTicketFormSchema
+  typeof ticketFormSchema
 > & {
   eventId: Event["id"];
 };
@@ -61,9 +62,14 @@ export type GetPromocodeResponse = PromoCode & {
   isActive: boolean;
 };
 
+export type GetEventTicketTypesResponse = (TicketType &
+  TicketCount & {
+    saleStatus: "on-sale" | "not-on-sale" | "sale-ended";
+  })[];
+
 export type UpdateTicketTypeResponse = TicketType;
 
-export type UpdateTicketTypeData = Yup.InferType<typeof newTicketFormSchema> & {
+export type UpdateTicketTypeData = Yup.InferType<typeof ticketFormSchema> & {
   ticketTypeId: string;
 };
 

@@ -1,18 +1,10 @@
 "use client";
 
-import { AdminButton } from "@/components";
-import PromoCodeTab from "@/components/newEvents/PromoCodeTab";
 import DetailsTab from "@/components/newEvents/DetailsTab";
-import PreviewIcon from "@/components/newEvents/PreviewIcon";
-import TicketsTab from "@/components/newEvents/TicketsTab";
 import { cn } from "@/utils/cn";
 import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa6";
-import { useRouter, useSearchParams } from "next/navigation";
 import { parseAsString, useQueryState } from "nuqs";
-import EventAddOnTab from "@/components/newEvents/EventAddOnTab";
-import EventDetailsDashboard from "@/components/newEvents/EventDetailsDashboard";
-import { useGetEvent } from "@/api/events/events.queries";
 import { SearchQueryState } from "@/constants/types";
 // import { useNewEventStore } from "@/store/new-event.store";
 import Link from "next/link";

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
 import { parseAsString, useQueryState } from "nuqs";
 import {
-  useGetEvent,
+  useAdminGetEvent,
   useGetEventRevenue,
   usePageView,
   usePublishEvent,
@@ -38,7 +38,7 @@ export default function EventDetailsDashboard({
   const { mutate: unpublishEvent, isPending: unpublishEventPending } =
     useUnpublishEvent(eventId);
 
-  const eventQuery = useGetEvent(eventId);
+  const eventQuery = useAdminGetEvent(eventId);
   const event = eventQuery.data?.data;
 
   const eventRevenueQuery = useGetEventRevenue(eventId);

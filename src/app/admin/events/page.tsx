@@ -102,17 +102,6 @@ export default function AdminEventsPage() {
 
         {/* EVENT ACTION BUTTONS */}
         <div className="flex items-center gap-x-6 justify-end">
-          {/* NEW EVENT BUTTON */}
-          <AdminButton
-            variant="primary"
-            className="flex items-center gap-x-2 leading-5"
-            onClick={() => router.push(`/admin/events/new-event`)}
-          >
-            <FiPlusCircle />
-            <span className="pt-1">New Event</span>
-          </AdminButton>
-          {/* END NEW EVENT BUTTON */}
-
           {/* FILTER SELECT */}
           <FilterSelect
             onSelect={setEventStatus}
@@ -126,6 +115,10 @@ export default function AdminEventsPage() {
                 title: "Upcoming Events",
                 value: "upcoming",
               },
+              {
+                title: "Draft",
+                value: "draft",
+              },
               // {
               //   title: "Drafts",
               //   value: "drafts",
@@ -133,6 +126,17 @@ export default function AdminEventsPage() {
             ]}
           />
           {/* END FILTER SELECT */}
+
+          {/* NEW EVENT BUTTON */}
+          <AdminButton
+            variant="primary"
+            className="flex items-center gap-x-2 leading-5"
+            onClick={() => router.push(`/admin/events/new-event`)}
+          >
+            <FiPlusCircle />
+            <span className="pt-1">New Event</span>
+          </AdminButton>
+          {/* END NEW EVENT BUTTON */}
         </div>
         {/* END EVENT ACTION BUTTONS */}
 
@@ -164,7 +168,11 @@ export default function AdminEventsPage() {
                 {eventsQuery.data?.data || !eventsQuery.isError ? (
                   eventsData?.events.map((event) => {
                     return (
-                      <tr key={event.id}>
+                      <tr
+                        key={event.id}
+                        className="hover:bg-[#131313] transition-all cursor-pointer"
+                        onClick={() => handleAction("edit", event.id)}
+                      >
                         <td className="py-6">
                           <div className="flex items-start gap-x-6">
                             {/* MONTH AND DAY */}
@@ -390,7 +398,12 @@ function ActionDropDown({
   return (
     <div className="relative">
       {/* ACTION BUTTON */}
-      <button onClick={() => setDropdownOpen((state) => !state)}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setDropdownOpen((state) => !state);
+        }}
+      >
         <FiMoreVertical />
       </button>
       {/* ACTION BUTTON */}

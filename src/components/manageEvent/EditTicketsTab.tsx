@@ -15,17 +15,23 @@ import Input from "../shared/Input";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import IconInputField from "../shared/IconInputField";
-import { FaDollarSign, FaRegCalendar, FaRegClock } from "react-icons/fa6";
+import {
+  FaDollarSign,
+  FaEye,
+  FaRegCalendar,
+  FaRegClock,
+} from "react-icons/fa6";
 import { cn } from "@/utils/cn";
 import {
-  editTicketFormSchema,
+  ticketFormSchema,
   updateEventTicketTypeSchema,
 } from "@/api/events/events.schemas";
-import { FiChevronUp, FiMoreVertical } from "react-icons/fi";
+import { FiChevronUp, FiEyeOff, FiMoreVertical } from "react-icons/fi";
 import { BsDot } from "react-icons/bs";
 import Checkbox from "../shared/Checkbox";
 import { parseAsString, useQueryState } from "nuqs";
 import {
+  useAdminGetEvent,
   useDeleteTicketType,
   useGetEventTicketTypes,
   useUpdateTicketType,
@@ -57,6 +63,10 @@ import { SelectVisibilityDropDown } from "../newEvents/TicketTypeVisibility";
 import { NewTicketDialog } from "../shared/NewTicketDialog";
 import toast from "react-hot-toast";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
+import NotOnSaleStatus from "./NotOnSaleStatus";
+import SaleEndedStatus from "./SaleEndedStatus";
+import OnSaleStatus from "./OnSaleStatus";
+import SoldOutStatus from "./SoldOutStatus";
 
 export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
@@ -71,8 +81,11 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
   const eventId = params.id;
   let loadingToastId = useRef("");
   const [ticketToEdit, setTicketToEdit] = useState<Yup.InferType<
-    typeof editTicketFormSchema
+    typeof ticketFormSchema
   > | null>(null);
+
+  const eventQuery = useAdminGetEvent(eventId);
+  const eventData = eventQuery.data?.data;
 
   const onDeleteSuccess = async (
     data: AxiosResponse<DeleteTicketTypeResponse>
@@ -107,13 +120,6 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
     resolver: yupResolver(updateEventTicketTypeSchema),
   });
 
-  const watchedDisplayTicketsRemainder = watch("displayTicketsRemainder");
-  const watchedShowSalesEndMessage = watch("showSalesEndMessage");
-
-  function onSubmit(values: Yup.InferType<typeof updateEventTicketTypeSchema>) {
-    // TODO: Handle updating event details..
-    setCurrentTab("code");
-  }
   const ticketTypes = useGetEventTicketTypes(eventId);
   const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
   const ticketTypeSalesData = ticketTypeSalesQuery.data?.data;
@@ -190,71 +196,12 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
           />
         )}
 
-        {/* TICKET TYPE LIST */}
-        {/* <table>
-          <thead className="bg-[#A3A7AA] text-black leading-10 font-medium [&_th]:px-4">
-            <tr>
-              <th>Name</th>
-              <th>Sold/Total Quantity</th>
-              <th>Price </th>
-              <th></th>
-            </tr>
-          </thead>
-          <div className="font-medium mt-12">
-            {ticketTypes.isPending ? (
-              <div>Loading ticket types..</div>
-            ) : ticketTypes.isError ? (
-              <div>Error loading ticket types..</div>
-            ) : (
-              ticketTypes.data?.data.map((ticketType) => {
-                return (
-                  <div
-                    key={ticketType.id}
-                    className="flex gap-x-24 py-4 whitespace-nowrap overflow-x-auto"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium text-xl">
-                        {ticketType.name}
-                      </div>
-                      {ticketType.endDate ? (
-                        <div className="flex items-center mt-2">
-                          <BsDot className="text-[#34C759] text-2xl -ml-2" />
-                          <p className="">
-                            On Sale · Ends{" "}
-                            {dateFns.format(
-                              dateFnsTz.toZonedTime(
-                                new Date(ticketType.endDate),
-                                newYorkTimeZone
-                              ),
-                              "MMM d, yyyy 'at' h:mm a"
-                            )}
-                          </p>
-                        </div>
-                      ) : null}
-                    </div>
-                    <div>Sold: </div>
-                    <div>
-                      {ticketType._count.tickets}/{ticketType.quantity}
-                    </div>
-                    <div>${ticketType.price.toFixed(2)}</div>
-
-                    <ActionDropDown
-                      disabled={deleteTicketTypePending}
-                      handleAction={handleAction}
-                      ticketTypeId={ticketType.id}
-                    />
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </table> */}
         <div className="overflow-x-auto text-[#A3A7AA] mt-10">
           <table className="w-full text-left">
             <thead className="bg-[#A3A7AA] text-black leading-10 font-medium [&_th]:px-4">
               <tr>
                 <th>Name</th>
-                <th>Sale Ends</th>
+                <th>Status</th>
                 <th>Sold/Total</th>
                 <th>Price </th>
                 <th></th>
@@ -270,32 +217,45 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
               ) : null}
               {ticketTypes.data?.data ? (
                 ticketTypes.data?.data.map((ticketType) => {
+                  const soldOut =
+                    ticketType._count.tickets >= ticketType.quantity;
                   return (
                     <tr
-                      className="border-b border-b-[#151515]"
+                      className="border-b border-b-[#151515] hover:bg-[#131313] transition-all cursor-pointer"
                       key={ticketType.id}
+                      onClick={() => handleAction("edit", ticketType.id)}
                     >
                       <td>{ticketType.name}</td>
                       <td>
-                        <p>
-                          {ticketType.endDate ? (
-                            <div className="flex items-center mt-2">
-                              <BsDot className="text-[#34C759] text-2xl -ml-2" />
-                              <p className="">
-                                On Sale · Ends{" "}
-                                {dateFns.format(
-                                  dateFnsTz.toZonedTime(
-                                    new Date(ticketType.endDate),
-                                    newYorkTimeZone
-                                  ),
-                                  "MMM d, yyyy 'at' h:mm a"
-                                )}
-                              </p>
-                            </div>
+                        <div className="flex items-center mt-2 min-w-72">
+                          {ticketType.saleStatus === "not-on-sale" ? (
+                            <NotOnSaleStatus
+                              eventData={eventData}
+                              ticketType={ticketType}
+                            />
+                          ) : ticketType.saleStatus === "sale-ended" ? (
+                            <SaleEndedStatus
+                              eventData={eventData}
+                              ticketType={ticketType}
+                            />
+                          ) : !soldOut ? (
+                            <OnSaleStatus
+                              eventData={eventData}
+                              ticketType={ticketType}
+                            />
                           ) : (
-                            "N/A"
+                            <SoldOutStatus
+                              eventData={eventData}
+                              ticketType={ticketType}
+                            />
                           )}
-                        </p>
+                        </div>
+                        {ticketType.visibility === "HIDDEN" ? (
+                          <p className="flex gap-x-1 items-center text-xs">
+                            <FiEyeOff />
+                            <span className="">Hidden</span>
+                          </p>
+                        ) : null}
                       </td>
                       <td>
                         {ticketType._count.tickets}/{ticketType.quantity}
@@ -400,7 +360,7 @@ function EditTicketDialog({
   defaultValues,
   ...props
 }: ComponentProps<typeof Dialog> & {
-  defaultValues: Yup.InferType<typeof editTicketFormSchema>;
+  defaultValues: Yup.InferType<typeof ticketFormSchema>;
   ticketTypeId: string;
 }) {
   const {
@@ -410,8 +370,8 @@ function EditTicketDialog({
     watch,
     setValue,
     reset,
-  } = useForm<Yup.InferType<typeof editTicketFormSchema>>({
-    resolver: yupResolver(editTicketFormSchema),
+  } = useForm<Yup.InferType<typeof ticketFormSchema>>({
+    resolver: yupResolver(ticketFormSchema),
     defaultValues,
     shouldUnregister: false,
   });
@@ -453,9 +413,14 @@ function EditTicketDialog({
     endDate,
     endTime,
     ...values
-  }: Yup.InferType<typeof editTicketFormSchema>) {
+  }: Yup.InferType<typeof ticketFormSchema>) {
     let dates = {};
-    if (values.visibility === "CUSTOM_SCHEDULE" && startDate && endDate) {
+    if (
+      (values.visibility === "CUSTOM_SCHEDULE" ||
+        values.visibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+      startDate &&
+      endDate
+    ) {
       dates = {
         startDate: new Date(startDate).toISOString(),
         startTime,
@@ -602,7 +567,9 @@ function EditTicketDialog({
                   <div
                     className={cn(
                       "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                      (watchedVisibility === "CUSTOM_SCHEDULE" ||
+                        watchedVisibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+                        "flex"
                     )}
                   >
                     <div className="flex-1">
@@ -610,7 +577,9 @@ function EditTicketDialog({
                       <IconInputField
                         variant="white"
                         value={
-                          new Date(watchedStartDate).toISOString().split("T")[0]
+                          new Date(watchedStartDate || new Date())
+                            .toISOString()
+                            .split("T")[0]
                         }
                         className="bg-input-bg"
                         Icon={<FaRegCalendar />}
@@ -636,7 +605,9 @@ function EditTicketDialog({
                   <div
                     className={cn(
                       "hidden items-center gap-x-4 gap-y-4 transition overflow-hidden",
-                      watchedVisibility === "CUSTOM_SCHEDULE" && "flex"
+                      (watchedVisibility === "CUSTOM_SCHEDULE" ||
+                        watchedVisibility === "HIDDEN_WHEN_NOT_ON_SALE") &&
+                        "flex"
                     )}
                   >
                     <div className="flex-1">
@@ -644,7 +615,9 @@ function EditTicketDialog({
                       <IconInputField
                         variant="white"
                         value={
-                          new Date(watchedEndDate).toISOString().split("T")[0]
+                          new Date(watchedEndDate || new Date())
+                            .toISOString()
+                            .split("T")[0]
                         }
                         className="bg-input-bg"
                         Icon={<FaRegCalendar />}
@@ -716,7 +689,10 @@ function ActionDropDown({
       <PopoverTrigger asChild>
         <button
           className="flex items-start mt-1"
-          onClick={() => setDropdownOpen((state) => !state)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setDropdownOpen((state) => !state);
+          }}
         >
           <FiMoreVertical />
         </button>

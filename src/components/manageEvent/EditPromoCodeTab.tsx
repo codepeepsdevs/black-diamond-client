@@ -250,8 +250,9 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                 promocodesQuery.data?.data.map((promocode) => {
                   return (
                     <tr
-                      className="border-b border-b-[#151515]"
+                      className="border-b border-b-[#151515] hover:bg-[#131313] transition-all cursor-pointer"
                       key={promocode.id}
+                      onClick={() => handleAction("edit", promocode.id)}
                     >
                       <td>{promocode.name}</td>
                       <td>{promocode.key}</td>
@@ -343,7 +344,10 @@ function ActionDropDown({
       <PopoverTrigger asChild>
         <button
           className="flex items-start mt-1"
-          onClick={() => setDropdownOpen((state) => !state)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setDropdownOpen((state) => !state);
+          }}
         >
           <FiMoreVertical />
         </button>

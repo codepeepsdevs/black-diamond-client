@@ -36,6 +36,8 @@ import { FiPlus, FiTrash2 } from "react-icons/fi";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
 import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import Checkbox from "../shared/Checkbox";
+import { cn } from "@/utils/cn";
 
 export default function EditDetailsTab({
   isActive,
@@ -72,6 +74,7 @@ export default function EditDetailsTab({
   const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
     null
   );
+  const [refundPolicy, setRefundPolicy] = useState(false);
 
   function onEditDetailsSuccess(data: AxiosResponse<any>) {
     // Clear file input and image preview on success
@@ -141,6 +144,16 @@ export default function EditDetailsTab({
   const watchedLocationType = watch("locationType");
   const watchedImages = watch("images");
 
+  const toggleRefundPolicy = () => {
+    setRefundPolicy((state) => {
+      // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
+      if (state === true) {
+        setValue("refundPolicy", undefined);
+      }
+      return !state;
+    });
+  };
+
   return (
     <div className={isActive ? "block" : "hidden"}>
       <form
@@ -148,7 +161,7 @@ export default function EditDetailsTab({
         onSubmit={handleSubmit(onSubmit)}
       >
         {/* UPLOAD COVER IMAGES SECTION */}
-        <div>
+        <div className="mt-4">
           <label htmlFor="cover=image">Cover image</label>
           <EditEventCoverImageInput
             onSelectFile={(file) => {
@@ -380,7 +393,12 @@ export default function EditDetailsTab({
           <FormError error={errors.locationType} />
 
           {/* INPUT FIELD */}
-          <div className="mt-4">
+          <div
+            className={cn(
+              "mt-4",
+              watchedLocationType === "TO_BE_ANNOUNCED" && "hidden"
+            )}
+          >
             <label htmlFor="location">Location</label>
             <IconInputField
               {...register("location")}
@@ -441,9 +459,13 @@ export default function EditDetailsTab({
           <div className="text-xl font-semibold">Additional Information</div>
 
           <div className="mt-4">
-            <label htmlFor="refund-policy">Refund Policy</label>
+            <div className="flex items-center gap-x-2">
+              <Checkbox checked={refundPolicy} onClick={toggleRefundPolicy} />
+              <label htmlFor="refund-policy">Refund Policy</label>
+            </div>
             <Input
-              className="bg-white text-black"
+              variant="white"
+              className={!refundPolicy ? "hidden" : ""}
               {...register("refundPolicy")}
             />
           </div>
@@ -453,7 +475,7 @@ export default function EditDetailsTab({
         <AdminButton
           disabled={updateEventDetailsPending}
           variant="ghost"
-          className="font-medium flex items-center gap-x-2 px-6 mt-12"
+          className="font-medium flex items-center gap-x-2 px-6 mt-12 disabled:opacity-50"
         >
           <FaSave />
           {updateEventDetailsPending ? (
