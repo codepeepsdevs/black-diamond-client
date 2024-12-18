@@ -117,7 +117,7 @@ const UserListTable = () => {
                   aria-label="Select all"
                 />
               </th> */}
-              <th className="p-4 m-4 text-left">User ID</th>
+              <th className="p-4 m-4 text-left">User #</th>
               <th className="p-4 m-4 text-left">Name</th>
               <th className="p-4 m-4 text-left">Email</th>
               <th className="p-4 m-4 text-left">Phone Number</th>

@@ -292,14 +292,14 @@ const OrderListTable = ({
           <table className="w-full bg-[#151515] whitespace-nowrap overflow-x-auto">
             <thead>
               <tr className="border-b border-b-[#A3A7AA] text-white">
-                <th className="p-4 m-4">Date</th>
-                <th className="p-4 m-4">Event Name</th>
-                <th className="p-4 m-4">Order ID</th>
-                <th className="p-4 m-4">Customer Name</th>
-                <th className="p-4 m-4">Ticket Qty</th>
-                <th className="p-4 m-4">Amount</th>
-                <th className="p-4 m-4">Payment Status</th>
-                <th className="p-4 m-4">Order Status</th>
+                <th className="p-4 m-4 text-left">Date</th>
+                <th className="p-4 m-4 text-left">Event Name</th>
+                <th className="p-4 m-4 text-left">Order #</th>
+                <th className="p-4 m-4 text-left">Customer Name</th>
+                <th className="p-4 m-4 text-left">Ticket Qty</th>
+                <th className="p-4 m-4 text-left">Amount</th>
+                <th className="p-4 m-4 text-left">Payment Status</th>
+                <th className="p-4 m-4 text-left">Order Status</th>
                 {/* <th className="p-4 m-4"></th> */}
               </tr>
             </thead>
@@ -312,7 +312,7 @@ const OrderListTable = ({
                 </tr>
               ) : orderListData?.orders ? (
                 orderListData.orders.map((order) => (
-                  <tr key={order.id}>
+                  <tr key={order.id} className="odd:bg-black">
                     <td className="p-4 m-4">
                       <div className="capitalize">
                         <div>
