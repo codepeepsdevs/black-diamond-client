@@ -117,7 +117,7 @@ const UserListTable = () => {
                   aria-label="Select all"
                 />
               </th> */}
-              <th className="p-4 m-4 text-left">User #</th>
+              <th className="p-4 m-4 text-left">User ID</th>
               <th className="p-4 m-4 text-left">Name</th>
               <th className="p-4 m-4 text-left">Email</th>
               <th className="p-4 m-4 text-left">Phone Number</th>
@@ -142,8 +142,10 @@ const UserListTable = () => {
                   </td>
                   <td className="p-4 m-4">{user.email}</td>
                   <td className="p-4 m-4">{user.phone}</td>
-                  <td className="p-4 m-4">{user.amountSpent}</td>
-                  <td className="p-4 m-4 uppercase font-medium">{user.role}</td>
+                  <td className="p-4 m-4">${user.amountSpent}</td>
+                  <td className="p-4 m-4 capitalize font-medium">
+                    {user.role}
+                  </td>
                   <td className="p-4 m-4">
                     {dateFns.format(new Date(user.createdAt), "MMM d, yyyy")}
                   </td>

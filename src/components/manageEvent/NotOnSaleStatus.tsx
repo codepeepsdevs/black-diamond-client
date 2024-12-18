@@ -14,7 +14,7 @@ export default function NotOnSaleStatus({
   eventData: EventWithSoldQuantity | undefined;
 }) {
   return (
-    <p className="flex items-center gap-x-1 text-xs">
+    <p className="flex items-center gap-x-1">
       <div className="flex items-center whitespace-nowrap">
         <BsDot className="text-3xl -ml-2 text-yellow-500" />
         <span>Not on Sale · Starts</span>

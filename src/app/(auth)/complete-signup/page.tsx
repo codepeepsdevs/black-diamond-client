@@ -199,9 +199,6 @@ function TokenNotFoundDialog({ ...props }: ComponentProps<typeof Dialog.Root>) {
               <p className="text-white text-base lg:text-xl">
                 The details the account to complete could not be found!
               </p>
-              {/* <p className="text-text-color text-sm lg:text-base">
-                Order #{orderId}
-              </p> */}
             </div>
 
             {/* TODO: Link to edit new ticket details */}

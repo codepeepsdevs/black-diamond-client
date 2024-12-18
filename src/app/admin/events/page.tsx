@@ -106,23 +106,19 @@ export default function AdminEventsPage() {
           <FilterSelect
             onSelect={setEventStatus}
             items={[
-              { title: "All Events", value: "all" },
+              { title: "All", value: "all" },
               {
-                title: "Past Events",
-                value: "past",
+                title: "Draft",
+                value: "draft",
               },
               {
                 title: "Upcoming Events",
                 value: "upcoming",
               },
               {
-                title: "Draft",
-                value: "draft",
+                title: "Past",
+                value: "past",
               },
-              // {
-              //   title: "Drafts",
-              //   value: "drafts",
-              // },
             ]}
           />
           {/* END FILTER SELECT */}
@@ -252,7 +248,9 @@ export default function AdminEventsPage() {
 
                         {/* STATUS */}
                         <td className="capitalize">
-                          {event.eventStatus?.toLowerCase()}
+                          {event.isPublished
+                            ? event.eventStatus?.toLowerCase()
+                            : "draft"}
                         </td>
                         {/* END STATUS */}
 
