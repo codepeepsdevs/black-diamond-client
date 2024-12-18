@@ -14,7 +14,7 @@ export default function SoldOutStatus({
   eventData: EventWithSoldQuantity | undefined;
 }) {
   return (
-    <p className="flex items-center text-xs">
+    <p className="flex items-center">
       <BsDot className="text-3xl -ml-2 text-red-500" />
       <span>
         Sold Out{" "}

@@ -14,7 +14,7 @@ export default function OnSaleStatus({
   eventData: EventWithSoldQuantity | undefined;
 }) {
   return (
-    <p className="flex items-center text-xs">
+    <p className="flex items-center">
       <BsDot className="text-3xl -ml-2 text-[#34C759]" />
       <span>
         On Sale · Ends{" "}

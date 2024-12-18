@@ -286,17 +286,17 @@ const OrderListTable = ({
         ]}
       />
       {/* END FILTER SELECT */}
-      <div className="text-[#A3A7AA] overflow-x-auto">
+      <div className="text-[#A3A7AA] mt-6">
         {/* TODO: Bring the table action buttons here */}
-        <div className="mt-6">
+        <div>
           <table className="w-full bg-[#151515] whitespace-nowrap overflow-x-auto">
             <thead>
               <tr className="border-b border-b-[#A3A7AA] text-white">
                 <th className="p-4 m-4 text-left">Date</th>
                 <th className="p-4 m-4 text-left">Event Name</th>
-                <th className="p-4 m-4 text-left">Order #</th>
+                <th className="p-4 m-4 text-left">Order ID</th>
                 <th className="p-4 m-4 text-left">Customer Name</th>
-                <th className="p-4 m-4 text-left">Ticket Qty</th>
+                <th className="p-4 m-4 text-left">Ticket</th>
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
                 <th className="p-4 m-4 text-left">Order Status</th>
@@ -332,7 +332,7 @@ const OrderListTable = ({
                       {order.firstName} {order.lastName}
                     </td>
                     <td className="p-4 m-4">{order.tickets.length}</td>
-                    <td className="p-4 m-4">{order.amountPaid}</td>
+                    <td className="p-4 m-4">${order.amountPaid ?? 0}</td>
                     <td className="p-4 m-4">
                       <span
                         className={cn(
@@ -347,18 +347,21 @@ const OrderListTable = ({
                       </span>
                     </td>
                     <td className="p-4 m-4">
-                      {" "}
-                      <span
-                        className={cn(
-                          order.status === "COMPLETED"
-                            ? "text-[#34C759]"
-                            : "text-yellow-500"
-                        )}
-                      >
-                        {order.status === "COMPLETED"
-                          ? "Successful"
-                          : "Pending"}
-                      </span>
+                      {order.paymentStatus === "SUCCESSFUL" ? (
+                        <span
+                          className={cn(
+                            order.status === "COMPLETED"
+                              ? "text-[#34C759]"
+                              : "text-yellow-500"
+                          )}
+                        >
+                          {order.status === "COMPLETED"
+                            ? "Successful"
+                            : "Pending"}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                     {/* <td className="p-4 m-4">
                       <Popover>
