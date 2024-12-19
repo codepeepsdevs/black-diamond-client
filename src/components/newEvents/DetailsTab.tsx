@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { FormError } from "../shared/FormError";
 import {
   FaClock,
+  FaLink,
   FaList,
   FaLocationPin,
   FaPlus,
@@ -40,6 +41,7 @@ import { useRouter } from "next/navigation";
 import SuccessToast from "../toast/SuccessToast";
 import { cn } from "@/utils/cn";
 import Checkbox from "../shared/Checkbox";
+import { PiBrowser } from "react-icons/pi";
 
 export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const {
@@ -138,7 +140,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     setRefundPolicy((state) => {
       // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
       if (state === true) {
-        setValue("refundPolicy", undefined);
+        setValue("refundPolicy", null);
       }
       return !state;
     });
@@ -272,6 +274,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
                 id="start-date"
                 type="date"
                 min={new Date().toISOString().split("T")[0]}
+                max="9999-12-31"
                 {...register("startDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />
@@ -298,6 +301,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
                 id="end-date"
                 type="date"
                 min={new Date().toISOString().split("T")[0]}
+                max="9999-12-31"
                 {...register("endDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
               />
@@ -367,10 +371,18 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
               watchedLocationType === "TO_BE_ANNOUNCED" && "hidden"
             )}
           >
-            <label htmlFor="location">Location</label>
+            <label htmlFor="location">
+              {watchedLocationType === "VENUE" ? "Location" : "Link"}
+            </label>
             <IconInputField
               {...register("location")}
-              Icon={<FaMapMarkerAlt className="text-[#14171A]" />}
+              Icon={
+                watchedLocationType === "VENUE" ? (
+                  <FaMapMarkerAlt className="text-[#14171A]" />
+                ) : (
+                  <FaLink className="text-[#14171A]" />
+                )
+              }
             />
           </div>
           {/* END INPUT FIELD */}

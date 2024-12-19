@@ -22,7 +22,7 @@ import { VscTriangleDown, VscTriangleUp } from "react-icons/vsc";
 import IconInputField from "../shared/IconInputField";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { GetUserData } from "@/api/user/user.types";
+import { GetUsersData } from "@/api/user/user.types";
 import { debounce } from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
 
@@ -75,7 +75,7 @@ const UserListTable = () => {
               <span>Total Users</span>
             </div>
             <div className="text-white font-semibold text-6xl">
-              {usersData?.usersCount || 0}
+              {usersData?.totalUsers || 0}
             </div>
           </div>
           {/* END TOTAL USERS */}

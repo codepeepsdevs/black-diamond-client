@@ -18,7 +18,7 @@ import { ErrorResponse, PageData, User } from "@/constants/types";
 import {
   AdminUsersStats,
   DownloadUsersData,
-  GetUserData,
+  GetUsersData,
   NewUsersTodayStats,
   UsersStatsData,
   UsersStatsResponse,
@@ -35,7 +35,7 @@ export const useGetUser = () => {
 };
 
 export const useGetUsers = (options?: PageData & { search: string }) => {
-  return useQuery<AxiosResponse<GetUserData>, AxiosError<ErrorResponse>>({
+  return useQuery<AxiosResponse<GetUsersData>, AxiosError<ErrorResponse>>({
     queryKey: ["users", options],
     queryFn: () => getUsers(options),
     placeholderData: keepPreviousData,

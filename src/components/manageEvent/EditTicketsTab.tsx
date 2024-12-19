@@ -251,7 +251,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                           )}
                         </div>
                         {ticketType.visibility === "HIDDEN" ? (
-                          <p className="flex gap-x-1 items-center text-xs">
+                          <p className="flex gap-x-1 items-center text-xs ml-6">
                             <FiEyeOff />
                             <span className="">Hidden</span>
                           </p>
@@ -710,7 +710,8 @@ function ActionDropDown({
                 <button
                   disabled={disabled}
                   key={item}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     handleAction(item, ticketTypeId);
                     setDropdownOpen(false);
                   }}

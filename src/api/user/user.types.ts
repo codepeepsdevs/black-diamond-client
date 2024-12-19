@@ -23,11 +23,12 @@ export type NewUsersTodayStats = {
   upTrend: boolean;
 };
 
-export type GetUserData = {
+export type GetUsersData = {
   users: (User & {
     amountSpent: number;
   })[];
   usersCount: number;
+  totalUsers: number;
 };
 
 export type AdminUsersStats = {
