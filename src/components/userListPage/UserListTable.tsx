@@ -86,7 +86,7 @@ const UserListTable = () => {
               {/* <VscTriangleDown className="text-[#E1306C] text-2xl" /> */}
               <span>Total Admins</span>
             </div>
-            <div className="text-*white font-semibold text-6xl">
+            <div className="text-white font-semibold text-6xl">
               {adminUsersStats?.adminsCount || 0}
             </div>
           </div>
