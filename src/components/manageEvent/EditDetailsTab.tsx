@@ -75,7 +75,18 @@ export default function EditDetailsTab({
   const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
     null
   );
-  const [refundPolicy, setRefundPolicy] = useState(false);
+  // Storing if refundpolicy is used or to be used in sessionStorage because
+  // switching tabs unmounts the EditDetails tab which makes it loose state.
+  // This checks if theres a default refund policy from the server first to determine wether
+  // it should show the field at initial render or mount, then it uses session storage to store
+  // it's states after interaction
+  const refundPolicyActive = Boolean(defaultValues.refundPolicy)
+    ? true
+    : JSON.parse(
+        sessionStorage.getItem(`refundPolicy-${eventId}`) ??
+          JSON.stringify(false)
+      );
+  const [refundPolicy, setRefundPolicy] = useState<boolean>(refundPolicyActive);
 
   function onEditDetailsSuccess(data: AxiosResponse<any>) {
     // Clear file input and image preview on success
@@ -151,6 +162,7 @@ export default function EditDetailsTab({
       if (state === true) {
         setValue("refundPolicy", undefined);
       }
+      sessionStorage.setItem(`refundPolicy-${eventId}`, JSON.stringify(!state));
       return !state;
     });
   };
