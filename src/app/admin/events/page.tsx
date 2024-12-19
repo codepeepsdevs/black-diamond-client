@@ -415,7 +415,8 @@ function ActionDropDown({
           return (
             <button
               key={item}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 handleAction(item, eventId, eventStatus);
                 setDropdownOpen(false);
               }}

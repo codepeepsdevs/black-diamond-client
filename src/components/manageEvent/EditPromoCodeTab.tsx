@@ -365,7 +365,8 @@ function ActionDropDown({
                 <button
                   disabled={disabled}
                   key={item}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     handleAction(item, promocodeId);
                     setDropdownOpen(false);
                   }}

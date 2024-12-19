@@ -248,6 +248,7 @@ export function NewTicketDialog({
                         id="start-date"
                         type="date"
                         min={new Date().toISOString().split("T")[0]}
+                        max="9999-12-31"
                       />
                       <FormError error={errors.startDate} />
                     </div>
@@ -281,6 +282,7 @@ export function NewTicketDialog({
                         {...register("endDate", { required: true })}
                         type="date"
                         min={new Date().toISOString().split("T")[0]}
+                        max="9999-12-31"
                       />
                       <FormError error={errors.endDate} />
                     </div>

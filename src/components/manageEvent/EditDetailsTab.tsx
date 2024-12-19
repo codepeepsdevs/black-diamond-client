@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormError } from "../shared/FormError";
-import { FaRegCalendar, FaRegClock } from "react-icons/fa6";
+import { FaLink, FaRegCalendar, FaRegClock } from "react-icons/fa6";
 import OnlineEventIcon from "./OnlineEventIcon";
 import IconInputField from "../shared/IconInputField";
 import {
@@ -38,6 +38,7 @@ import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import Checkbox from "../shared/Checkbox";
 import { cn } from "@/utils/cn";
+import { PiBrowser } from "react-icons/pi";
 
 export default function EditDetailsTab({
   isActive,
@@ -399,10 +400,18 @@ export default function EditDetailsTab({
               watchedLocationType === "TO_BE_ANNOUNCED" && "hidden"
             )}
           >
-            <label htmlFor="location">Location</label>
+            <label htmlFor="location">
+              {watchedLocationType === "VENUE" ? "Location" : "Link"}
+            </label>
             <IconInputField
               {...register("location")}
-              Icon={<FaMapMarkerAlt className="text-[#14171A]" />}
+              Icon={
+                watchedLocationType === "VENUE" ? (
+                  <FaMapMarkerAlt className="text-[#14171A]" />
+                ) : (
+                  <FaLink className="text-[#14171A]" />
+                )
+              }
             />
           </div>
           {/* END INPUT FIELD */}

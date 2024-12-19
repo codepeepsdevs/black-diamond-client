@@ -4,7 +4,7 @@ import { AxiosResponse } from "axios";
 import {
   AdminUsersStats,
   DownloadUsersData,
-  GetUserData,
+  GetUsersData,
   IUpdateUser,
   NewUsersTodayStats,
   UsersStatsData,
@@ -19,7 +19,7 @@ export const getUsers = (options?: PageData & { search: string }) => {
   const page = options?.page;
   const limit = options?.limit;
   const search = options?.search;
-  return request<GetUserData>({
+  return request<GetUsersData>({
     url: `/users/get-users?page=${page || ""}&limit=${limit || ""}&search=${search || ""}`,
   });
 };

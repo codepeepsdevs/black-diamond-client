@@ -104,18 +104,21 @@ const RecentOrdersTable = ({
                       </span>
                     </td>
                     <td className="p-4 m-4">
-                      {" "}
-                      <span
-                        className={cn(
-                          order.status === "COMPLETED"
-                            ? "text-[#34C759]"
-                            : "text-yellow-500"
-                        )}
-                      >
-                        {order.status === "COMPLETED"
-                          ? "Successful"
-                          : "Pending"}
-                      </span>
+                      {order.paymentStatus === "SUCCESSFUL" ? (
+                        <span
+                          className={cn(
+                            order.status === "COMPLETED"
+                              ? "text-[#34C759]"
+                              : "text-yellow-500"
+                          )}
+                        >
+                          {order.status === "COMPLETED"
+                            ? "Successful"
+                            : "Pending"}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                   </tr>
                 ))

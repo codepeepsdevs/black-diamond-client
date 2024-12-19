@@ -287,6 +287,7 @@ function AddPromoCodeDialog({
                     Icon={<FaRegCalendar />}
                     {...register("startDate")}
                     min={new Date().toISOString().split("T")[0]}
+                    max="9999-12-31"
                   />
                   <FormError error={errors.startDate} />
                 </div>
@@ -310,6 +311,7 @@ function AddPromoCodeDialog({
                     Icon={<FaRegCalendar />}
                     {...register("endDate")}
                     min={new Date().toISOString().split("T")[0]}
+                    max="9999-12-31"
                   />
                   <FormError error={errors.endDate} />
                 </div>

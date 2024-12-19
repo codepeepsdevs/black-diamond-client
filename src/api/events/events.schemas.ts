@@ -64,7 +64,7 @@ export const newEventSchema = Yup.object().shape({
       return schema.required("Location/Venue is required");
     }
   }),
-  refundPolicy: Yup.string(),
+  refundPolicy: Yup.string().default("No Refunds").nullable(),
   images: Yup.mixed<File[]>().test(
     "imagesRequired",
     "Image slides is required",
