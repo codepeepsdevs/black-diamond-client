@@ -11,10 +11,6 @@ import { SearchQueryState } from "@/constants/types";
 import * as Dialog from "@radix-ui/react-dialog";
 import { MdGppBad } from "react-icons/md";
 import EditDetailsTab from "@/components/manageEvent/EditDetailsTab";
-import EditTicketsTab from "@/components/manageEvent/EditTicketsTab";
-import EditPromoCodeTab from "@/components/manageEvent/EditPromoCodeTab";
-import EditEventAddOnTab from "@/components/manageEvent/EditEventAddOnTab";
-import EditEventDetailsDashboard from "@/components/manageEvent/EditEventDetailsDashboard";
 import * as Yup from "yup";
 import { editEventDetailsSchema } from "@/api/events/events.schemas";
 import Link from "next/link";
@@ -22,23 +18,9 @@ import * as dateFnsTz from "date-fns-tz";
 import * as dateFns from "date-fns";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 
-const tabsList = [
-  { id: "details", title: "Details Page" },
-  { id: "ticket", title: "Ticket" },
-  { id: "code", title: "Code" },
-  // { id: "add-ons", title: "Add Ons" },
-  { id: "dashboard", title: "Dashboard" },
-] as const;
-
-type Tabs = (typeof tabsList)[number]["id"];
-
-export default function ManageEventPage() {
+export default function CopyEventPage() {
   const params = useParams<{ id: string }>();
   const [notFoundDialogOpen, setNotFoundDialogOpen] = useState(false);
-  const [currentTab, setCurrentTab] = useQueryState(
-    "tab",
-    parseAsString.withDefault("details")
-  ) as SearchQueryState<Tabs>;
   const [detailsDefault, setDetailsDefault] = useState<Yup.InferType<
     typeof editEventDetailsSchema
   > | null>(null);
@@ -61,12 +43,6 @@ export default function ManageEventPage() {
       setNotFoundDialogOpen(true);
     }
   }, [event]);
-
-  useEffect(() => {
-    if (currentTab !== "details" && !eventId) {
-      setCurrentTab("details");
-    }
-  }, [eventId, currentTab]);
 
   useEffect(() => {
     const zonedStartTime = dateFnsTz.toZonedTime(
@@ -113,65 +89,28 @@ export default function ManageEventPage() {
               Events
             </Link>
             <FaChevronRight className="size-4" />
-            <span>Manage Event</span>
+            <span>Copy Event</span>
           </h1>
           {/* END TOP BREADCRUMB */}
 
           {/* TAB BUTTONS */}
           <div className="text-[#757575] border-y border-y-[#151515] mt-6">
-            {tabsList.map((tab) => (
-              <button
-                key={tab.id}
-                className={cn(
-                  "border-b border-b-transparent py-3 px-4",
-                  tab.id === currentTab && "text-white border-b-white"
-                )}
-                disabled={!Boolean(eventId)}
-                onClick={() => setCurrentTab(tab.id)}
-              >
-                {tab.title}
-              </button>
-            ))}
+            <div
+              className={cn(
+                "border-b border-b-transparent inline-block py-3 px-4 text-white border-b-white"
+              )}
+            >
+              Event Details
+            </div>
           </div>
           {/* END TAB BUTTONS */}
-
-          {/* PREVIEW BUTTON */}
-          {/* FIXME: preview button is disabled for now */}
-          {/* <AdminButton
-          variant="ghost"
-          className="flex items-center px-6 gap-x-3 ml-auto mt-12"
-        >
-          <PreviewIcon />
-
-          <span className="font-medium mt-1">Preview</span>
-        </AdminButton> */}
-          {/* END PREVIEW BUTTON */}
 
           {/* TAB CONTENTS */}
           <EditDetailsTab
             defaultValues={detailsDefault}
             defaultMedia={defaultMedia}
-            isActive={currentTab === "details" && detailsDefault !== null}
           />
           {/* END TAB CONTENTS */}
-
-          {/* TICKETS TAB */}
-          {currentTab === "ticket" && (
-            <EditTicketsTab isActive={currentTab === "ticket"} />
-          )}
-          {/* END TICKETS TAB */}
-
-          {currentTab === "code" && (
-            <EditPromoCodeTab isActive={currentTab === "code"} />
-          )}
-
-          {/* {currentTab === "add-ons" && (
-            <EditEventAddOnTab isActive={currentTab === "add-ons"} />
-          )} */}
-
-          {currentTab === "dashboard" && (
-            <EditEventDetailsDashboard isActive={currentTab === "dashboard"} />
-          )}
         </div>
       </section>
       <EventNotFoundDialog

@@ -13,6 +13,8 @@ import { request } from "@/utils/axios-utils";
 import axios, { AxiosResponse } from "axios";
 import {
   AdminGetEvents,
+  CopyEventData,
+  CopyEventResponse,
   CreateEventAddonData,
   CreateEventAddonResponse,
   CreateEventDetailsData,
@@ -160,7 +162,7 @@ export const createEventDetails = async ({
   const formData = new FormData();
   Object.entries(data).map(([key, value]) => {
     if (value) {
-      formData.append(key, value);
+      formData.append(key, value.toString());
     }
   });
 
@@ -247,7 +249,7 @@ export const updateEventDetails = async ({
 }: UpdateEventDetailsData) => {
   const formData = new FormData();
   Object.entries(data).map(([key, value]) => {
-    formData.append(key, value);
+    formData.append(key, value.toString());
   });
 
   if (coverImage) {
@@ -262,6 +264,14 @@ export const updateEventDetails = async ({
     method: "put",
     data: formData,
   })) as AxiosResponse<UpdateEventDetailsResponse>;
+};
+
+export const copyEventDetails = async ({ eventId, ...data }: CopyEventData) => {
+  return (await request({
+    url: `/events/copy-event/${eventId}`,
+    method: "post",
+    data: data,
+  })) as AxiosResponse<CopyEventResponse>;
 };
 
 export const upateTicketTypeDetails = async ({

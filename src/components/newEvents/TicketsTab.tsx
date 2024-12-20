@@ -163,7 +163,7 @@ export default function TicketsTab({ isActive }: { isActive: boolean }) {
         <div className="flex gap-x-4 items-center mt-6">
           <Checkbox
             checked={watchedDisplayTicketsRemainder}
-            onClick={() =>
+            onChange={() =>
               setValue(
                 "displayTicketsRemainder",
                 !watchedDisplayTicketsRemainder
@@ -184,7 +184,7 @@ export default function TicketsTab({ isActive }: { isActive: boolean }) {
           <div className="flex gap-x-4 items-center">
             <Checkbox
               checked={watchedShowSalesEndMessage}
-              onClick={() =>
+              onChange={() =>
                 setValue("showSalesEndMessage", !watchedShowSalesEndMessage)
               }
             />
@@ -445,7 +445,7 @@ function ActionDropDown({
       {/* ACTION BUTTON */}
       <PopoverTrigger asChild>
         <button
-          className="flex items-start mt-1"
+          className="flex items-start mt-1 p-3 hover:bg-[#2c2b2b] rounded-full"
           onClick={() => setDropdownOpen((state) => !state)}
         >
           <FiMoreVertical />

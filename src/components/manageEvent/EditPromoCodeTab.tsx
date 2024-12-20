@@ -343,7 +343,7 @@ function ActionDropDown({
       {/* ACTION BUTTON */}
       <PopoverTrigger asChild>
         <button
-          className="flex items-start mt-1"
+          className="flex items-start mt-1 p-3 hover:bg-[#2c2b2b] rounded-full"
           onClick={(e) => {
             e.stopPropagation();
             setDropdownOpen((state) => !state);
@@ -446,6 +446,9 @@ function EditPromoCodeDialog({
     updatePromocode({ ...values, promocodeId });
   }
 
+  const watchedAbsoluteDiscountAmount = watch("absoluteDiscountAmount");
+  const watchedPercentageDiscountAmount = watch("percentageDiscountAmount");
+
   return (
     <Dialog {...props}>
       <DialogPortal>
@@ -485,6 +488,7 @@ function EditPromoCodeDialog({
                     className="bg-input-bg"
                     Icon={<FaDollarSign />}
                     {...register("absoluteDiscountAmount")}
+                    disabled={watchedPercentageDiscountAmount === 0}
                   />
                   <FormError error={errors.absoluteDiscountAmount} />
                 </div>
@@ -494,6 +498,7 @@ function EditPromoCodeDialog({
                     className="bg-input-bg"
                     Icon={<AiOutlinePercentage />}
                     {...register("percentageDiscountAmount")}
+                    disabled={watchedAbsoluteDiscountAmount === 0}
                   />
                   <FormError error={errors.percentageDiscountAmount} />
                 </div>

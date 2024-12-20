@@ -46,7 +46,7 @@ export default function EditDetailsTab({
   defaultMedia,
 }: {
   isActive: boolean;
-  defaultValues: Yup.InferType<typeof editEventDetailsSchema>;
+  defaultValues: Yup.InferType<typeof editEventDetailsSchema> | null;
   defaultMedia: {
     images: string[] | undefined;
     coverImage: string | undefined;
@@ -61,32 +61,35 @@ export default function EditDetailsTab({
     reset,
   } = useForm<Yup.InferType<typeof editEventDetailsSchema>>({
     resolver: yupResolver(editEventDetailsSchema),
-    defaultValues,
+    defaultValues: defaultValues ?? {},
   });
   const params = useParams<{ id: string }>();
   const eventId = params.id;
-
-  const [currentTab, setCurrentTab] = useQueryState(
-    "tab",
-    parseAsString.withDefault("details")
-  ) as SearchQueryState<Tabs>;
 
   const [imagesPreview, setImagesPreview] = useState<string[] | null>([]);
   const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
     null
   );
+
+  useEffect(() => {
+    if (defaultValues) {
+      for (const [key, value] of Object.entries(defaultValues)) {
+        setValue(key as any, value);
+      }
+    }
+  }, [defaultValues]);
+
   // Storing if refundpolicy is used or to be used in sessionStorage because
   // switching tabs unmounts the EditDetails tab which makes it loose state.
   // This checks if theres a default refund policy from the server first to determine wether
   // it should show the field at initial render or mount, then it uses session storage to store
   // it's states after interaction
-  const refundPolicyActive = Boolean(defaultValues.refundPolicy)
-    ? true
-    : JSON.parse(
-        sessionStorage.getItem(`refundPolicy-${eventId}`) ??
-          JSON.stringify(false)
-      );
-  const [refundPolicy, setRefundPolicy] = useState<boolean>(refundPolicyActive);
+  // const refundPolicyActive = Boolean(defaultValues.refundPolicy)
+  //   ? true
+  //   : JSON.parse(
+  //       sessionStorage.getItem(`refundPolicy-${eventId}`) ??
+  //         JSON.stringify(false)
+  //     );
 
   function onEditDetailsSuccess(data: AxiosResponse<any>) {
     // Clear file input and image preview on success
@@ -114,18 +117,10 @@ export default function EditDetailsTab({
 
   function onSubmit(values: Yup.InferType<typeof editEventDetailsSchema>) {
     updateEventDetails({
-      name: values.name,
-      summary: values.summary,
-      location: values.location,
-      refundPolicy: values.refundPolicy,
+      ...values,
       startDate: new Date(values.startDate).toISOString(),
-      startTime: values.startTime,
       endDate: new Date(values.endDate).toISOString(),
-      endTime: values.endTime,
       eventId: eventId,
-      locationType: values.locationType,
-      images: values.images,
-      coverImage: values.coverImage,
     });
   }
 
@@ -141,11 +136,11 @@ export default function EditDetailsTab({
   const watchedEndDate = watch("endDate");
   useEffect(() => {
     const zonedStartDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues.startDate || Date.now()),
+      new Date(defaultValues?.startDate || Date.now()),
       newYorkTimeZone
     );
     const zonedEndDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues.endDate || Date.now()),
+      new Date(defaultValues?.endDate || Date.now()),
       newYorkTimeZone
     );
 
@@ -155,16 +150,15 @@ export default function EditDetailsTab({
 
   const watchedLocationType = watch("locationType");
   const watchedImages = watch("images");
+  const watchedHasRefundPolicy = watch("hasRefundPolicy");
 
-  const toggleRefundPolicy = () => {
-    setRefundPolicy((state) => {
-      // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
-      if (state === true) {
-        setValue("refundPolicy", undefined);
-      }
-      sessionStorage.setItem(`refundPolicy-${eventId}`, JSON.stringify(!state));
-      return !state;
-    });
+  const toggleHasRefundPolicy = () => {
+    // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
+    if (watchedHasRefundPolicy === true) {
+      setValue("hasRefundPolicy", false);
+    } else {
+      setValue("hasRefundPolicy", true);
+    }
   };
 
   return (
@@ -481,12 +475,15 @@ export default function EditDetailsTab({
 
           <div className="mt-4">
             <div className="flex items-center gap-x-2">
-              <Checkbox checked={refundPolicy} onClick={toggleRefundPolicy} />
+              <Checkbox
+                checked={watchedHasRefundPolicy}
+                onChange={toggleHasRefundPolicy}
+              />
               <label htmlFor="refund-policy">Refund Policy</label>
             </div>
             <Input
               variant="white"
-              className={!refundPolicy ? "hidden" : ""}
+              className={!watchedHasRefundPolicy ? "hidden" : ""}
               {...register("refundPolicy")}
             />
           </div>

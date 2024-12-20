@@ -7,6 +7,7 @@ import {
 } from "@/api/events/events.queries";
 import { DeleteEventResponse } from "@/api/events/events.types";
 import { AdminButton } from "@/components";
+import { CopyEventDialog } from "@/components/copyEvent/CopyEventDialog";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import LoadingSvg from "@/components/shared/Loader/LoadingSvg";
 import ErrorToast from "@/components/toast/ErrorToast";
@@ -35,7 +36,7 @@ import {
   FiPlusCircle,
 } from "react-icons/fi";
 
-const actions = ["view", "edit", "delete"] as const;
+const actions = ["view", "edit", "copy", "delete"] as const;
 
 export default function AdminEventsPage() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
@@ -45,6 +46,8 @@ export default function AdminEventsPage() {
   const eventsData = eventsQuery.data?.data;
   const router = useRouter();
   const loadingToastId = useRef("");
+  const [copyEventDialogOpen, setCopyEventDialogOpen] = useState(false);
+  const [eventToCopyId, setEventToCopyId] = useState<null | string>(null);
 
   const { mutate: deleteEvent, isPending: deleteEventPending } = useDeleteEvent(
     onDeleteError,
@@ -92,235 +95,250 @@ export default function AdminEventsPage() {
         break;
       case "delete":
         deleteEvent({ eventId });
+        break;
+      case "copy":
+        setEventToCopyId(eventId);
+        setCopyEventDialogOpen(true);
     }
   }
 
   return (
-    <section>
-      <div className="mx-8 mt-20 pt-10">
-        <h1 className="text-3xl font-semibold text-white">Events</h1>
+    <>
+      <section>
+        <div className="mx-8 mt-20 pt-10">
+          <h1 className="text-3xl font-semibold text-white">Events</h1>
 
-        {/* EVENT ACTION BUTTONS */}
-        <div className="flex items-center gap-x-6 justify-end">
-          {/* FILTER SELECT */}
-          <FilterSelect
-            onSelect={setEventStatus}
-            items={[
-              { title: "All", value: "all" },
-              {
-                title: "Draft",
-                value: "draft",
-              },
-              {
-                title: "Upcoming Events",
-                value: "upcoming",
-              },
-              {
-                title: "Past",
-                value: "past",
-              },
-            ]}
-          />
-          {/* END FILTER SELECT */}
+          {/* EVENT ACTION BUTTONS */}
+          <div className="flex items-center gap-x-6 justify-end">
+            {/* FILTER SELECT */}
+            <FilterSelect
+              onSelect={setEventStatus}
+              items={[
+                { title: "All", value: "all" },
+                {
+                  title: "Draft",
+                  value: "draft",
+                },
+                {
+                  title: "Upcoming Events",
+                  value: "upcoming",
+                },
+                {
+                  title: "Past",
+                  value: "past",
+                },
+              ]}
+            />
+            {/* END FILTER SELECT */}
 
-          {/* NEW EVENT BUTTON */}
-          <AdminButton
-            variant="primary"
-            className="flex items-center gap-x-2 leading-5"
-            onClick={() => router.push(`/admin/events/new-event`)}
-          >
-            <FiPlusCircle />
-            <span className="pt-1">New Event</span>
-          </AdminButton>
-          {/* END NEW EVENT BUTTON */}
-        </div>
-        {/* END EVENT ACTION BUTTONS */}
+            {/* NEW EVENT BUTTON */}
+            <AdminButton
+              variant="primary"
+              className="flex items-center gap-x-2 leading-5"
+              onClick={() => router.push(`/admin/events/new-event`)}
+            >
+              <FiPlusCircle />
+              <span className="pt-1">New Event</span>
+            </AdminButton>
+            {/* END NEW EVENT BUTTON */}
+          </div>
+          {/* END EVENT ACTION BUTTONS */}
 
-        {/* EVENTS LIST */}
-        <div className="overflow-x-auto whitespace-nowrap min-w-0">
-          <table className="w-full mt-12 overflow-x-auto min-w-max">
-            {/* LIST HEAEDER */}
-            <thead className="bg-[#A3A7AA] leading-10 text-left [&_th]:px-4">
-              <tr>
-                <th>Event</th>
-                <th>Sold</th>
-                <th>Gross</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            {/* END LIST HEAEDER */}
-            {/* LIST BODY */}
-            {eventsQuery.isPending ? (
-              <tbody>
+          {/* EVENTS LIST */}
+          <div className="overflow-x-auto whitespace-nowrap min-w-0">
+            <table className="w-full mt-12 overflow-x-auto min-w-max">
+              {/* LIST HEAEDER */}
+              <thead className="bg-[#A3A7AA] leading-10 text-left [&_th]:px-4">
                 <tr>
-                  <td colSpan={4}>
-                    <LoadingMessage>Loading events..</LoadingMessage>
-                  </td>
+                  <th>Event</th>
+                  <th>Sold</th>
+                  <th>Gross</th>
+                  <th>Status</th>
+                  <th></th>
                 </tr>
-              </tbody>
-            ) : (
-              <tbody className="text-text-color [&>tr>td]:px-4">
-                {eventsQuery.data?.data || !eventsQuery.isError ? (
-                  eventsData?.events.map((event) => {
-                    return (
-                      <tr
-                        key={event.id}
-                        className="hover:bg-[#131313] transition-all cursor-pointer"
-                        onClick={() => handleAction("edit", event.id)}
-                      >
-                        <td className="py-6">
-                          <div className="flex items-start gap-x-6">
-                            {/* MONTH AND DAY */}
-                            <div className="text-center space-y-2 pl-4">
-                              {new Date(event.startTime)
-                                .toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  timeZone: newYorkTimeZone, // PDT timezone
-                                })
-                                .toUpperCase()
-                                .split(" ")
-                                .map((item) => (
-                                  <div key={item} className="text-text-color">
-                                    {item}
-                                  </div>
-                                ))}
-                            </div>
-                            {/* END MONTH AND DAY */}
-                            {/* COVER IMAGE */}
-                            <Image
-                              src={event.coverImage}
-                              alt="Event Poster"
-                              width={180}
-                              height={180}
-                              className="aspect-square size-24 object-cover"
-                            />
-                            {/* END COVER IMAGE */}
-
-                            {/* EVENT DETAILS */}
-                            <div>
-                              <div className="text-xl font-medium">
-                                {event.name}
+              </thead>
+              {/* END LIST HEAEDER */}
+              {/* LIST BODY */}
+              {eventsQuery.isPending ? (
+                <tbody>
+                  <tr>
+                    <td colSpan={4}>
+                      <LoadingMessage>Loading events..</LoadingMessage>
+                    </td>
+                  </tr>
+                </tbody>
+              ) : (
+                <tbody className="text-text-color [&>tr>td]:px-4">
+                  {eventsQuery.data?.data || !eventsQuery.isError ? (
+                    eventsData?.events.map((event) => {
+                      return (
+                        <tr
+                          key={event.id}
+                          className="hover:bg-[#131313] transition-all cursor-pointer"
+                          onClick={() => handleAction("edit", event.id)}
+                        >
+                          <td className="py-6">
+                            <div className="flex items-start gap-x-6">
+                              {/* MONTH AND DAY */}
+                              <div className="text-center space-y-2 pl-4">
+                                {new Date(event.startTime)
+                                  .toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    timeZone: newYorkTimeZone, // PDT timezone
+                                  })
+                                  .toUpperCase()
+                                  .split(" ")
+                                  .map((item) => (
+                                    <div key={item} className="text-text-color">
+                                      {item}
+                                    </div>
+                                  ))}
                               </div>
-                              <p className="mt-2">{event.location}</p>
-                              <p>
-                                {new Intl.DateTimeFormat("en-US", {
-                                  weekday: "long", // Full day name
-                                  year: "numeric",
-                                  month: "long", // Full month name
-                                  day: "numeric",
-                                  hour: "numeric",
-                                  minute: "numeric",
-                                  hour12: true, // 12-hour format
-                                  timeZone: newYorkTimeZone, // PDT timezone
-                                  timeZoneName: "short", // Abbreviated time zone
-                                }).format(new Date(event.startTime))}
-                              </p>
-                            </div>
-                            {/* END EVENT DETAILS */}
-                          </div>
-                        </td>
+                              {/* END MONTH AND DAY */}
+                              {/* COVER IMAGE */}
+                              <Image
+                                src={event.coverImage}
+                                alt="Event Poster"
+                                width={180}
+                                height={180}
+                                className="aspect-square size-24 object-cover"
+                              />
+                              {/* END COVER IMAGE */}
 
-                        <td>
-                          <div>
+                              {/* EVENT DETAILS */}
+                              <div>
+                                <div className="text-xl font-medium">
+                                  {event.name}
+                                </div>
+                                <p className="mt-2">{event.location}</p>
+                                <p>
+                                  {new Intl.DateTimeFormat("en-US", {
+                                    weekday: "long", // Full day name
+                                    year: "numeric",
+                                    month: "long", // Full month name
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true, // 12-hour format
+                                    timeZone: newYorkTimeZone, // PDT timezone
+                                    timeZoneName: "short", // Abbreviated time zone
+                                  }).format(new Date(event.startTime))}
+                                </p>
+                              </div>
+                              {/* END EVENT DETAILS */}
+                            </div>
+                          </td>
+
+                          <td>
                             <div>
                               <div>
-                                {event.totalSales}/{event.totalTickets}
+                                <div>
+                                  {event.totalSales}/{event.totalTickets}
+                                </div>
+                                {/* PROGRESS FOR SALES/TOTAL */}
+                                <div className="bg-[#333333] rounded-full h-1 min-w-40 overflow-hidden">
+                                  <div
+                                    style={{
+                                      width: `${(event.totalSales / event.totalTickets) * 100}%`,
+                                    }}
+                                    className="bg-[#A3A7AA] h-full"
+                                  ></div>
+                                </div>
+                                {/* END PROGRESS FOR SALES/TOTAL */}
                               </div>
-                              {/* PROGRESS FOR SALES/TOTAL */}
-                              <div className="bg-[#333333] rounded-full h-1 min-w-40 overflow-hidden">
-                                <div
-                                  style={{
-                                    width: `${(event.totalSales / event.totalTickets) * 100}%`,
-                                  }}
-                                  className="bg-[#A3A7AA] h-full"
-                                ></div>
-                              </div>
-                              {/* END PROGRESS FOR SALES/TOTAL */}
                             </div>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* GROSS */}
-                        <td>${event.gross}</td>
-                        {/* END GROSS */}
+                          {/* GROSS */}
+                          <td>${event.gross}</td>
+                          {/* END GROSS */}
 
-                        {/* STATUS */}
-                        <td className="capitalize">
-                          {event.isPublished
-                            ? event.eventStatus?.toLowerCase()
-                            : "draft"}
-                        </td>
-                        {/* END STATUS */}
+                          {/* STATUS */}
+                          <td className="capitalize">
+                            {event.isPublished
+                              ? event.eventStatus?.toLowerCase()
+                              : "draft"}
+                          </td>
+                          {/* END STATUS */}
 
-                        {/* ACTIONS */}
-                        <td>
-                          <ActionDropDown
-                            eventStatus={event.eventStatus}
-                            eventId={event.id}
-                            handleAction={handleAction}
-                          />
-                        </td>
-                        {/* END ACTIONS */}
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <div>Error fetching Events..</div>
-                )}
-              </tbody>
-            )}
-            {/* END LIST BODY */}
-          </table>
-        </div>
-        {/* END EVENTS LIST */}
+                          {/* ACTIONS */}
+                          <td>
+                            <ActionDropDown
+                              eventStatus={event.eventStatus}
+                              eventId={event.id}
+                              handleAction={handleAction}
+                            />
+                          </td>
+                          {/* END ACTIONS */}
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <div>Error fetching Events..</div>
+                  )}
+                </tbody>
+              )}
+              {/* END LIST BODY */}
+            </table>
+          </div>
+          {/* END EVENTS LIST */}
 
-        {/* TABLE PAGINATION */}
-        <div className="flex items-center justify-end space-x-2 py-4">
+          {/* TABLE PAGINATION */}
           <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="space-x-2 flex items-center">
-              <button
-                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-                onClick={() =>
-                  setPage((prev) => {
-                    if (prev <= 1) {
-                      return 1;
-                    }
-                    return prev - 1;
-                  })
-                }
-                disabled={page == 1}
-              >
-                <FiChevronsLeft />
-              </button>
-              <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
-                {page}
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="space-x-2 flex items-center">
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() =>
+                    setPage((prev) => {
+                      if (prev <= 1) {
+                        return 1;
+                      }
+                      return prev - 1;
+                    })
+                  }
+                  disabled={page == 1}
+                >
+                  <FiChevronsLeft />
+                </button>
+                <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+                  {page}
+                </div>
+                <button
+                  className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+                  onClick={() => setPage((prev) => prev + 1)}
+                  disabled={isLast}
+                >
+                  <FiChevronsRight />
+                </button>
               </div>
-              <button
-                className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
-                onClick={() => setPage((prev) => prev + 1)}
-                disabled={isLast}
-              >
-                <FiChevronsRight />
-              </button>
             </div>
           </div>
+          <div className="text-white">
+            {eventsQuery.isFetching ? (
+              <LoadingMessage>Loading events..</LoadingMessage>
+            ) : page && eventsData?.eventsCount ? (
+              <div>
+                Showing {page * 10 - 9}-
+                {isLast ? eventsData.eventsCount : page * 10} of{" "}
+                {eventsData.eventsCount}
+              </div>
+            ) : null}
+          </div>
+          {/* END TABLE PAGINATION */}
         </div>
-        <div className="text-white">
-          {eventsQuery.isFetching ? (
-            <LoadingMessage>Loading events..</LoadingMessage>
-          ) : page && eventsData?.eventsCount ? (
-            <div>
-              Showing {page * 10 - 9}-
-              {isLast ? eventsData.eventsCount : page * 10} of{" "}
-              {eventsData.eventsCount}
-            </div>
-          ) : null}
-        </div>
-        {/* END TABLE PAGINATION */}
-      </div>
-    </section>
+      </section>
+
+      <CopyEventDialog
+        open={copyEventDialogOpen}
+        onOpenChange={(value) => {
+          setEventToCopyId(null);
+          setCopyEventDialogOpen(value);
+        }}
+        eventId={eventToCopyId}
+      />
+    </>
   );
 }
 
@@ -397,6 +415,7 @@ function ActionDropDown({
     <div className="relative">
       {/* ACTION BUTTON */}
       <button
+        className="p-3 hover:bg-[#2c2b2b] rounded-full"
         onClick={(e) => {
           e.stopPropagation();
           setDropdownOpen((state) => !state);

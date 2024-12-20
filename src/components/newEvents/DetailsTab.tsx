@@ -55,6 +55,7 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
     resolver: yupResolver(newEventSchema),
     defaultValues: {
       locationType: "VENUE",
+      refundPolicy: "No Refunds",
     },
   });
   const router = useRouter();
@@ -67,8 +68,6 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
   const [activePreviewImage, setActivePreviewImage] = useState<string | null>(
     null
   );
-  const [refundPolicy, setRefundPolicy] = useState(false);
-
   // const setEventId = useNewEventStore((state) => state.setEventId);
   const [eventId, setEventId] = useQueryState(
     "newEventId",
@@ -109,17 +108,9 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
 
   function onSubmit(values: Yup.InferType<typeof newEventSchema>) {
     createEventDetails({
-      name: values.name,
-      summary: values.summary,
-      location: values.location,
-      refundPolicy: values.refundPolicy,
-      coverImage: values.coverImage,
-      images: values.images,
+      ...values,
       startDate: new Date(values.startDate).toISOString(),
-      startTime: values.startTime,
       endDate: new Date(values.endDate).toISOString(),
-      endTime: values.endTime,
-      locationType: values.locationType,
     });
   }
 
@@ -135,15 +126,15 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
   };
 
   const watchedLocationType = watch("locationType");
+  const watchedHasRefundPolicy = watch("hasRefundPolicy");
 
-  const toggleRefundPolicy = () => {
-    setRefundPolicy((state) => {
-      // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
-      if (state === true) {
-        setValue("refundPolicy", null);
-      }
-      return !state;
-    });
+  const toggleHasRefundPolicy = () => {
+    // if refund policy is being disabled, i.e prev state is true and is being toggled to false, empty the input
+    if (watchedHasRefundPolicy === true) {
+      setValue("hasRefundPolicy", false);
+    } else {
+      setValue("hasRefundPolicy", true);
+    }
   };
 
   return (
@@ -441,12 +432,15 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
 
           <div className="mt-4">
             <div className="flex items-center gap-x-2">
-              <Checkbox checked={refundPolicy} onClick={toggleRefundPolicy} />
+              <Checkbox
+                checked={watchedHasRefundPolicy}
+                onChange={toggleHasRefundPolicy}
+              />
               <label htmlFor="refund-policy">Refund Policy</label>
             </div>
             <Input
               variant="white"
-              className={!refundPolicy ? "hidden" : ""}
+              className={!watchedHasRefundPolicy ? "hidden" : ""}
               {...register("refundPolicy")}
             />
           </div>

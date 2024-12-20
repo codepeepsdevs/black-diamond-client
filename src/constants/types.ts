@@ -133,7 +133,8 @@ export type Event = {
   locationType: "VENUE" | "ONLINE_EVENT" | "TO_BE_ANNOUNCED";
   ticketSalesEndMessage: string | null;
   displayTicketsRemainder: boolean;
-  refundPolicy: string;
+  refundPolicy?: string;
+  hasRefundPolicy: boolean;
   createdAt: string; // ISO string (Date)
   updatedAt: string; // ISO string (Date)
   ticketTypes: TicketType[];

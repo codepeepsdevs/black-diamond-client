@@ -64,7 +64,19 @@ export const newEventSchema = Yup.object().shape({
       return schema.required("Location/Venue is required");
     }
   }),
-  refundPolicy: Yup.string().default("No Refunds").nullable(),
+  refundPolicy: Yup.string().when(
+    "hasRefundPolicy",
+    (value, schema: Yup.Schema) => {
+      if (value[0] === true) {
+        return schema
+          .required("Refund policy is required")
+          .default("No Refunds");
+      } else {
+        return schema.notRequired();
+      }
+    }
+  ),
+  hasRefundPolicy: Yup.boolean().default(false),
   images: Yup.mixed<File[]>().test(
     "imagesRequired",
     "Image slides is required",
@@ -104,12 +116,33 @@ export const editEventDetailsSchema = Yup.object().shape({
       return schema.required("Location/Venue is required");
     }
   }),
-  refundPolicy: Yup.string(),
+  refundPolicy: Yup.string().when(
+    "hasRefundPolicy",
+    (value, schema: Yup.Schema) => {
+      if (value[0] === true) {
+        return schema
+          .required("Refund policy is required")
+          .default("No Refunds");
+      } else {
+        return schema.notRequired();
+      }
+    }
+  ),
+  hasRefundPolicy: Yup.boolean().default(false),
   images: Yup.mixed<File[]>(),
   coverImage: Yup.mixed<File>(),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),
+});
+
+export const copyEventSchema = Yup.object().shape({
+  name: Yup.string().required("Event title is required"),
+  summary: Yup.string().required("Event summary is required"),
+  startDate: dateStringSchema.required("Start date is required"),
+  startTime: Yup.string().required("Start time is required"),
+  endDate: dateStringSchema.required("End date is required"),
+  endTime: Yup.string().required("End time is required"),
 });
 
 export const ticketFormSchema = Yup.object().shape({
