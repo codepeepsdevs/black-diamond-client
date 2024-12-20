@@ -147,6 +147,8 @@ export function AddPromoCodeDialog({
                     className="bg-input-bg"
                     Icon={<FaRegCalendar />}
                     {...register("startDate")}
+                    min={new Date().toISOString().split("T")[0]}
+                    max="9999-12-31"
                   />
                   <FormError error={errors.startDate} />
                 </div>
@@ -169,6 +171,8 @@ export function AddPromoCodeDialog({
                     className="bg-input-bg"
                     Icon={<FaRegCalendar />}
                     {...register("endDate")}
+                    min={new Date().toISOString().split("T")[0]}
+                    max="9999-12-31"
                   />
                   <FormError error={errors.endDate} />
                 </div>
