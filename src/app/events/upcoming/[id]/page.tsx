@@ -220,7 +220,7 @@ const UpComingEventDetailPage = () => {
                     </a>
                   )}
                   {eventQuery.data?.data.locationType === "TO_BE_ANNOUNCED" && (
-                    <p className="text-xs md:text-sm">TO BE ANNOUNCED</p>
+                    <p className="text-xs md:text-sm">To be announced</p>
                   )}
                 </div>
               </div>
