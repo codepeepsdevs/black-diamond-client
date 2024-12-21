@@ -112,9 +112,9 @@ export function CopyEventDialog({
               <div className="py-6">
                 <div className="text-xl font-semibold">Date and time</div>
 
-                <div className="flex flex-col lg:flex-row gap-y-4 items-center gap-x-4">
+                <div className="space-y-4 items-center gap-x-4">
                   {/* EVENT START DATE */}
-                  <div className="lg:flex-1 w-full">
+                  <div>
                     <label htmlFor="start-date">Start Date</label>
                     <IconInputField
                       variant="white"
@@ -133,7 +133,7 @@ export function CopyEventDialog({
                   {/* END EVENT START DATE */}
 
                   {/* EVENT START TIME */}
-                  <div className="lg:flex-1 w-full">
+                  <div>
                     <label htmlFor="start-time">Start time</label>
                     <IconInputField
                       type="time"
@@ -145,7 +145,7 @@ export function CopyEventDialog({
                   {/* END EVENT START TIME */}
 
                   {/* EVENT END DATE */}
-                  <div className="lg:flex-1 w-full">
+                  <div>
                     <label htmlFor="end-date">End Date</label>
                     <IconInputField
                       variant="white"
@@ -164,7 +164,7 @@ export function CopyEventDialog({
                   {/* END EVENT END DATE */}
 
                   {/* EVENT END TIME */}
-                  <div className="lg:flex-1 w-full">
+                  <div>
                     <label htmlFor="date">End time</label>
                     <IconInputField
                       type="time"
