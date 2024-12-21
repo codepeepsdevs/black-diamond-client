@@ -89,7 +89,6 @@ const OrderListTable = ({
       />
       {/* END FILTER SELECT */}
       <div className="text-[#A3A7AA] mt-6">
-        {/* TODO: Bring the table action buttons here */}
         <div className="overflow-x-auto">
           <table className="w-full bg-[#151515] whitespace-nowrap">
             <thead>
@@ -98,6 +97,7 @@ const OrderListTable = ({
                 <th className="p-4 m-4 text-left">Event Name</th>
                 <th className="p-4 m-4 text-left">Order ID</th>
                 <th className="p-4 m-4 text-left">Customer Name</th>
+                <th className="p-4 m-4 text-left">Phone No.</th>
                 <th className="p-4 m-4 text-left">Ticket</th>
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
@@ -133,6 +133,7 @@ const OrderListTable = ({
                     <td className="p-4 m-4">
                       {order.firstName} {order.lastName}
                     </td>
+                    <td className="p-4 m-4">{order.phone}</td>
                     <td className="p-4 m-4">{order.tickets.length}</td>
                     <td className="p-4 m-4">${order.amountPaid ?? 0}</td>
                     <td className="p-4 m-4">
