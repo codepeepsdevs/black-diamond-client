@@ -97,7 +97,7 @@ const OrderListTable = ({
                 <th className="p-4 m-4 text-left">Event Name</th>
                 <th className="p-4 m-4 text-left">Order ID</th>
                 <th className="p-4 m-4 text-left">Customer Name</th>
-                <th className="p-4 m-4 text-left">Phone No.</th>
+                {/* <th className="p-4 m-4 text-left">Phone No.</th> */}
                 <th className="p-4 m-4 text-left">Ticket</th>
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
@@ -133,7 +133,7 @@ const OrderListTable = ({
                     <td className="p-4 m-4">
                       {order.firstName} {order.lastName}
                     </td>
-                    <td className="p-4 m-4">{order.phone}</td>
+                    {/* <td className="p-4 m-4">{order.phone}</td> */}
                     <td className="p-4 m-4">{order.tickets.length}</td>
                     <td className="p-4 m-4">
                       ${Number(order.amountPaid).toFixed(2) ?? 0}
