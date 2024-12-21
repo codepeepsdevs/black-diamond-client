@@ -228,6 +228,16 @@ const UpComingEventDetailPage = () => {
                 </div>
               </div>
 
+              <div className="flex flex-col gap-2">
+                <h3 className="text-white text-xl font-bold">Summary</h3>
+                <p className="leading-5 md:leading-7 text-xs md:text-sm text-justify">
+                  {eventQuery.isPending && (
+                    <LoadingSkeleton containerClassName="flex-1" />
+                  )}
+                  {eventQuery.data?.data?.summary}
+                </p>
+              </div>
+
               {eventData?.hasRefundPolicy ? (
                 <div className="flex flex-col gap-2">
                   <h3 className="text-white text-xl font-bold">
@@ -242,16 +252,6 @@ const UpComingEventDetailPage = () => {
                   </p>
                 </div>
               ) : null}
-
-              <div className="flex flex-col gap-2">
-                <h3 className="text-white text-xl font-bold">Summary</h3>
-                <p className="leading-5 md:leading-7 text-xs md:text-sm text-justify">
-                  {eventQuery.isPending && (
-                    <LoadingSkeleton containerClassName="flex-1" />
-                  )}
-                  {eventQuery.data?.data?.summary}
-                </p>
-              </div>
             </div>
             {/* END EVENT DETAILS SECTION */}
 
