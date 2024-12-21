@@ -45,7 +45,7 @@ export default function EditEventDetailsDashboard({
     useUnpublishEvent(eventId);
 
   const onError = (e: AxiosError<ErrorResponse>) => {
-    const errorMessage = getApiErrorMessage(e, "Error generating order report");
+    const errorMessage = getApiErrorMessage(e, "Error generating party list");
     ErrorToast({
       title: "Error",
       descriptions: errorMessage,

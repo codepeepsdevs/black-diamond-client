@@ -144,15 +144,14 @@ export const generateOrderReport = async (range?: DateRangeData) => {
   window.URL.revokeObjectURL(downloadUrl);
 };
 
-export const generatePartyList = async (dto: GeneratePartyListData) => {
+export const generatePartyList = async ({ eventId }: GeneratePartyListData) => {
   const response = await request({
-    url: `/orders/generate-party-list`,
-    method: "post",
+    url: `/orders/generate-party-list/${eventId}`,
+    method: "get",
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     },
-    data: dto,
     responseType: "blob",
   });
 
