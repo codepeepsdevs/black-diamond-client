@@ -142,7 +142,7 @@ const UserListTable = () => {
                   </td>
                   <td className="p-4 m-4">{user.email}</td>
                   <td className="p-4 m-4">{user.phone}</td>
-                  <td className="p-4 m-4">${user.amountSpent}</td>
+                  <td className="p-4 m-4">${user.amountSpent.toFixed(2)}</td>
                   <td className="p-4 m-4 capitalize font-medium">
                     {user.role}
                   </td>

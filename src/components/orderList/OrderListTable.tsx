@@ -66,204 +66,6 @@ const OrderListTable = ({
       : false
     : true;
 
-  // const columns: ColumnDef<ExtendedOrder>[] = React.useMemo(
-  //   () => [
-  //     {
-  //       id: "id",
-  //       header: ({ table }) => (
-  //         <Checkbox
-  //           // @ts-expect-error TODO: handle indeterminate state
-  //           checked={
-  //             table.getIsAllPageRowsSelected() ||
-  //             (table.getIsSomePageRowsSelected() && "indeterminate")
-  //           }
-  //           onChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //           aria-label="Select all"
-  //         />
-  //       ),
-  //       cell: ({ row }) => (
-  //         <Checkbox
-  //           checked={row.getIsSelected()}
-  //           onChange={(value) => row.toggleSelected(!!value)}
-  //           aria-label="Select row"
-  //         />
-  //       ),
-  //       enableSorting: false,
-  //       enableHiding: false,
-  //     },
-  //     {
-  //       id: "date",
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Date</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       cell: ({ row }) => (
-  //         <div className="capitalize">
-  //           <div>
-  //             {dateFns.format(new Date(row.original.createdAt), "dd/MM/yyyy")}
-  //           </div>
-  //           <div>
-  //             {dateFns.format(new Date(row.original.createdAt), "hh:mm a")}
-  //           </div>
-  //         </div>
-  //       ),
-  //     },
-  //     {
-  //       id: "eventName",
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Event Name</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       cell: ({ row }) => (
-  //         <div className="capitalize">{row.original.event.name}</div>
-  //       ),
-  //     },
-  //     {
-  //       id: "orderId",
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Order ID</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       cell: ({ row }) => <div className="capitalize">{row.original.id}</div>,
-  //     },
-  //     {
-  //       id: "customerName",
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Customer name</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       cell: ({ row }) => (
-  //         <div className="capitalize">
-  //           {row.original.user?.firstname} {row.original.user?.lastname}
-  //         </div>
-  //       ),
-  //     },
-  //     {
-  //       id: "ticketQuantity",
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Ticket</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       cell: ({ row }) => (
-  //         <div className="capitalize">{row.original.tickets.length}</div>
-  //       ),
-  //     },
-  //     {
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Amount</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       id: "price",
-  //       cell: ({ row }) => (
-  //         <div className="capitalize">${row.original.orderAmount}</div>
-  //       ),
-  //     },
-  //     {
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Payment Status</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       id: "payment-status",
-  //       cell: ({ row }) => (
-  //         <span
-  //           className={cn(
-  //             row.original.paymentStatus === "SUCCESSFUL"
-  //               ? "text-[#34C759]"
-  //               : "text-[#E1306C]"
-  //           )}
-  //         >
-  //           {row.original.paymentStatus === "SUCCESSFUL" ? "Paid" : "Not Paid"}
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       header: () => (
-  //         <div className="capitalize inline-flex items-center gap-x-2 cursor-pointer">
-  //           <span>Order Status</span>
-  //           <FaSort className="text-xs" />
-  //         </div>
-  //       ),
-  //       id: "order-status",
-  //       cell: ({ row }) => (
-  //         <span
-  //           className={cn(
-  //             row.original.status === "COMPLETED"
-  //               ? "text-[#34C759]"
-  //               : "text-yellow-500"
-  //           )}
-  //         >
-  //           {row.original.status === "COMPLETED" ? "Successful" : "Pending"}
-  //         </span>
-  //       ),
-  //     },
-  //     {
-  //       id: "actions",
-  //       enableHiding: false,
-  //       cell: ({ row }) => {
-  //         const payment = row.original;
-
-  //         return (
-  //           <Popover>
-  //             <PopoverTrigger asChild>
-  //               <FiMoreHorizontal className="h-4 w-4" />
-  //             </PopoverTrigger>
-  //             <PopoverContent align="end">
-  //               <button
-  //                 onClick={() => navigator.clipboard.writeText(payment.id)}
-  //               >
-  //                 Copy payment ID
-  //               </button>
-  //               <button>View customer</button>
-  //               <button>View payment details</button>
-  //             </PopoverContent>
-  //           </Popover>
-  //         );
-  //       },
-  //     },
-  //   ],
-  //   []
-  // );
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
-
-  // const table = useReactTable({
-  //   data: orderListData?.orders || [],
-  //   manualPagination: true,
-  //   columns,
-  //   onSortingChange: setSorting,
-  //   onColumnFiltersChange: setColumnFilters,
-  //   getCoreRowModel: getCoreRowModel(),
-  //   getSortedRowModel: getSortedRowModel(),
-  //   getFilteredRowModel: getFilteredRowModel(),
-  //   onRowSelectionChange: setRowSelection,
-  //   state: {
-  //     sorting,
-  //     columnFilters,
-  //     columnVisibility,
-  //     rowSelection,
-  //   },
-  // });
-
   return (
     <>
       {/* FILTER SELECT */}
@@ -287,15 +89,15 @@ const OrderListTable = ({
       />
       {/* END FILTER SELECT */}
       <div className="text-[#A3A7AA] mt-6">
-        {/* TODO: Bring the table action buttons here */}
-        <div>
-          <table className="w-full bg-[#151515] whitespace-nowrap overflow-x-auto">
+        <div className="overflow-x-auto">
+          <table className="w-full bg-[#151515] whitespace-nowrap">
             <thead>
               <tr className="border-b border-b-[#A3A7AA] text-white">
                 <th className="p-4 m-4 text-left">Date</th>
                 <th className="p-4 m-4 text-left">Event Name</th>
                 <th className="p-4 m-4 text-left">Order ID</th>
                 <th className="p-4 m-4 text-left">Customer Name</th>
+                {/* <th className="p-4 m-4 text-left">Phone No.</th> */}
                 <th className="p-4 m-4 text-left">Ticket</th>
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
@@ -331,8 +133,11 @@ const OrderListTable = ({
                     <td className="p-4 m-4">
                       {order.firstName} {order.lastName}
                     </td>
+                    {/* <td className="p-4 m-4">{order.phone}</td> */}
                     <td className="p-4 m-4">{order.tickets.length}</td>
-                    <td className="p-4 m-4">${order.amountPaid ?? 0}</td>
+                    <td className="p-4 m-4">
+                      ${Number(order.amountPaid).toFixed(2) ?? 0}
+                    </td>
                     <td className="p-4 m-4">
                       <span
                         className={cn(

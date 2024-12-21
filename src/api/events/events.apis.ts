@@ -156,16 +156,16 @@ export const getAddons = async (eventId: Event["id"]) => {
 // };
 
 export const createEventDetails = async ({
+  coverImage,
   images,
   ...data
 }: CreateEventDetailsData) => {
   const formData = new FormData();
   Object.entries(data).map(([key, value]) => {
-    if (value) {
-      formData.append(key, value.toString());
-    }
+    formData.append(key, value.toString());
   });
 
+  formData.append("coverImage", coverImage);
   images?.forEach((image: File) => formData.append("images", image));
 
   // const formData = jsonToFormData(data);

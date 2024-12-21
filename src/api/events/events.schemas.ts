@@ -90,13 +90,11 @@ export const newEventSchema = Yup.object().shape({
       }
     }
   ),
-  coverImage: Yup.mixed<File>().test(
-    "coverImageRequired",
-    "Cover image is required",
-    (value) => {
+  coverImage: Yup.mixed<File>()
+    .test("coverImageRequired", "Cover image is required", (value) => {
       return !!value;
-    }
-  ),
+    })
+    .required(),
   locationType: Yup.string()
     .oneOf(["VENUE", "ONLINE_EVENT", "TO_BE_ANNOUNCED"])
     .default("VENUE"),
