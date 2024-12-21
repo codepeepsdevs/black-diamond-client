@@ -298,14 +298,14 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
         </div>
         {/* END PROMO CODE TABLE LIST */}
 
-        <AdminButton
+        {/* <AdminButton
           variant="ghost"
           className="flex items-center gap-x-2 font-medium mt-10"
           onClick={() => setCurrentTab("add-ons")}
         >
           <FaSave />
           <span>Save and continue</span>
-        </AdminButton>
+        </AdminButton> */}
       </div>
       <NoTicketsDialog
         open={noTicketsDialogOpen}
