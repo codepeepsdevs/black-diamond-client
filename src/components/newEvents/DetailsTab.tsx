@@ -148,7 +148,9 @@ export default function DetailsTab({ isActive }: { isActive: boolean }) {
           <label htmlFor="cover-image">Cover image</label>
           <EventCoverImageInput
             onSelectFile={(file) => {
-              setValue("coverImage", file);
+              if (file) {
+                setValue("coverImage", file);
+              }
             }}
           />
           <FormError error={errors.coverImage} />
