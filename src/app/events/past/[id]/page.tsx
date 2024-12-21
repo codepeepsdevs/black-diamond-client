@@ -16,11 +16,13 @@ import "react-loading-skeleton/dist/skeleton.css";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 import { getTimeZoneDateRange } from "@/utils/utilityFunctions";
 import { useAdminGetEvent } from "@/api/events/events.queries";
+import Loading from "@/app/loading";
 
 const PastEventsDetailPage = () => {
   const [eventModalState, setEventModalState] = useState<boolean>(false);
   const [eventNotFoundDialogOpen, setEventNotFoundDialogOpen] = useState(false);
   const params = useParams<{ id: string }>();
+  const router = useRouter();
 
   const pastEventQuery = useAdminGetEvent(params.id);
   const pastEvent = pastEventQuery.data?.data;
@@ -30,6 +32,15 @@ const PastEventsDetailPage = () => {
       setEventNotFoundDialogOpen(true);
     }
   }, []);
+
+  if (pastEventQuery.isPending) {
+    return <Loading />;
+  } else if (
+    !pastEventQuery.isPending &&
+    pastEvent?.eventStatus === "UPCOMING"
+  ) {
+    return router.push("/events/upcoming/" + pastEvent.id);
+  }
 
   return (
     <>

@@ -23,17 +23,16 @@ import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import * as dateFns from "date-fns";
 import toast from "react-hot-toast";
 import { AxiosError, AxiosResponse } from "axios";
-import { PromoCode } from "@/constants/types";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 import {
   getApiErrorMessage,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
-import { useWindowsize } from "@/hooks";
 import Loading from "@/app/loading";
 import { GetPromocodeResponse } from "@/api/events/events.types";
 import { incPageView } from "@/api/events/events.apis";
+import { FaLink } from "react-icons/fa6";
 
 const UpComingEventDetailPage = () => {
   const order = useOrderStore();
@@ -129,7 +128,6 @@ const UpComingEventDetailPage = () => {
   // update total discount anytime promocode or order is updated
   useEffect(() => {
     order.updateDiscount();
-    console.log("computing discount");
   }, [order.promocode, order.ticketOrders]);
 
   if (eventQuery.isPending) {
@@ -201,23 +199,28 @@ const UpComingEventDetailPage = () => {
                 <h3 className="text-white text-xl font-bold">Location</h3>
 
                 <div className="flex items-center gap-2">
-                  <Image src={Location} alt="location" />
                   {eventQuery.isPending && (
                     <LoadingSkeleton containerClassName="flex-1" />
                   )}
                   {eventQuery.data?.data.locationType === "VENUE" && (
-                    <p className="text-xs md:text-sm">
-                      {eventQuery.data?.data?.location}
-                    </p>
+                    <>
+                      <Image src={Location} alt="location" />
+                      <p className="text-xs md:text-sm">
+                        {eventQuery.data?.data?.location}
+                      </p>
+                    </>
                   )}
                   {eventQuery.data?.data.locationType === "ONLINE_EVENT" && (
-                    <a
-                      href={eventQuery.data.data.location}
-                      target="_blank"
-                      className="text-xs md:text-sm"
-                    >
-                      {eventQuery.data?.data?.location}
-                    </a>
+                    <>
+                      <FaLink />
+                      <a
+                        href={eventQuery.data.data.location}
+                        target="_blank"
+                        className="text-xs md:text-sm text-blue-500 underline"
+                      >
+                        {eventQuery.data?.data?.location}
+                      </a>
+                    </>
                   )}
                   {eventQuery.data?.data.locationType === "TO_BE_ANNOUNCED" && (
                     <p className="text-xs md:text-sm">To be announced</p>
