@@ -135,7 +135,9 @@ const OrderListTable = ({
                     </td>
                     <td className="p-4 m-4">{order.phone}</td>
                     <td className="p-4 m-4">{order.tickets.length}</td>
-                    <td className="p-4 m-4">${order.amountPaid ?? 0}</td>
+                    <td className="p-4 m-4">
+                      ${Number(order.amountPaid).toFixed(2) ?? 0}
+                    </td>
                     <td className="p-4 m-4">
                       <span
                         className={cn(
