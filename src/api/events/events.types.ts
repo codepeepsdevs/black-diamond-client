@@ -7,6 +7,7 @@ import {
   TicketCount,
 } from "@/constants/types";
 import {
+  copyEventSchema,
   editEventDetailsSchema,
   newAddOnSchema,
   newEventSchema,
@@ -30,6 +31,11 @@ export type UpdateEventDetailsData = Omit<
 export type CreateEventDetailsResponse = Event;
 
 export type UpdateEventDetailsResponse = Event;
+
+export type CopyEventData = Yup.InferType<typeof copyEventSchema> & {
+  eventId: string;
+};
+export type CopyEventResponse = Event;
 
 export type CreateEventTicketTypeData = Yup.InferType<
   typeof ticketFormSchema

@@ -225,7 +225,7 @@ const UpComingEventDetailPage = () => {
                 </div>
               </div>
 
-              {eventData?.refundPolicy ? (
+              {eventData?.hasRefundPolicy ? (
                 <div className="flex flex-col gap-2">
                   <h3 className="text-white text-xl font-bold">
                     Refund Policy

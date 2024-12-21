@@ -29,6 +29,7 @@ import {
   deletePromocode,
   updatePromocode,
   adminGetEvent,
+  copyEventDetails,
 } from "./events.apis";
 import { AxiosError, AxiosResponse } from "axios";
 import {
@@ -43,6 +44,7 @@ import {
 } from "@/constants/types";
 import {
   AdminGetEvents,
+  CopyEventResponse,
   CreateEventAddonResponse,
   CreateEventDetailsResponse,
   CreateEventPromocodeResponse,
@@ -250,6 +252,23 @@ export const useUpdateEventDetails = (
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
         queryKey: ["get-event", data.data.id],
+      });
+      onSuccess(data);
+    },
+  });
+};
+
+export const useCopyEventDetails = (
+  onError: (error: AxiosError<ErrorResponse>) => void,
+  onSuccess: (data: AxiosResponse<CopyEventResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: copyEventDetails,
+    onError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-get-events"],
       });
       onSuccess(data);
     },

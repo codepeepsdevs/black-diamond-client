@@ -89,6 +89,7 @@ export default function ManageEventPage() {
         refundPolicy: event?.refundPolicy || "",
         summary: event?.summary || "",
         locationType: event?.locationType || "VENUE",
+        hasRefundPolicy: event?.hasRefundPolicy ?? false,
         // coverImage: event?.coverImage,
         // images: event?.coverImage,
       });
@@ -147,13 +148,11 @@ export default function ManageEventPage() {
           {/* END PREVIEW BUTTON */}
 
           {/* TAB CONTENTS */}
-          {currentTab === "details" && detailsDefault !== null && (
-            <EditDetailsTab
-              defaultValues={detailsDefault}
-              defaultMedia={defaultMedia}
-              isActive={currentTab === "details"}
-            />
-          )}
+          <EditDetailsTab
+            defaultValues={detailsDefault}
+            defaultMedia={defaultMedia}
+            isActive={currentTab === "details" && detailsDefault !== null}
+          />
           {/* END TAB CONTENTS */}
 
           {/* TICKETS TAB */}

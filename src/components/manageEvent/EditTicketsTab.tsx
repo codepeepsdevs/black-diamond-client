@@ -227,7 +227,7 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                     >
                       <td>{ticketType.name}</td>
                       <td>
-                        <div className="flex items-center mt-2 min-w-72">
+                        <div className="flex items-center mt-2 whitespace-nowrap">
                           {ticketType.saleStatus === "not-on-sale" ? (
                             <NotOnSaleStatus
                               eventData={eventData}
@@ -250,7 +250,9 @@ export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
                             />
                           )}
                         </div>
-                        {ticketType.visibility === "HIDDEN" ? (
+                        {ticketType.visibility === "HIDDEN" ||
+                        (ticketType.visibility === "HIDDEN_WHEN_NOT_ON_SALE" &&
+                          ticketType.saleStatus === "not-on-sale") ? (
                           <p className="flex gap-x-1 items-center text-xs ml-6">
                             <FiEyeOff />
                             <span className="">Hidden</span>
@@ -688,7 +690,7 @@ function ActionDropDown({
       {/* ACTION BUTTON */}
       <PopoverTrigger asChild>
         <button
-          className="flex items-start mt-1"
+          className="flex items-start mt-1 p-3 hover:bg-[#2c2b2b] rounded-full"
           onClick={(e) => {
             e.stopPropagation();
             setDropdownOpen((state) => !state);
