@@ -162,9 +162,7 @@ export const createEventDetails = async ({
 }: CreateEventDetailsData) => {
   const formData = new FormData();
   Object.entries(data).map(([key, value]) => {
-    if (value) {
-      formData.append(key, value.toString());
-    }
+    formData.append(key, value.toString());
   });
 
   formData.append("coverImage", coverImage);
