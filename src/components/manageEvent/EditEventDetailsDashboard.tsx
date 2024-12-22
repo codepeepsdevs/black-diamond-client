@@ -30,6 +30,8 @@ import SuccessToast from "../toast/SuccessToast";
 import { AxiosError } from "axios";
 import { ErrorResponse } from "@/constants/types";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
+import * as dateFnsTz from "date-fns-tz";
+import { newYorkTimeZone } from "@/utils/date-formatter";
 
 export default function EditEventDetailsDashboard({
   isActive,
@@ -82,10 +84,9 @@ export default function EditEventDetailsDashboard({
 
   const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
   // const eventLink = `https://${process.env.NEXT_PUBLIC_FRONTEND_URL}/events/${event?.eventStatus.toLowerCase()}/${eventId}`;
-  const differenceInDays = dateFns.differenceInDays(
-    new Date(event?.endTime || Date.now()),
-    new Date()
-  );
+  const differenceInDays = event?.endTime
+    ? dateFns.differenceInDays(new Date(event.endTime), new Date())
+    : null;
 
   const lowestPrice = event?.ticketTypes
     ? getLowestTicket(event?.ticketTypes)?.price || 0
@@ -104,6 +105,14 @@ export default function EditEventDetailsDashboard({
       return twitterShare;
     }
   }
+
+  console.table({
+    endDate: event?.endTime,
+    endDateNY: dateFnsTz.toZonedTime(
+      event?.endTime ?? new Date(),
+      newYorkTimeZone
+    ),
+  });
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
@@ -178,7 +187,9 @@ export default function EditEventDetailsDashboard({
             </div>
           </div>
 
-          {differenceInDays > 0 ? (
+          {differenceInDays === null ? (
+            "N/A"
+          ) : differenceInDays > 0 ? (
             <p className="text-[#34C759] font-medium text-xl self-end pl-32">
               Your event is in {differenceInDays} day(s)!
             </p>

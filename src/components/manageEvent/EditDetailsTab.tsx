@@ -136,11 +136,11 @@ export default function EditDetailsTab({
   const watchedEndDate = watch("endDate");
   useEffect(() => {
     const zonedStartDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues?.startDate || Date.now()),
+      defaultValues?.startDate ?? Date.now(),
       newYorkTimeZone
     );
     const zonedEndDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues?.endDate || Date.now()),
+      defaultValues?.endDate ?? Date.now(),
       newYorkTimeZone
     );
 
