@@ -109,14 +109,6 @@ export default function EditEventDetailsDashboard({
     }
   }
 
-  console.table({
-    endDate: event?.endTime,
-    endDateNY: dateFnsTz.toZonedTime(
-      event?.endTime ?? new Date(),
-      newYorkTimeZone
-    ),
-  });
-
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
       {/* ACTION BUTTONS */}

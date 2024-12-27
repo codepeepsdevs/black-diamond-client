@@ -15,12 +15,12 @@ export const Socials = () => {
           cursor="pointer"
         />
       </a>
-      <a target="_blank" href="">
+      {/* <a target="_blank" href="">
         <FaXTwitter
           className="text-white text-lg md:text-xl"
           cursor="pointer"
         />
-      </a>
+      </a> */}
     </div>
   );
 };
