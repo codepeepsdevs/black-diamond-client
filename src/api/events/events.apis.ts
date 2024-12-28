@@ -368,7 +368,6 @@ export const removeImageFromSlide = async (data: RemoveSlideData) => {
 };
 
 export const incPageView = async (data: { eventId: string }) => {
-  console.log("incpage");
   return request<{}>({
     url: `/events/inc-pageview/${data.eventId}`,
     method: "get",

@@ -134,19 +134,34 @@ export default function EditDetailsTab({
 
   const watchedStartDate = watch("startDate");
   const watchedEndDate = watch("endDate");
-  useEffect(() => {
-    const zonedStartDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues?.startDate || Date.now()),
-      newYorkTimeZone
-    );
-    const zonedEndDate = dateFnsTz.toZonedTime(
-      new Date(defaultValues?.endDate || Date.now()),
-      newYorkTimeZone
-    );
+  // useEffect(() => {
+  //   const zonedStartDate = dateFnsTz.toZonedTime(
+  //     defaultValues?.startDate ?? Date.now(),
+  //     newYorkTimeZone
+  //   );
+  //   const zonedEndDate = dateFnsTz.toZonedTime(
+  //     defaultValues?.endDate ?? Date.now(),
+  //     newYorkTimeZone
+  //   );
 
-    setValue("startDate", dateFns.format(zonedStartDate, "yyyy-MM-dd"));
-    setValue("endDate", dateFns.format(zonedEndDate, "yyyy-MM-dd"));
-  }, [defaultValues]);
+  //   console.table({
+  //     zonedStartDate: zonedStartDate.getTime(),
+  //     zonedEndDate: zonedEndDate.getTime(),
+  //   });
+
+  //   setValue(
+  //     "startDate",
+  //     dateFnsTz.format(zonedStartDate, "yyyy-MM-dd", {
+  //       timeZone: newYorkTimeZone,
+  //     })
+  //   );
+  //   setValue(
+  //     "endDate",
+  //     dateFnsTz.format(zonedEndDate, "yyyy-MM-dd", {
+  //       timeZone: newYorkTimeZone,
+  //     })
+  //   );
+  // }, [defaultValues]);
 
   const watchedLocationType = watch("locationType");
   const watchedImages = watch("images");

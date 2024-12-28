@@ -12,6 +12,9 @@ const nextConfig = {
       },
     ],
   },
+  devIndicators: {
+    buildActivity: true,
+  },
 };
 
 export default nextConfig;

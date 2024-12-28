@@ -251,7 +251,7 @@ export const useUpdateEventDetails = (
     onError,
     onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: ["get-event", data.data.id],
+        queryKey: ["admin-get-event", data.data.id],
       });
       onSuccess(data);
     },

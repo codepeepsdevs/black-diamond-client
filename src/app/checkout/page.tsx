@@ -115,7 +115,6 @@ function CheckoutForm() {
   const onCheckoutSuccess = async ({
     data,
   }: AxiosResponse<CheckoutResponse>) => {
-    console.log(data);
     if (stripe) {
       // setOrderId(data.data.id);
       order.setPromocode(null);
