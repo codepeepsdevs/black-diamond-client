@@ -54,7 +54,7 @@ export default function UpcomingEventsList() {
             autoplay={{
               disableOnInteraction: false,
             }}
-            slidesPerView={1}
+            slidesPerView={eventsCount === 1 ? 1 : 1.2}
             breakpoints={{
               480: {
                 slidesPerView: 1.5,
