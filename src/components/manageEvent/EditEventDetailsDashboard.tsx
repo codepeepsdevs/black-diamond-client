@@ -6,7 +6,7 @@ import { VscTriangleDown } from "react-icons/vsc";
 import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   useAdminGetEvent,
   useGetEventRevenue,
@@ -32,6 +32,7 @@ import { ErrorResponse } from "@/constants/types";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
 import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { MdOutlineFilterCenterFocus } from "react-icons/md";
 
 export default function EditEventDetailsDashboard({
   isActive,
@@ -39,6 +40,7 @@ export default function EditEventDetailsDashboard({
   isActive: boolean;
 }) {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const eventId = params.id;
 
   const { mutate: publishEvent, isPending: publishEventPending } =
@@ -88,12 +90,21 @@ export default function EditEventDetailsDashboard({
     ? dateFns.differenceInDays(new Date(event.startTime), new Date())
     : null;
   const daysPastEvent = event?.endTime
-    ? dateFns.differenceInDays(new Date(event.startTime), new Date())
+    ? dateFns.differenceInDays(new Date(), new Date(event.startTime))
     : null;
 
   const lowestPrice = event?.ticketTypes
     ? getLowestTicket(event?.ticketTypes)?.price || 0
     : 0;
+
+  const checkinDisabled =
+    !event?.isPublished ||
+    (daysPastEvent && daysPastEvent > 0) ||
+    eventQuery.isPending;
+  console.log("checkinDisabled:", checkinDisabled);
+  console.log("event?.isPublished:", event?.isPublished);
+  console.log("daysPastEvent:", daysPastEvent);
+  console.log("eventQuery.isPending:", eventQuery.isPending);
 
   function shareLink(platform: "facebook" | "twitter") {
     const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventLink)}`;
@@ -147,6 +158,15 @@ export default function EditEventDetailsDashboard({
         >
           {generatePartyListPending ? <LoadingSvg /> : <FiBookOpen />}
           <span>Party List</span>
+        </AdminButton>
+
+        <AdminButton
+          disabled={checkinDisabled}
+          onClick={() => router.push(`/admin/events/${eventId}/checkin`)}
+          className="flex items-center gap-x-2 disabled:opacity-50"
+        >
+          <MdOutlineFilterCenterFocus />
+          <span>Check-in</span>
         </AdminButton>
       </div>
       {/* END ACTION BUTTONS */}
