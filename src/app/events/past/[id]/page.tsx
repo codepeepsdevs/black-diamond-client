@@ -5,7 +5,6 @@ import React, { ComponentProps, useEffect, useState } from "react";
 import Image from "next/image";
 
 import { Share, TicketCalander, Location } from "../../../../../public/icons";
-import PastEventCard from "@/components/eventPage/PastEventCard";
 import ShareEventModal from "@/components/shared/Modals/ShareEventModal";
 import { useParams, useRouter } from "next/navigation";
 import * as dateFns from "date-fns";

@@ -64,7 +64,8 @@ const EventCard: React.FC<EventCardProps> = ({
           "md:w-full": variant == "landingPage",
         })}
       >
-        <div className="relative w-full h-60 md:h-80 overflow-hidden shadow-lg">
+        {/* <div className="relative w-full h-60 md:h-80 overflow-hidden shadow-lg"> */}
+        <div className="relative w-full aspect-[4/5] overflow-hidden shadow-lg">
           <Image
             src={image}
             alt={`event image`}

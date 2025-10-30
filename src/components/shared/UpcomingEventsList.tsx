@@ -3,11 +3,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
 import LoadingSkeleton from "./Loader/LoadingSkeleton";
 import EventCard from "./EventCard";
 import { useGetEvents } from "@/api/events/events.queries";
 import { cn } from "@/utils/cn";
-import UpcomingEventCard from "./UpcomingEventCard";
 
 export default function UpcomingEventsList() {
   const upcomingEventsQuery = useGetEvents({
@@ -34,27 +35,13 @@ export default function UpcomingEventsList() {
             </h2>
           ) : null}
 
-          <Swiper autoplay={true} draggable={true} className="w-full">
-            {upcomingEventsQuery.isPending && !upcomingEventsQuery.isError ? (
-              <>
-                {new Array(3).fill(0).map((_, index) => {
-                  return (
-                    <SwiperSlide key={index}>
-                      <LoadingSkeleton key={index} className="h-48 sm:h-60" />
-                    </SwiperSlide>
-                  );
-                })}
-              </>
-            ) : null}
-          </Swiper>
-
           <Swiper
             className="w-full text-white"
             spaceBetween={16}
+            modules={[Autoplay]}
             autoplay={{
               disableOnInteraction: false,
             }}
-            // slidesPerView={}
             breakpoints={{
               320: {
                 slidesPerView: eventsCount === 1 ? 1 : 1.2,
@@ -70,44 +57,41 @@ export default function UpcomingEventsList() {
               },
             }}
           >
-            {upcomingEventsData?.events.map((event, index) => {
-              return (
-                <SwiperSlide key={event.id}>
-                  <EventCard
-                    id={event.id}
-                    key={event.id}
-                    index={index}
-                    image={event.coverImage}
-                    title={event.name}
-                    ticketTypes={event.ticketTypes}
-                    startTime={new Date(event.startTime)}
-                    tab={"upcoming"}
-                    variant="landingPage"
-                    className=""
-                  />
-                </SwiperSlide>
-              );
-            })}
+            {upcomingEventsQuery.isPending && !upcomingEventsQuery.isError ? (
+              <>
+                {new Array(3).fill(0).map((_, index) => {
+                  return (
+                    <SwiperSlide key={index}>
+                      {/* <LoadingSkeleton key={index} className="h-48 sm:h-60" /> */}
+                      <LoadingSkeleton
+                        key={index}
+                        className="w-full aspect-[4/5]"
+                      />
+                    </SwiperSlide>
+                  );
+                })}
+              </>
+            ) : (
+              upcomingEventsData?.events.map((event, index) => {
+                return (
+                  <SwiperSlide key={event.id}>
+                    <EventCard
+                      id={event.id}
+                      key={event.id}
+                      index={index}
+                      image={event.coverImage}
+                      title={event.name}
+                      ticketTypes={event.ticketTypes}
+                      startTime={new Date(event.startTime)}
+                      tab={"upcoming"}
+                      variant="landingPage"
+                      className=""
+                    />
+                  </SwiperSlide>
+                );
+              })
+            )}
           </Swiper>
-
-          {/* <div className="flex">
-            {upcomingEventsData?.events.map((event, index) => {
-              return (
-                <UpcomingEventCard
-                  id={event.id}
-                  key={event.id}
-                  index={index}
-                  image={event.coverImage}
-                  title={event.name}
-                  ticketTypes={event.ticketTypes}
-                  startTime={new Date(event.startTime)}
-                  tab={"upcoming"}
-                  variant="landingPage"
-                  className=""
-                />
-              );
-            })}
-          </div> */}
         </motion.div>
       )}
     </>

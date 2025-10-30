@@ -315,7 +315,7 @@ export default function AdminEventsPage() {
               </div>
             </div>
           </div>
-          <div className="text-white">
+          <div className="text-white mt-2">
             {eventsQuery.isFetching ? (
               <LoadingMessage>Loading events..</LoadingMessage>
             ) : page && eventsData?.eventsCount ? (

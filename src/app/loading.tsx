@@ -21,6 +21,7 @@ export default function Loading() {
         priority
         src={Preloader2}
         alt=""
+        unoptimized
         className="w-[70%] xs:w-[60%] sm:w-[50%] md:w-[40%] lg:w-[30%] object-cover"
       />
     </div>
