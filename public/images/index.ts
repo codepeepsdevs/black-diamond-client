@@ -1,7 +1,6 @@
 import carouselImages from "./carousel";
 import ExploreEvent from "./ExploreEvent.svg";
 import OrderImage from "./order-image.png";
-import { TickerObjectProps } from "./tickets";
 import { landingPageEvents } from "./landingPage";
 import { CareersHero, CareersHero1, WhatToDo } from "./careersPages";
 
@@ -14,5 +13,3 @@ export {
   OrderImage,
   WhatToDo,
 };
-
-export type { TickerObjectProps };
