@@ -14,6 +14,7 @@ import { AdminButton } from "@/components";
 import LoadingMessage from "@/components/shared/Loader/LoadingMessage";
 import { useGetUser } from "@/api/user/user.queries";
 import Loading from "../loading";
+import { isAdminOrViewer, isReadOnly } from "@/utils/roleHelpers";
 
 export default function AdminLayout({
   children,
@@ -28,7 +29,7 @@ export default function AdminLayout({
     if (userQuery.isPending) {
       return;
     }
-    if (userData?.role !== "admin") {
+    if (!isAdminOrViewer(userData?.role || "")) {
       setShowDialog(true);
     }
   }, [userData, userQuery.isPending]);
@@ -44,11 +45,20 @@ export default function AdminLayout({
           </LoadingMessage>
         </div>
       )} */}
-      {userData?.role === "admin" && (
+      {isAdminOrViewer(userData?.role || "") && (
         <div className={`flex min-h-[50vh] `}>
           <AdminSidebar />
           {/* The min-w-0 is to prevent the contents of the container from overflowing */}
           <div className="flex-1 min-w-0 max-w-screen-xl mx-auto">
+            {isReadOnly(userData?.role || "") && (
+              <div className="mx-8 mt-20 pt-10 mb-4">
+                <div className="bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
+                  <p className="text-sm font-medium">
+                    You are in read-only mode. You can view all data but cannot make changes.
+                  </p>
+                </div>
+              </div>
+            )}
             {children}
           </div>
         </div>

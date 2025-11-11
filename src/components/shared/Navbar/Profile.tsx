@@ -2,6 +2,7 @@ import { useGetUser } from "@/api/user/user.queries";
 import { cn } from "@/utils/cn";
 import Link from "next/link";
 import { TfiClose } from "react-icons/tfi";
+import { isAdminOrViewer } from "@/utils/roleHelpers";
 
 type ProfileModalProps = {
   isOpen: boolean;
@@ -30,7 +31,7 @@ const Profile = ({ isOpen, onClose }: ProfileModalProps) => {
           <span
             className={cn(
               "bg-[#333333] py-0.5 px-1 text-xs absolute right-0",
-              userData?.role !== "admin" && "hidden"
+              !isAdminOrViewer(userData?.role || "") && "hidden"
             )}
           >
             {userData?.role}
@@ -55,7 +56,7 @@ const Profile = ({ isOpen, onClose }: ProfileModalProps) => {
         >
           Account Settings
         </Link>
-        {userData?.role === "admin" && (
+        {isAdminOrViewer(userData?.role || "") && (
           <Link
             href="/admin"
             onClick={onClose}

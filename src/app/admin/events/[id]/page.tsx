@@ -21,6 +21,8 @@ import Link from "next/link";
 import * as dateFnsTz from "date-fns-tz";
 import * as dateFns from "date-fns";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { useGetUser } from "@/api/user/user.queries";
+import { canModifyData } from "@/utils/roleHelpers";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
@@ -54,6 +56,9 @@ export default function ManageEventPage() {
 
   const eventQuery = useAdminGetEvent(eventId);
   const event = eventQuery.data?.data;
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
+  const canModify = canModifyData(userData?.role || "");
 
   useEffect(() => {
     if ((eventQuery.isFetched && !event) || eventQuery.isError) {
@@ -152,25 +157,26 @@ export default function ManageEventPage() {
             defaultValues={detailsDefault}
             defaultMedia={defaultMedia}
             isActive={currentTab === "details" && detailsDefault !== null}
+            canModify={canModify}
           />
           {/* END TAB CONTENTS */}
 
           {/* TICKETS TAB */}
           {currentTab === "ticket" && (
-            <EditTicketsTab isActive={currentTab === "ticket"} />
+            <EditTicketsTab isActive={currentTab === "ticket"} canModify={canModify} />
           )}
           {/* END TICKETS TAB */}
 
           {currentTab === "code" && (
-            <EditPromoCodeTab isActive={currentTab === "code"} />
+            <EditPromoCodeTab isActive={currentTab === "code"} canModify={canModify} />
           )}
 
           {/* {currentTab === "add-ons" && (
-            <EditEventAddOnTab isActive={currentTab === "add-ons"} />
+            <EditEventAddOnTab isActive={currentTab === "add-ons"} canModify={canModify} />
           )} */}
 
           {currentTab === "dashboard" && (
-            <EditEventDetailsDashboard isActive={currentTab === "dashboard"} />
+            <EditEventDetailsDashboard isActive={currentTab === "dashboard"} canModify={canModify} />
           )}
         </div>
       </section>
