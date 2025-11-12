@@ -21,6 +21,8 @@ import {
 import { cn } from "@/utils/cn";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import { useGetUser } from "@/api/user/user.queries";
+import { canModifyData } from "@/utils/roleHelpers";
 import { AxiosError, AxiosResponse } from "axios";
 // import { formatEventDate } from "@/utils/date-formatter";
 import Image from "next/image";
@@ -48,6 +50,9 @@ export default function AdminEventsPage() {
   const loadingToastId = useRef("");
   const [copyEventDialogOpen, setCopyEventDialogOpen] = useState(false);
   const [eventToCopyId, setEventToCopyId] = useState<null | string>(null);
+  const userQuery = useGetUser();
+  const userData = userQuery.data?.data;
+  const canModify = canModifyData(userData?.role || "");
 
   const { mutate: deleteEvent, isPending: deleteEventPending } = useDeleteEvent(
     onDeleteError,
@@ -132,14 +137,16 @@ export default function AdminEventsPage() {
             {/* END FILTER SELECT */}
 
             {/* NEW EVENT BUTTON */}
-            <AdminButton
-              variant="primary"
-              className="flex items-center gap-x-2 leading-5"
-              onClick={() => router.push(`/admin/events/new-event`)}
-            >
-              <FiPlusCircle />
-              <span className="pt-1">New Event</span>
-            </AdminButton>
+            {canModify ? (
+              <AdminButton
+                variant="primary"
+                className="flex items-center gap-x-2 leading-5"
+                onClick={() => router.push(`/admin/events/new-event`)}
+              >
+                <FiPlusCircle />
+                <span className="pt-1">New Event</span>
+              </AdminButton>
+            ) : null}
             {/* END NEW EVENT BUTTON */}
           </div>
           {/* END EVENT ACTION BUTTONS */}
@@ -174,8 +181,15 @@ export default function AdminEventsPage() {
                       return (
                         <tr
                           key={event.id}
-                          className="hover:bg-[#131313] transition-all cursor-pointer"
-                          onClick={() => handleAction("edit", event.id)}
+                          className={cn(
+                            "hover:bg-[#131313] transition-all",
+                            canModify && "cursor-pointer"
+                          )}
+                          onClick={() => {
+                            if (canModify) {
+                              handleAction("view", event.id, event.eventStatus);
+                            }
+                          }}
                         >
                           <td className="py-6">
                             <div className="flex items-start gap-x-6">
@@ -268,6 +282,7 @@ export default function AdminEventsPage() {
                               eventStatus={event.eventStatus}
                               eventId={event.id}
                               handleAction={handleAction}
+                              canModify={canModify}
                             />
                           </td>
                           {/* END ACTIONS */}
@@ -401,6 +416,7 @@ function ActionDropDown({
   eventId,
   eventStatus,
   handleAction,
+  canModify,
 }: {
   eventId: string;
   eventStatus: EventStatus["eventStatus"];
@@ -409,8 +425,10 @@ function ActionDropDown({
     eventId: string,
     eventStatus: EventStatus["eventStatus"]
   ) => void;
+  canModify: boolean;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const availableActions = canModify ? actions : (["view"] as const);
   return (
     <div className="relative">
       {/* ACTION BUTTON */}
@@ -430,7 +448,7 @@ function ActionDropDown({
           dropdownOpen ? "h-max" : "h-0"
         )}
       >
-        {actions.map((item) => {
+        {availableActions.map((item) => {
           return (
             <button
               key={item}

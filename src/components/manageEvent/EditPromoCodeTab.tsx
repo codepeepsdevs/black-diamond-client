@@ -67,7 +67,7 @@ import SuccessToast from "../toast/SuccessToast";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 // import * as Dialog from '@radix-ui/react-dialog'
 
-export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
+export default function EditPromoCodeTab({ isActive, canModify = true }: { isActive: boolean; canModify?: boolean }) {
   const [addPromoCodeDialogOpen, setAddPromoCodeDialogOpen] = useState(false);
   const [editPromocodeDialogOpen, setEditPromocodeDialogOpen] = useState(false);
   const [noTicketsDialogOpen, setNoTicketsDialogOpen] = useState(false);
@@ -211,14 +211,23 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
   return (
     <>
       <div className={cn("mt-10", isActive ? "block" : "hidden")}>
-        <AdminButton
-          variant="outline"
-          onClick={() => setAddPromoCodeDialogOpen(true)}
-          className="flex items-center px-6 gap-x-2"
-        >
-          <FaSave className="-mt-1" />
-          <span>Add Promo Code</span>
-        </AdminButton>
+        {!canModify && (
+          <div className="mb-4 bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
+            <p className="text-sm font-medium">
+              You are in read-only mode. You can view promocodes but cannot make changes.
+            </p>
+          </div>
+        )}
+        {canModify && (
+          <AdminButton
+            variant="outline"
+            onClick={() => setAddPromoCodeDialogOpen(true)}
+            className="flex items-center px-6 gap-x-2"
+          >
+            <FaSave className="-mt-1" />
+            <span>Add Promo Code</span>
+          </AdminButton>
+        )}
         <AddPromoCodeDialog
           ticketTypes={ticketTypes}
           open={addPromoCodeDialogOpen}
@@ -250,9 +259,16 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                 promocodesQuery.data?.data.map((promocode) => {
                   return (
                     <tr
-                      className="border-b border-b-[#151515] hover:bg-[#131313] transition-all cursor-pointer"
+                      className={cn(
+                        "border-b border-b-[#151515] hover:bg-[#131313] transition-all",
+                        canModify && "cursor-pointer"
+                      )}
                       key={promocode.id}
-                      onClick={() => handleAction("edit", promocode.id)}
+                      onClick={() => {
+                        if (canModify) {
+                          handleAction("edit", promocode.id);
+                        }
+                      }}
                     >
                       <td>{promocode.name}</td>
                       <td>{promocode.key}</td>
@@ -281,6 +297,7 @@ export default function EditPromoCodeTab({ isActive }: { isActive: boolean }) {
                           disabled={deletePromocodePending}
                           handleAction={handleAction}
                           promocodeId={promocode.id}
+                          canModify={canModify}
                         />
                       </td>
                     </tr>
@@ -331,12 +348,16 @@ function ActionDropDown({
   promocodeId,
   handleAction,
   disabled,
+  canModify = true,
 }: {
   promocodeId: string;
   disabled?: boolean;
   handleAction: (action: (typeof actions)[number], promocodeId: string) => void;
+  canModify?: boolean;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const availableActions = canModify ? actions : [];
+  if (!canModify) return null;
   return (
     <Popover open={dropdownOpen} onOpenChange={setDropdownOpen}>
       {/* <div className="relative"> */}
@@ -360,7 +381,7 @@ function ActionDropDown({
               "bg-[#151515] text-white flex-col inline-flex divide-y divide-[#151515] min-w-36"
             )}
           >
-            {actions.map((item) => {
+            {availableActions.map((item) => {
               return (
                 <button
                   disabled={disabled}

@@ -13,7 +13,8 @@ const EditEventImagesInputField: React.FC<{
   onSelectFile: (file: File[]) => void;
   imagesPreview: string[] | null;
   setImagesPreview: React.Dispatch<React.SetStateAction<string[] | null>>;
-}> = ({ onSelectFile, imagesPreview, setImagesPreview }) => {
+  disabled?: boolean;
+}> = ({ onSelectFile, imagesPreview, setImagesPreview, disabled = false }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       // Handle the dropped files
@@ -37,6 +38,7 @@ const EditEventImagesInputField: React.FC<{
       "image/*": [],
     },
     onDrop,
+    disabled,
   });
 
   return (
@@ -44,7 +46,8 @@ const EditEventImagesInputField: React.FC<{
       <div
         {...getRootProps()}
         className={cn(
-          "event-details-file-input bg-[#757575] h-96 text-center cursor-pointer flex justify-center items-center relative"
+          "event-details-file-input bg-[#757575] h-96 text-center flex justify-center items-center relative",
+          disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
           // for carousel
           // "[&_.carousel-root>*]:h-full"
         )}
