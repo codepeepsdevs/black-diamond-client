@@ -428,9 +428,7 @@ function ActionDropDown({
   canModify: boolean;
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const availableActions = canModify
-    ? actions
-    : (["view"] as typeof actions);
+  const availableActions = canModify ? actions : (["view"] as const);
   return (
     <div className="relative">
       {/* ACTION BUTTON */}

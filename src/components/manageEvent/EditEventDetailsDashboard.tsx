@@ -36,8 +36,10 @@ import { MdOutlineFilterCenterFocus } from "react-icons/md";
 
 export default function EditEventDetailsDashboard({
   isActive,
+  canModify = true,
 }: {
   isActive: boolean;
+  canModify?: boolean;
 }) {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -122,28 +124,39 @@ export default function EditEventDetailsDashboard({
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
+      {!canModify && (
+        <div className="mb-4 bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
+          <p className="text-sm font-medium">
+            You are in read-only mode. You can view event dashboard but cannot publish/unpublish events.
+          </p>
+        </div>
+      )}
       {/* ACTION BUTTONS */}
       <div className="flex items-center justify-end mt-12 gap-x-4">
-        {event?.isPublished ? (
-          <AdminButton
-            disabled={unpublishEventPending}
-            onClick={() => unpublishEvent(eventId)}
-            variant="primary"
-            className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
-          >
-            {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
-            <span>Unpublish</span>
-          </AdminButton>
-        ) : (
-          <AdminButton
-            disabled={publishEventPending}
-            onClick={() => publishEvent(eventId)}
-            variant="primary"
-            className="flex items-center gap-2 disabled:opacity-50"
-          >
-            {publishEventPending ? <LoadingSvg /> : <FiUpload />}
-            <span>Publish</span>
-          </AdminButton>
+        {canModify && (
+          <>
+            {event?.isPublished ? (
+              <AdminButton
+                disabled={unpublishEventPending}
+                onClick={() => unpublishEvent(eventId)}
+                variant="primary"
+                className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+              >
+                {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
+                <span>Unpublish</span>
+              </AdminButton>
+            ) : (
+              <AdminButton
+                disabled={publishEventPending}
+                onClick={() => publishEvent(eventId)}
+                variant="primary"
+                className="flex items-center gap-2 disabled:opacity-50"
+              >
+                {publishEventPending ? <LoadingSvg /> : <FiUpload />}
+                <span>Publish</span>
+              </AdminButton>
+            )}
+          </>
         )}
 
         <AdminButton

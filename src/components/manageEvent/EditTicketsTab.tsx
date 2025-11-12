@@ -68,7 +68,13 @@ import SaleEndedStatus from "./SaleEndedStatus";
 import OnSaleStatus from "./OnSaleStatus";
 import SoldOutStatus from "./SoldOutStatus";
 
-export default function EditTicketsTab({ isActive }: { isActive: boolean }) {
+export default function EditTicketsTab({
+  isActive,
+  canModify = true,
+}: {
+  isActive: boolean;
+  canModify?: boolean;
+}) {
   const [newTicketDialogOpen, setNewTicketDialogOpen] = useState(false);
   const [editTicketDialogOpen, setEditTicketDialogOpen] = useState(false);
   const [currentTab, setCurrentTab] = useQueryState(

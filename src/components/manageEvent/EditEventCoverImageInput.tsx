@@ -12,7 +12,8 @@ import { FiTrash2 } from "react-icons/fi";
 const EditEventCoverImageInput: React.FC<{
   onSelectFile: (file: File | undefined) => void;
   oldCoverImage: string | undefined;
-}> = ({ onSelectFile, oldCoverImage }) => {
+  disabled?: boolean;
+}> = ({ onSelectFile, oldCoverImage, disabled = false }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -32,6 +33,7 @@ const EditEventCoverImageInput: React.FC<{
     },
     maxFiles: 1,
     onDrop,
+    disabled,
   });
 
   const removeImage = () => {
@@ -44,7 +46,8 @@ const EditEventCoverImageInput: React.FC<{
       <div
         {...getRootProps()}
         className={cn(
-          "event-details-file-input bg-[#757575] p-[20px] h-96 text-center cursor-pointer flex justify-center items-center relative"
+          "event-details-file-input bg-[#757575] p-[20px] h-96 text-center flex justify-center items-center relative",
+          disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
         )}
       >
         <input {...getInputProps()} />
@@ -101,13 +104,15 @@ const EditEventCoverImageInput: React.FC<{
               className="object-fill"
             />
 
-            <button
-              type="button"
-              className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
-              onClick={() => removeImage()}
-            >
-              <FiTrash2 />
-            </button>
+            {!disabled && (
+              <button
+                type="button"
+                className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+                onClick={() => removeImage()}
+              >
+                <FiTrash2 />
+              </button>
+            )}
           </div>
         )}
         {/* END IMAGE PREVIEW */}
