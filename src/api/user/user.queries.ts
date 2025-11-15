@@ -28,9 +28,8 @@ export const useGetUser = () => {
   return useQuery({
     queryKey: ["user"],
     queryFn: getUser,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    // refetchInterval: 10000,
+    staleTime: 5 * 60 * 1000, // 5 minutes - user data doesn't change frequently
+    // Use global defaults for refetchOnWindowFocus and refetchOnReconnect
   });
 };
 

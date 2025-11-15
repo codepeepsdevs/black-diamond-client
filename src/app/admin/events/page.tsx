@@ -140,7 +140,7 @@ export default function AdminEventsPage() {
             {canModify ? (
               <AdminButton
                 variant="primary"
-                className="flex items-center gap-x-2 leading-5"
+                className="flex items-center gap-x-1 leading-5"
                 onClick={() => router.push(`/admin/events/new-event`)}
               >
                 <FiPlusCircle />
