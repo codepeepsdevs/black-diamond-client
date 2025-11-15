@@ -187,7 +187,7 @@ export default function AdminEventsPage() {
                           )}
                           onClick={() => {
                             if (canModify) {
-                              handleAction("view", event.id, event.eventStatus);
+                              handleAction("edit", event.id, event.eventStatus);
                             }
                           }}
                         >
