@@ -38,6 +38,11 @@ import {
   FiPlusCircle,
 } from "react-icons/fi";
 
+const currencyFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
 const actions = ["view", "edit", "copy", "delete"] as const;
 
 export default function AdminEventsPage() {
@@ -265,7 +270,9 @@ export default function AdminEventsPage() {
                           </td>
 
                           {/* GROSS */}
-                          <td>${event.gross}</td>
+                          <td className="tabular-nums">
+                            {currencyFormatter.format(event.gross || 0)}
+                          </td>
                           {/* END GROSS */}
 
                           {/* STATUS */}
