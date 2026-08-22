@@ -6,7 +6,7 @@ import { VscTriangleDown } from "react-icons/vsc";
 import { FaFacebookF, FaTwitter } from "react-icons/fa6";
 import toast from "react-hot-toast";
 import { cn } from "@/utils/cn";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   useAdminGetEvent,
   useGetEventRevenue,
@@ -32,13 +32,17 @@ import { ErrorResponse } from "@/constants/types";
 import LoadingSvg from "../shared/Loader/LoadingSvg";
 import * as dateFnsTz from "date-fns-tz";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { MdOutlineFilterCenterFocus } from "react-icons/md";
 
 export default function EditEventDetailsDashboard({
   isActive,
+  canModify = true,
 }: {
   isActive: boolean;
+  canModify?: boolean;
 }) {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const eventId = params.id;
 
   const { mutate: publishEvent, isPending: publishEventPending } =
@@ -88,12 +92,21 @@ export default function EditEventDetailsDashboard({
     ? dateFns.differenceInDays(new Date(event.startTime), new Date())
     : null;
   const daysPastEvent = event?.endTime
-    ? dateFns.differenceInDays(new Date(event.startTime), new Date())
+    ? dateFns.differenceInDays(new Date(), new Date(event.startTime))
     : null;
 
   const lowestPrice = event?.ticketTypes
     ? getLowestTicket(event?.ticketTypes)?.price || 0
     : 0;
+
+  const checkinDisabled =
+    !event?.isPublished ||
+    (daysPastEvent && daysPastEvent > 0) ||
+    eventQuery.isPending;
+  console.log("checkinDisabled:", checkinDisabled);
+  console.log("event?.isPublished:", event?.isPublished);
+  console.log("daysPastEvent:", daysPastEvent);
+  console.log("eventQuery.isPending:", eventQuery.isPending);
 
   function shareLink(platform: "facebook" | "twitter") {
     const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventLink)}`;
@@ -111,28 +124,39 @@ export default function EditEventDetailsDashboard({
 
   return (
     <div className={cn("text-[#A3A7AA]", isActive ? "block" : "hidden")}>
+      {!canModify && (
+        <div className="mb-4 bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
+          <p className="text-sm font-medium">
+            You are in read-only mode. You can view event dashboard but cannot publish/unpublish events.
+          </p>
+        </div>
+      )}
       {/* ACTION BUTTONS */}
       <div className="flex items-center justify-end mt-12 gap-x-4">
-        {event?.isPublished ? (
-          <AdminButton
-            disabled={unpublishEventPending}
-            onClick={() => unpublishEvent(eventId)}
-            variant="primary"
-            className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
-          >
-            {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
-            <span>Unpublish</span>
-          </AdminButton>
-        ) : (
-          <AdminButton
-            disabled={publishEventPending}
-            onClick={() => publishEvent(eventId)}
-            variant="primary"
-            className="flex items-center gap-2 disabled:opacity-50"
-          >
-            {publishEventPending ? <LoadingSvg /> : <FiUpload />}
-            <span>Publish</span>
-          </AdminButton>
+        {canModify && (
+          <>
+            {event?.isPublished ? (
+              <AdminButton
+                disabled={unpublishEventPending}
+                onClick={() => unpublishEvent(eventId)}
+                variant="primary"
+                className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+              >
+                {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
+                <span>Unpublish</span>
+              </AdminButton>
+            ) : (
+              <AdminButton
+                disabled={publishEventPending}
+                onClick={() => publishEvent(eventId)}
+                variant="primary"
+                className="flex items-center gap-2 disabled:opacity-50"
+              >
+                {publishEventPending ? <LoadingSvg /> : <FiUpload />}
+                <span>Publish</span>
+              </AdminButton>
+            )}
+          </>
         )}
 
         <AdminButton
@@ -147,6 +171,15 @@ export default function EditEventDetailsDashboard({
         >
           {generatePartyListPending ? <LoadingSvg /> : <FiBookOpen />}
           <span>Party List</span>
+        </AdminButton>
+
+        <AdminButton
+          disabled={checkinDisabled}
+          onClick={() => router.push(`/admin/events/${eventId}/checkin`)}
+          className="flex items-center gap-x-2 disabled:opacity-50"
+        >
+          <MdOutlineFilterCenterFocus />
+          <span>Check-in</span>
         </AdminButton>
       </div>
       {/* END ACTION BUTTONS */}

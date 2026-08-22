@@ -107,8 +107,7 @@ export const useAdminGetEvents = (options: OptionProps) => {
     queryKey: ["admin-get-events", options],
     queryFn: () => adminGetEvents(options),
     placeholderData: keepPreviousData,
-    // enabled: false,
-    // refetchInterval: 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes - events list can be slightly stale
   });
 };
 

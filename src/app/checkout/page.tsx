@@ -195,9 +195,6 @@ function CheckoutForm() {
             };
           }) || null,
       promocodeId: order.promocode?.id,
-
-      successUrl: `${window.location.protocol}//${window.location.host}/tickets`,
-      cancelUrl: `${window.location.protocol}//${window.location.host}/events`,
     } satisfies CheckoutData);
   }
 

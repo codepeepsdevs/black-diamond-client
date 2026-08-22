@@ -6,7 +6,7 @@ export interface User {
   lastname: string;
   imgUrl: string | null;
   emailConfirmed: boolean;
-  role: "user" | "admin";
+  role: "user" | "admin" | "viewer";
   addressId: string;
   billingInfoId: string;
   createdAt: string;

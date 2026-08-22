@@ -44,6 +44,7 @@ export default function EditDetailsTab({
   isActive,
   defaultValues,
   defaultMedia,
+  canModify = true,
 }: {
   isActive: boolean;
   defaultValues: Yup.InferType<typeof editEventDetailsSchema> | null;
@@ -51,6 +52,7 @@ export default function EditDetailsTab({
     images: string[] | undefined;
     coverImage: string | undefined;
   };
+  canModify?: boolean;
 }) {
   const {
     register,
@@ -178,6 +180,13 @@ export default function EditDetailsTab({
 
   return (
     <div className={isActive ? "block" : "hidden"}>
+      {!canModify && (
+        <div className="mb-4 bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
+          <p className="text-sm font-medium">
+            You are in read-only mode. You can view event details but cannot make changes.
+          </p>
+        </div>
+      )}
       <form
         className="text-[#BDBDBD] space-y-8"
         onSubmit={handleSubmit(onSubmit)}
@@ -190,6 +199,7 @@ export default function EditDetailsTab({
               setValue("coverImage", file);
             }}
             oldCoverImage={defaultMedia.coverImage}
+            disabled={!canModify}
           />
           <FormError error={errors.coverImage} />
         </div>
@@ -209,6 +219,7 @@ export default function EditDetailsTab({
               }}
               imagesPreview={imagesPreview}
               setImagesPreview={setImagesPreview}
+              disabled={!canModify}
             />
           ) : (
             <div className="relative h-96 ">
@@ -250,18 +261,20 @@ export default function EditDetailsTab({
                       alt="Slide Image"
                       sizes=""
                     />
-                    <button
-                      type="button"
-                      className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
-                      onClick={() => {
-                        removeImage({
-                          eventId: eventId,
-                          image: image,
-                        });
-                      }}
-                    >
-                      <FiTrash2 />
-                    </button>
+                    {canModify && (
+                      <button
+                        type="button"
+                        className="absolute top-2 right-2 bg-black text-red-500 text-lg p-0.5 border border-[#c0c0c0]"
+                        onClick={() => {
+                          removeImage({
+                            eventId: eventId,
+                            image: image,
+                          });
+                        }}
+                      >
+                        <FiTrash2 />
+                      </button>
+                    )}
 
                     {/* LOADING OVERLAY */}
                     {removeImagePending && (
@@ -284,7 +297,7 @@ export default function EditDetailsTab({
           {/* EVENT TITLE */}
           <div>
             <label htmlFor="name">Event Title</label>
-            <Input className="bg-white text-black" {...register("name")} />
+            <Input className="bg-white text-black" {...register("name")} disabled={!canModify} />
             <FormError error={errors.name} />
           </div>
           {/* END EVENT TITLE */}
@@ -296,6 +309,7 @@ export default function EditDetailsTab({
               rows={8}
               className="w-full text-black p-4 border border-input-border"
               {...register("summary")}
+              disabled={!canModify}
             />
             <FormError error={errors.summary} />
           </div>
@@ -322,6 +336,7 @@ export default function EditDetailsTab({
                 }
                 {...register("startDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
+                disabled={!canModify}
               />
               <FormError error={errors.startDate} />
             </div>
@@ -334,6 +349,7 @@ export default function EditDetailsTab({
                 type="time"
                 {...register("startTime", { required: true })}
                 Icon={<FaRegClock className="text-[#14171A]" />}
+                disabled={!canModify}
               />
               <FormError error={errors.startTime} />
             </div>
@@ -353,6 +369,7 @@ export default function EditDetailsTab({
                 }
                 {...register("endDate", { required: true })}
                 Icon={<FaRegCalendar className="text-[#14171A]" />}
+                disabled={!canModify}
               />
               <FormError error={errors.startDate} />
             </div>
@@ -365,6 +382,7 @@ export default function EditDetailsTab({
                 type="time"
                 {...register("endTime", { required: true })}
                 Icon={<FaRegClock className="text-[#14171A]" />}
+                disabled={!canModify}
               />
               <FormError error={errors.endTime} />
             </div>
@@ -382,6 +400,7 @@ export default function EditDetailsTab({
               type="button"
               variant={watchedLocationType === "VENUE" ? "primary" : "ghost"}
               className="text-sm flex items-center max-sm:flex-1 max-sm:justify-center gap-x-2 h-10 rounded-none"
+              disabled={!canModify}
             >
               <FaMapMarkerAlt />
               <span>Venue</span>
@@ -394,6 +413,7 @@ export default function EditDetailsTab({
                 watchedLocationType === "ONLINE_EVENT" ? "primary" : "ghost"
               }
               className="text-sm flex items-center max-sm:flex-1 max-sm:justify-center gap-x-2 h-10 rounded-none"
+              disabled={!canModify}
             >
               <OnlineEventIcon />
               <span>Online event</span>
@@ -406,6 +426,7 @@ export default function EditDetailsTab({
                 watchedLocationType === "TO_BE_ANNOUNCED" ? "primary" : "ghost"
               }
               className="text-sm flex items-center max-sm:flex-1 max-sm:justify-center gap-x-2 h-10 rounded-none"
+              disabled={!canModify}
             >
               <FaRegCalendar />
               <span>To be announced</span>
@@ -433,6 +454,7 @@ export default function EditDetailsTab({
                   <FaLink className="text-[#14171A]" />
                 )
               }
+              disabled={!canModify}
             />
           </div>
           {/* END INPUT FIELD */}
@@ -493,6 +515,7 @@ export default function EditDetailsTab({
               <Checkbox
                 checked={watchedHasRefundPolicy}
                 onChange={toggleHasRefundPolicy}
+                disabled={!canModify}
               />
               <label htmlFor="refund-policy">Refund Policy</label>
             </div>
@@ -500,13 +523,14 @@ export default function EditDetailsTab({
               variant="white"
               className={!watchedHasRefundPolicy ? "hidden" : ""}
               {...register("refundPolicy")}
+              disabled={!canModify}
             />
           </div>
         </div>
         {/* END ADDITIONAL INFORMATION */}
 
         <AdminButton
-          disabled={updateEventDetailsPending}
+          disabled={updateEventDetailsPending || !canModify}
           variant="ghost"
           className="font-medium flex items-center gap-x-2 px-6 mt-12 disabled:opacity-50"
         >

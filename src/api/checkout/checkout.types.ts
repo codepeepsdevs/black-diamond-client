@@ -16,8 +16,6 @@ export type CheckoutData = Yup.InferType<typeof checkoutFormSchema> & {
       }[]
     | null;
   promocodeId?: string;
-  successUrl?: string;
-  cancelUrl?: string;
 };
 
 export type CreateIntentResponse = {

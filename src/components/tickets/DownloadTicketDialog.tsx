@@ -120,7 +120,10 @@ export function DownloadTicketDialog({
                           <QRCodeSVG
                             marginSize={1}
                             size={256}
-                            value="https://www.eventsbyblackdiamond.com"
+                            value={
+                              ticket.checkinCode ??
+                              "https://www.eventsbyblackdiamond.com"
+                            }
                           />
                         </div>
                         {/* END QR CODE */}
