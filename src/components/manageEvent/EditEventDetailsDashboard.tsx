@@ -167,18 +167,19 @@ export default function EditEventDetailsDashboard({
             })
           }
           variant="primary"
-          className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-lg px-4 py-2 disabled:opacity-50 transition-colors"
+          className="inline-flex items-center justify-center gap-2 bg-[#1a1a1a] hover:bg-[#1e1e1e] hover:border-[#2a2a2a] border border-[#262626] rounded-lg px-4 py-2 text-white shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm font-medium"
         >
-          {generatePartyListPending ? <LoadingSvg sizeClass="w-4 h-4" /> : <FiBookOpen className="size-4" />}
+          {generatePartyListPending ? <LoadingSvg sizeClass="w-4 h-4" /> : <FiBookOpen className="size-4 opacity-70" />}
           <span>Party List</span>
         </AdminButton>
 
         <AdminButton
           disabled={checkinDisabled}
           onClick={() => router.push(`/admin/events/${eventId}/checkin`)}
-          className="flex items-center gap-x-2 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-lg px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          variant="ghost"
+          className="inline-flex items-center justify-center gap-2 bg-white hover:bg-zinc-100 text-black border border-white rounded-lg px-4 py-2 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 disabled:!bg-[#1a1a1a] disabled:!text-white/40 disabled:!border-[#262626] disabled:opacity-100 disabled:cursor-not-allowed transition-colors text-sm font-medium !text-black disabled:!text-white/40"
         >
-          <MdOutlineFilterCenterFocus className="size-4" />
+          <MdOutlineFilterCenterFocus className="size-4 opacity-70" />
           <span>Check-in</span>
         </AdminButton>
       </div>

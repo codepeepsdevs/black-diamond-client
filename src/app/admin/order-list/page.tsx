@@ -64,13 +64,21 @@ export default function OrderListPage() {
                 })
               }
               variant="ghost"
-              className="font-medium whitespace-nowrap rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] px-4 py-2.5"
+              className="font-medium whitespace-nowrap rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] hover:border-[#2a2a2a] text-white hover:text-white px-4 py-2.5 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2 !text-white"
               disabled={generateOrderReportPending}
             >
               {generateOrderReportPending ? (
                 <LoadingMessage>Generating…</LoadingMessage>
               ) : (
-                "Generate order report"
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="opacity-70">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                  </svg>
+                  Generate order report
+                </>
               )}
             </AdminButton>
             <DatePickerWithRange selected={date} onSelect={setDate} mode="range" />
