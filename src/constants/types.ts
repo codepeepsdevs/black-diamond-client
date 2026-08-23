@@ -243,6 +243,9 @@ export interface OptionProps {
   limit?: number;
   eventStatus?: "upcoming" | "past" | "all" | "draft" | undefined;
   search?: string;
+  paymentStatus?: "PENDING" | "SUCCESSFUL" | "FAILED" | "CANCELLED" | "PROCESSING" | "all" | undefined;
+  status?: "PENDING" | "COMPLETED" | "CANCELLED" | "all" | undefined;
+  eventId?: string;
 }
 
 export interface PageData {

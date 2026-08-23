@@ -67,14 +67,14 @@ import * as dateFns from "date-fns";
 
 export const getEvents = async (options: OptionProps) => {
   return await request({
-    url: `/events/get-events?eventStatus=${options.eventStatus || ""}&search=${options.search || ""}&page=${options.page || ""}&limit=${options.limit || ""}`,
+    url: `/events/get-events?eventStatus=${options?.eventStatus || ""}&search=${options?.search || ""}&page=${options?.page || ""}&limit=${options?.limit || ""}`,
     method: "get",
   });
 };
 
 export const adminGetEvents = async (options: OptionProps) => {
   return await request<AdminGetEvents>({
-    url: `/events/admin-get-events?eventStatus=${options.eventStatus || ""}&search=${options.search || ""}&page=${options.page || ""}&limit=${options.limit || ""}`,
+    url: `/events/admin-get-events?eventStatus=${options?.eventStatus || ""}&search=${options?.search || ""}&page=${options?.page || ""}&limit=${options?.limit || ""}`,
     method: "get",
   });
 };

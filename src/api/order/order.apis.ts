@@ -49,8 +49,18 @@ export const getUserUpcomingEventOrders = async (_page?: PageData) => {
 };
 
 export const getOrders = async (options?: OptionProps & DateRangeData) => {
+  const params = new URLSearchParams();
+  if (options?.page) params.set("page", String(options.page));
+  if (options?.limit) params.set("limit", String(options.limit));
+  if (options?.eventStatus) params.set("eventStatus", options.eventStatus);
+  if (options?.paymentStatus) params.set("paymentStatus", options.paymentStatus);
+  if (options?.status) params.set("status", options.status);
+  if (options?.eventId) params.set("eventId", options.eventId);
+  if (options?.search) params.set("search", options.search);
+  if (options?.startDate) params.set("startDate", options.startDate.toISOString());
+  if (options?.endDate) params.set("endDate", options.endDate.toISOString());
   return await request({
-    url: `/orders/get-orders?page=${options?.page || ""}&limit=${options?.limit || ""}&eventStatus=${options?.eventStatus || ""}&startDate=${options?.startDate?.toISOString() || ""}&endDate=${options?.endDate?.toISOString()}`,
+    url: `/orders/get-orders?${params.toString()}`,
     method: "get",
   });
 };

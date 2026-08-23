@@ -92,20 +92,20 @@ import SuccessToast from "@/components/toast/SuccessToast";
 //   });
 // };
 
-export const useGetEvents = (options: OptionProps) => {
+export const useGetEvents = (options?: OptionProps) => {
   return useQuery<AxiosResponse<GetEvents>>({
-    queryKey: ["get-events", options],
-    queryFn: () => getEvents(options),
+    queryKey: ["get-events", options?.page, options?.limit, options?.search, options?.eventStatus],
+    queryFn: () => getEvents((options ?? {}) as OptionProps),
     placeholderData: keepPreviousData,
     // enabled: false,
     // refetchInterval: 0,
   });
 };
 
-export const useAdminGetEvents = (options: OptionProps) => {
+export const useAdminGetEvents = (options?: OptionProps) => {
   return useQuery<AxiosResponse<AdminGetEvents>>({
-    queryKey: ["admin-get-events", options],
-    queryFn: () => adminGetEvents(options),
+    queryKey: ["admin-get-events", options?.page, options?.limit, options?.search, options?.eventStatus],
+    queryFn: () => adminGetEvents((options ?? {}) as OptionProps),
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000, // 2 minutes - events list can be slightly stale
   });
@@ -366,8 +366,9 @@ export const useGetEventRevenue = (eventId: Event["id"]) => {
   >({
     queryKey: ["get-revenue", eventId],
     queryFn: () => getEventRevenue(eventId),
-    // enabled: false,
-    // refetchInterval: 0,
+    enabled: !!eventId,
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };
 
@@ -479,7 +480,10 @@ export const useRemoveImageFromSlide = (
 
 export const usePageView = (eventId: string) => {
   return useQuery({
-    queryKey: ["s"],
+    queryKey: ["page-views", eventId],
     queryFn: () => getViewCount({ eventId }),
+    enabled: !!eventId,
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };

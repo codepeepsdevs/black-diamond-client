@@ -23,6 +23,10 @@ import * as dateFns from "date-fns";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import { useGetUser } from "@/api/user/user.queries";
 import { canModifyData } from "@/utils/roleHelpers";
+import OrderListTable from "@/components/orderList/OrderListTable";
+import { DatePickerWithRange } from "@/components/shared/DatePickerWithRange";
+import { DateRange } from "react-day-picker";
+import { subMonths } from "date-fns";
 
 const tabsList = [
   { id: "details", title: "Details Page" },
@@ -30,6 +34,7 @@ const tabsList = [
   { id: "code", title: "Code" },
   // { id: "add-ons", title: "Add Ons" },
   { id: "dashboard", title: "Dashboard" },
+  { id: "orders", title: "Orders" },
 ] as const;
 
 type Tabs = (typeof tabsList)[number]["id"];
@@ -59,6 +64,10 @@ export default function ManageEventPage() {
   const userQuery = useGetUser();
   const userData = userQuery.data?.data;
   const canModify = canModifyData(userData?.role || "");
+  const [ordersDate, setOrdersDate] = React.useState<DateRange | undefined>({
+    from: subMonths(new Date(), 1),
+    to: new Date(),
+  });
 
   useEffect(() => {
     if ((eventQuery.isFetched && !event) || eventQuery.isError) {
@@ -177,6 +186,21 @@ export default function ManageEventPage() {
 
           {currentTab === "dashboard" && (
             <EditEventDetailsDashboard isActive={currentTab === "dashboard"} canModify={canModify} />
+          )}
+
+          {currentTab === "orders" && (
+            <div className={cn(currentTab === "orders" ? "block" : "hidden", "mt-8")}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-medium text-white">Orders for {event?.name ?? "this event"}</h2>
+                <DatePickerWithRange selected={ordersDate} onSelect={setOrdersDate} mode="range" />
+              </div>
+              <OrderListTable
+                startDate={ordersDate?.from}
+                endDate={ordersDate?.to}
+                eventId={eventId}
+                hideEventFilter
+              />
+            </div>
           )}
         </div>
       </section>

@@ -151,13 +151,19 @@ export default function EventDetailsDashboard({
       <div className="overflow-x-auto">
         <div className="flex gap-x-8 justify-between whitespace-nowrap mt-12">
           {/* TICKETS SOLD */}
-          <div className="flex flex-col shrink-0 justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
             <div className="flex items-center justify-center gap-x-1">
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Tickets sold</span>
             </div>
             {ticketTypeSalesQuery.isPending ? (
-              <LoadingSvg />
+              <div className="flex items-center justify-center min-h-[72px]">
+                <LoadingSvg sizeClass="w-8 h-8" />
+              </div>
+            ) : ticketTypeSalesQuery.isError ? (
+              <div className="flex items-center justify-center min-h-[72px]">
+                <span className="text-lg font-normal text-red-400">Failed to load</span>
+              </div>
             ) : (
               <div className="text-white font-semibold text-6xl">
                 {totalTicketsSold}/{totalTickets}
@@ -167,13 +173,19 @@ export default function EventDetailsDashboard({
           {/* END TICKETS SOLD */}
 
           {/* REVENUE */}
-          <div className="flex flex-col shrink-0 justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
             <div className="flex items-center justify-center gap-x-1">
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Revenue</span>
             </div>
             {eventRevenueQuery.isPending ? (
-              <LoadingSvg />
+              <div className="flex items-center justify-center min-h-[72px]">
+                <LoadingSvg sizeClass="w-8 h-8" />
+              </div>
+            ) : eventRevenueQuery.isError ? (
+              <div className="flex items-center justify-center min-h-[72px]">
+                <span className="text-lg font-normal text-red-400">Failed to load</span>
+              </div>
             ) : (
               <div className="text-white font-semibold text-6xl">
                 ${eventRevenue}
@@ -183,16 +195,22 @@ export default function EventDetailsDashboard({
           {/* END REVENUE */}
 
           {/* PAGE VIEWS */}
-          <div className="flex flex-col shrink-0 justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
             <div className="flex items-center justify-center gap-x-1">
               <VscTriangleDown className="text-[#E1306C] text-2xl" />
               <span>Page Views</span>
             </div>
             {viewCountQuery.isPending ? (
-              <LoadingSvg />
+              <div className="flex items-center justify-center min-h-[72px]">
+                <LoadingSvg sizeClass="w-8 h-8" />
+              </div>
+            ) : viewCountQuery.isError ? (
+              <div className="flex items-center justify-center min-h-[72px]">
+                <span className="text-lg font-normal text-red-400">Failed to load</span>
+              </div>
             ) : (
               <div className="text-white font-semibold text-6xl">
-                {viewCountData?.views}
+                {viewCountData?.views ?? 0}
               </div>
             )}
           </div>

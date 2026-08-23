@@ -91,11 +91,22 @@ export const useUserUpcomingEventsOrders = (page?: PageData) => {
 
 export const useGetOrders = (options?: OptionProps & DateRangeData) => {
   return useQuery<AxiosResponse<GetOrders>>({
-    queryKey: ["get-orders", options],
+    queryKey: [
+      "get-orders",
+      options?.page,
+      options?.limit,
+      options?.eventStatus,
+      options?.paymentStatus,
+      options?.status,
+      options?.eventId,
+      options?.search,
+      options?.startDate?.toISOString() ?? null,
+      options?.endDate?.toISOString() ?? null,
+    ],
     queryFn: () => getOrders(options),
     placeholderData: keepPreviousData,
-    // enabled: false,
-    // refetchInterval: 0,
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 };
 
@@ -132,8 +143,15 @@ export const useCheckPaymentStatus = (orderId: string) => {
 
 export const useGetRevenue = (range?: GetRevenueData) => {
   return useQuery<AxiosResponse<GetRevenueResponse>, AxiosError<Error>>({
-    queryKey: [`revenue`, range],
+    queryKey: [
+      `revenue`,
+      range?.startDate?.toISOString() ?? null,
+      range?.endDate?.toISOString() ?? null,
+    ],
     queryFn: () => getRevenue(range),
+    placeholderData: keepPreviousData,
+    enabled: !!range?.startDate && !!range?.endDate,
+    staleTime: 30 * 1000,
   });
 };
 
@@ -141,14 +159,24 @@ export const useGetTicketTypeSales = (eventId: string) => {
   return useQuery<AxiosResponse<TicketTypeSalesResponse>, AxiosError<Error>>({
     queryKey: [`ticket-type-sales`, eventId],
     queryFn: () => getTicketTypeSales(eventId),
+    enabled: !!eventId,
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   });
 };
 
 export const useGetTicketsSoldStats = (range?: DateRangeData) => {
   return useQuery<AxiosResponse<GetTicketSoldStatsResponse>, AxiosError<Error>>(
     {
-      queryKey: [`tickets-sold-stats`, range],
+      queryKey: [
+        `tickets-sold-stats`,
+        range?.startDate?.toISOString() ?? null,
+        range?.endDate?.toISOString() ?? null,
+      ],
       queryFn: () => getTicketsSoldStats(range),
+      placeholderData: keepPreviousData,
+      enabled: !!range?.startDate && !!range?.endDate,
+      staleTime: 30 * 1000,
     }
   );
 };

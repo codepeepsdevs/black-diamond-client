@@ -1,53 +1,72 @@
-import React, { useEffect, useState } from "react";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
+import React, { useEffect, useMemo, useState } from "react";
 import Checkbox from "../shared/Checkbox";
-import {
-  FiChevronsLeft,
-  FiChevronsRight,
-  FiMoreHorizontal,
-  FiRefreshCw,
-} from "react-icons/fi";
+import { FiChevronsLeft, FiChevronsRight, FiRefreshCw, FiSearch, FiX } from "react-icons/fi";
 import { OptionProps, Order } from "@/constants/types";
 import {
   useBulkReconcileOrders,
   useGetOrders,
   useReconcileSingleOrder,
 } from "@/api/order/order.queries";
-import { FaSort, FaSortDown } from "react-icons/fa6";
+import { useAdminGetEvents } from "@/api/events/events.queries";
+import { FaSortDown } from "react-icons/fa6";
 import * as dateFns from "date-fns";
 import { cn } from "@/utils/cn";
-import { parseAsInteger, useQueryState, useQueryStates } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import toast from "react-hot-toast";
-import { Popover, PopoverContent, PopoverTrigger } from "../shared/Popover";
 import { getApiErrorMessage } from "@/utils/utilityFunctions";
 import ErrorToast from "../toast/ErrorToast";
 import SuccessToast from "../toast/SuccessToast";
 
-const OrderListTable = ({
-  startDate,
-  endDate,
-}: {
+type OrderListTableProps = {
   startDate: Date | undefined;
   endDate: Date | undefined;
-}) => {
+  eventId?: string;
+  hideEventFilter?: boolean;
+};
+
+const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventFilter }: OrderListTableProps) => {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
-  const [eventFilter, setEventFilter] =
-    useState<OptionProps["eventStatus"]>("all");
+  const [eventFilter, setEventFilter] = useState<OptionProps["eventStatus"]>("all");
+  const [selectedEventId, setSelectedEventId] = useState<string>(lockedEventId ?? "");
+  const [paymentFilter, setPaymentFilter] = useState<OptionProps["paymentStatus"]>("all");
+  const [statusFilter, setStatusFilter] = useState<OptionProps["status"]>("all");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // keep selectedEventId in sync if lockedEventId changes
+  useEffect(() => {
+    if (lockedEventId) setSelectedEventId(lockedEventId);
+  }, [lockedEventId]);
+
+  // debounce search 400ms
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const hasActiveFilters =
+    eventFilter !== "all" ||
+    paymentFilter !== "all" ||
+    statusFilter !== "all" ||
+    !!selectedEventId ||
+    !!debouncedSearch;
+
+  // fetch events for dropdown (only when not locked)
+  const eventsFilterOpt = useMemo(() => ({ limit: 50, search: "" }) as OptionProps, []);
+  const eventsQuery = useAdminGetEvents(
+    !lockedEventId && !hideEventFilter ? eventsFilterOpt : undefined
+  );
+  const eventsData = (eventsQuery as any)?.data?.data?.events ?? (eventsQuery as any)?.data?.data ?? [];
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
   const orderListQuery = useGetOrders({
-    eventStatus: eventFilter,
+    eventStatus: lockedEventId ? undefined : eventFilter === "all" ? undefined : eventFilter,
+    eventId: lockedEventId || selectedEventId || undefined,
+    paymentStatus: paymentFilter === "all" ? undefined : paymentFilter,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    search: debouncedSearch || undefined,
     page,
     limit: 10,
     startDate,
@@ -86,10 +105,36 @@ const OrderListTable = ({
     }
   };
 
-  // Clear selection on page/filter change
+  // Clear selection & reset to page 1 on filter change
   useEffect(() => {
     setSelectedIds(new Set());
-  }, [page, eventFilter, startDate, endDate]);
+  }, [page, eventFilter, selectedEventId, paymentFilter, statusFilter, debouncedSearch, startDate, endDate]);
+
+  useEffect(() => {
+    // when filters change, reset page to 1 (but avoid loop on initial page=1)
+    // we do it via effect that watches filters -> setPage(1) if page !==1
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleFilterChange = (setter: (v: any) => void) => (v: any) => {
+    setter(v);
+    setPage(1);
+  };
+
+  const handleSearchClear = () => {
+    setSearchInput("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
+
+  const handleClearAll = () => {
+    setEventFilter("all");
+    if (!lockedEventId) setSelectedEventId("");
+    setPaymentFilter("all");
+    setStatusFilter("all");
+    handleSearchClear();
+    setPage(1);
+  };
 
   const onBulkError = (e: any) => {
     ErrorToast({
@@ -152,26 +197,105 @@ const OrderListTable = ({
 
   return (
     <>
-      {/* FILTER SELECT */}
-      <FilterSelect
-        onSelect={setEventFilter}
-        items={[
-          { title: "All Events", value: "all" },
-          {
-            title: "Past Events",
-            value: "past",
-          },
-          {
-            title: "Upcoming Events",
-            value: "upcoming",
-          },
-          // {
-          //   title: "Drafts",
-          //   value: "drafts",
-          // },
-        ]}
-      />
-      {/* END FILTER SELECT */}
+      {/* FILTER BAR */}
+      <div className="flex flex-col gap-3 mt-2">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search */}
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A3A7AA] text-sm pointer-events-none" />
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search order, customer, event, email…"
+              className="bg-[#151515] text-white placeholder-[#6b6b6b] pl-9 pr-9 py-3 w-72 text-sm border border-transparent focus:border-[#2a2a2a] focus:outline-none"
+            />
+            {searchInput && (
+              <button
+                onClick={handleSearchClear}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A3A7AA] hover:text-white"
+                aria-label="Clear search"
+              >
+                <FiX />
+              </button>
+            )}
+          </div>
+
+          {!lockedEventId && !hideEventFilter && (
+            <>
+              <FilterSelect
+                onSelect={handleFilterChange(setEventFilter)}
+                value={eventFilter as string}
+                items={[
+                  { title: "All Events", value: "all" },
+                  { title: "Past Events", value: "past" },
+                  { title: "Upcoming Events", value: "upcoming" },
+                ]}
+              />
+              {/* Event selector */}
+              <div className="relative">
+                <select
+                  value={selectedEventId}
+                  onChange={(e) => {
+                    setSelectedEventId(e.target.value);
+                    setPage(1);
+                  }}
+                  className="bg-[#151515] text-white w-56 h-12 px-3 pr-8 text-sm border border-transparent focus:border-[#2a2a2a] focus:outline-none appearance-none"
+                >
+                  <option value="">All events (by ID)</option>
+                  {Array.isArray(eventsData) &&
+                    eventsData.slice(0, 50).map((ev: any) => (
+                      <option key={ev.id} value={ev.id}>
+                        {ev.name?.slice(0, 32) ?? ev.id}
+                      </option>
+                    ))}
+                </select>
+                <FaSortDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/60 -mt-1" />
+              </div>
+            </>
+          )}
+
+          <FilterSelect
+            onSelect={handleFilterChange(setPaymentFilter)}
+            value={paymentFilter as string}
+            items={[
+              { title: "Any Payment", value: "all" },
+              { title: "Paid", value: "SUCCESSFUL" },
+              { title: "Not Paid", value: "PENDING" },
+              { title: "Failed", value: "FAILED" },
+            ]}
+          />
+
+          <FilterSelect
+            onSelect={handleFilterChange(setStatusFilter)}
+            value={statusFilter as string}
+            items={[
+              { title: "Any Order Status", value: "all" },
+              { title: "Completed", value: "COMPLETED" },
+              { title: "Pending", value: "PENDING" },
+              { title: "Cancelled", value: "CANCELLED" },
+            ]}
+          />
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearAll}
+              className="text-sm text-[#A3A7AA] hover:text-white px-3 py-2 border border-[#2a2a2a] bg-[#151515]"
+            >
+              Clear filters
+            </button>
+          )}
+
+          {orderListQuery.isFetching && !orderListQuery.isPending && (
+            <span className="text-xs text-[#A3A7AA] flex items-center gap-2">
+              <FiRefreshCw className="animate-spin" /> Updating…
+            </span>
+          )}
+        </div>
+        {debouncedSearch && searchInput !== debouncedSearch && (
+          <span className="text-xs text-[#6b6b6b]">Typing…</span>
+        )}
+      </div>
+      {/* END FILTER BAR */}
 
       {/* BULK ACTION BAR */}
       {selectedIds.size > 0 && (
@@ -223,7 +347,6 @@ const OrderListTable = ({
                 <th className="p-4 m-4 text-left">Event Name</th>
                 <th className="p-4 m-4 text-left">Order ID</th>
                 <th className="p-4 m-4 text-left">Customer Name</th>
-                {/* <th className="p-4 m-4 text-left">Phone No.</th> */}
                 <th className="p-4 m-4 text-left">Ticket</th>
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
@@ -234,8 +357,22 @@ const OrderListTable = ({
             <tbody>
               {orderListQuery.isPending ? (
                 <tr>
-                  <td colSpan={8} className="h-24 text-center">
-                    Loading orders..
+                  <td colSpan={10} className="h-24 text-center">
+                    <span className="inline-flex items-center gap-2">
+                      <FiRefreshCw className="animate-spin" /> Loading orders..
+                    </span>
+                  </td>
+                </tr>
+              ) : orderListQuery.isError ? (
+                <tr>
+                  <td colSpan={10} className="h-24 text-center text-red-400">
+                    Failed to load orders.{" "}
+                    <button
+                      onClick={() => orderListQuery.refetch()}
+                      className="underline hover:text-red-300"
+                    >
+                      Retry
+                    </button>
                   </td>
                 </tr>
               ) : orderListData?.orders && orderListData.orders.length > 0 ? (
@@ -266,11 +403,10 @@ const OrderListTable = ({
                       </div>
                     </td>
                     <td className="p-4 m-4">{order.event.name}</td>
-                    <td className="p-4 m-4">{order.id}</td>
+                    <td className="p-4 m-4 font-mono text-xs max-w-[140px] truncate" title={order.id}>{order.id}</td>
                     <td className="p-4 m-4">
                       {order.firstName} {order.lastName}
                     </td>
-                    {/* <td className="p-4 m-4">{order.phone}</td> */}
                     <td className="p-4 m-4">{order.tickets.length}</td>
                     <td className="p-4 m-4">
                       ${Number(order.amountPaid).toFixed(2) ?? 0}
@@ -322,33 +458,17 @@ const OrderListTable = ({
                         <span className="text-xs text-[#555]">—</span>
                       )}
                     </td>
-                    {/* <td className="p-4 m-4">
-                      <Popover>
-                        <PopoverTrigger>
-                          <FiMoreHorizontal className="h-4 w-4" />
-                        </PopoverTrigger>
-                        <PopoverContent
-                          align="end"
-                          className="bg-black text-white"
-                        >
-                          <button
-                            onClick={() =>
-                              navigator.clipboard.writeText(order.id)
-                            }
-                          >
-                            Copy payment ID
-                          </button>
-                          <button>View customer</button>
-                          <button>View payment details</button>
-                        </PopoverContent>
-                      </Popover>
-                    </td> */}
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan={10} className="h-24 text-center">
-                    No results.
+                    No results{hasActiveFilters ? " for current filters" : ""}.
+                    {hasActiveFilters && (
+                      <button onClick={handleClearAll} className="ml-2 underline text-white hover:text-[#A3A7AA]">
+                        Clear filters
+                      </button>
+                    )}
                   </td>
                 </tr>
               )}
@@ -360,7 +480,7 @@ const OrderListTable = ({
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="space-x-2 flex items-center">
             <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed"
               onClick={() =>
                 setPage((prev) => {
                   if (prev <= 1) {
@@ -373,11 +493,11 @@ const OrderListTable = ({
             >
               <FiChevronsLeft />
             </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center">
+            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center text-white text-sm px-3">
               {page}
             </div>
             <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center"
+              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed"
               onClick={() => setPage((prev) => prev + 1)}
               disabled={isLast}
             >
@@ -395,6 +515,9 @@ const OrderListTable = ({
                 Showing {page * 10 - 9}-
                 {isLast ? orderListData.ordersCount : page * 10} of{" "}
                 {orderListData.ordersCount}
+                {orderListData.ordersCount > 50 && (
+                  <span className="text-[#A3A7AA] text-xs ml-2">(capped page size 50 for performance)</span>
+                )}
               </div>
             ) : null
           ) : null}
@@ -406,57 +529,46 @@ const OrderListTable = ({
 
 export default OrderListTable;
 
-function FilterSelect({
-  items,
-  onSelect,
-}: {
-  onSelect: (value: OptionProps["eventStatus"]) => void;
-  items: {
-    title: string;
-    value: OptionProps["eventStatus"];
-  }[];
-}) {
-  const [selectValue, setSelectValue] = useState(items[0].value);
+type FilterSelectProps = {
+  items: { title: string; value: string }[];
+  onSelect: (value: any) => void;
+  value?: string;
+};
+
+function FilterSelect({ items, onSelect, value }: FilterSelectProps) {
   const [selectOpen, setSelectOpen] = useState(false);
+  const current = value ?? items[0].value;
   return (
     <div className="text-white relative inline-block z-[1]">
-      {/* SELECT DISPLAY */}
       <button
-        className={
-          "bg-[#151515] w-44 h-14 px-4 flex items-center gap-x-4 justify-between"
-        }
+        className="bg-[#151515] min-w-36 h-12 px-4 flex items-center gap-x-3 justify-between border border-transparent focus:border-[#2a2a2a] focus:outline-none"
         onClick={() => setSelectOpen((state) => !state)}
       >
-        <span>{items.find((item) => item.value === selectValue)?.title}</span>
-
-        <FaSortDown className="-mt-2" />
+        <span className="text-sm whitespace-nowrap">{items.find((item) => item.value === current)?.title ?? items[0].title}</span>
+        <FaSortDown className="-mt-2 shrink-0" />
       </button>
-      {/* END SELECT DISPLAY */}
-
-      {/* SELECT DROPDOWN */}
       <div
         className={cn(
-          "bg-[#151515] border border-black flex-col inline-flex divide-y divide-[#151515] min-w-36 absolute top-14 mt-2 right-0 overflow-hidden",
+          "bg-[#151515] border border-black flex-col inline-flex divide-y divide-[#2a2a2a] min-w-36 absolute top-12 mt-2 right-0 overflow-hidden shadow-lg",
           selectOpen ? "h-max" : "h-0"
         )}
       >
-        {items.map((item) => {
-          return (
-            <button
-              key={item.value}
-              onClick={() => {
-                setSelectValue(item.value);
-                onSelect(item.value);
-                setSelectOpen(false);
-              }}
-              className="px-6 py-3 hover:bg-[#2c2b2b]"
-            >
-              {item.title}
-            </button>
-          );
-        })}
+        {items.map((item) => (
+          <button
+            key={item.value}
+            onClick={() => {
+              onSelect(item.value);
+              setSelectOpen(false);
+            }}
+            className={cn(
+              "px-6 py-3 hover:bg-[#2c2b2b] text-sm text-left whitespace-nowrap",
+              current === item.value && "bg-[#2c2b2b] text-white"
+            )}
+          >
+            {item.title}
+          </button>
+        ))}
       </div>
-      {/* END SELECT DROPDOWN */}
     </div>
   );
 }

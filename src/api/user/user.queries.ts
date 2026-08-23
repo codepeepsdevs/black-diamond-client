@@ -64,7 +64,14 @@ export const useUsersStats = (range?: UsersStatsData) => {
   return useQuery<AxiosResponse<UsersStatsResponse>, AxiosError<ErrorResponse>>(
     {
       queryFn: () => usersStats(range),
-      queryKey: ["users-stats", range],
+      queryKey: [
+        "users-stats",
+        range?.startDate?.toISOString() ?? null,
+        range?.endDate?.toISOString() ?? null,
+      ],
+      placeholderData: keepPreviousData,
+      enabled: !!range?.startDate && !!range?.endDate,
+      staleTime: 30 * 1000,
     }
   );
 };
