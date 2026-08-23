@@ -12,34 +12,22 @@ const SuccessToast = ({
   toast.custom(
     (t) => (
       <div
-        className={`max-w-md w-full bg-[#333333] shadow-lg rounded-lg pointer-events-auto flex flex-col ${
+        className={`max-w-md w-full bg-black border border-[#22c55e] border-l-[6px] pointer-events-auto ${
           t.visible ? "animate-enter" : "animate-leave"
         }`}
       >
-        <div className="w-full px-3 sm:px-4 py-1 sm:py-2">
-          <div className="flex items-start">
-            <div className="flex-shrink-0 pt-0.5">
-              <FiCheckCircle className="h-4 sm:h-6 w-4 sm:w-6 text-green-500" />
-            </div>
-            <div className="ml-2 sm:ml-3 ">
-              <p className="text-base sm:text-lg font-medium text-green-500">
-                {title}
-              </p>
-              <p className="text-sm sm:text-base text-white">{description} </p>
-            </div>
+        <div className="flex items-start gap-3 px-4 py-4">
+          <div className="flex-shrink-0 pt-0.5">
+            <FiCheckCircle className="h-6 w-6 text-[#22c55e]" />
           </div>
-        </div>
-        <div className="flex justify-end px-3 sm:px-4 py-1 sm:py-2 w-full ">
-          <button
-            onClick={() => toast.dismiss(t.id)}
-            className=" text-white text-sm sm:text-base"
-          >
-            Dismiss
-          </button>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-[#22c55e] leading-5">{title}</p>
+            <p className="text-sm text-[#22c55e] leading-5 mt-1">{description}</p>
+          </div>
         </div>
       </div>
     ),
-    { duration: 3000 }
+    { duration: 5000 }
   );
 };
 

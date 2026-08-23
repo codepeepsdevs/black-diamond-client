@@ -28,17 +28,19 @@ const RecentOrdersTable = ({
   const orderListQuery = useGetOrders({ startDate, endDate, limit: 10 });
   const orderListData = orderListQuery.data?.data;
 
+  const loadingToastRef = React.useRef<string | undefined>(undefined);
   useEffect(() => {
-    let toastId;
-    if (!toastId && orderListQuery.isFetching) {
-      toastId = toast.loading("Order table data loading");
-    } else {
-      toast.dismiss(toastId);
-      toastId = null;
+    if (orderListQuery.isFetching && !loadingToastRef.current) {
+      loadingToastRef.current = toast.loading("Order table data loading");
+    } else if (!orderListQuery.isFetching && loadingToastRef.current) {
+      toast.dismiss(loadingToastRef.current);
+      loadingToastRef.current = undefined;
     }
-
     return () => {
-      toastId && toast.dismiss(toastId);
+      if (loadingToastRef.current) {
+        toast.dismiss(loadingToastRef.current);
+        loadingToastRef.current = undefined;
+      }
     };
   }, [orderListQuery.isFetching]);
 

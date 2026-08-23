@@ -51,3 +51,17 @@ export type FillTicketDetailsResponse = {
 export type GeneratePartyListData = {
   eventId: string;
 };
+
+export type BulkReconcileData = {
+  orderIds: string[];
+};
+
+export type BulkReconcileResponse = {
+  results: Array<{
+    orderId: string;
+    status: 'verified' | 'skipped' | 'error';
+    reason: string;
+    paid?: boolean;
+  }>;
+  summary: { verified: number; skipped: number; error: number };
+};

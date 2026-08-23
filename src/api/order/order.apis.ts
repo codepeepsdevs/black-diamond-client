@@ -11,6 +11,8 @@ import {
   GetUserOrders,
   FillTicketDetailsResponse,
   GeneratePartyListData,
+  BulkReconcileData,
+  BulkReconcileResponse,
 } from "./order.types";
 import {
   DateRangeData,
@@ -142,6 +144,14 @@ export const generateOrderReport = async (range?: DateRangeData) => {
   // Step 5: Clean up
   document.body.removeChild(link);
   window.URL.revokeObjectURL(downloadUrl);
+};
+
+export const bulkReconcileOrders = async (data: BulkReconcileData) => {
+  return await request<BulkReconcileResponse>({
+    url: `/orders/admin/bulk-reconcile`,
+    method: "post",
+    data,
+  });
 };
 
 export const generatePartyList = async ({ eventId }: GeneratePartyListData) => {

@@ -25,14 +25,47 @@ export default function RootLayout({
             position="bottom-right"
             reverseOrder={false}
             toastOptions={{
+              duration: 5000,
               style: {
-                border: "1px solid #E4E7EC",
-                borderRadius: 15,
-                padding: "16px",
-                color: "#fff",
-                backgroundColor: "#333333",
-                fontSize: 15,
+                background: "#000000",
+                color: "#ffffff",
+                border: "1px solid #ffffff",
+                borderLeft: "6px solid #ffffff",
+                borderRadius: "0px",
+                padding: "16px 20px",
+                fontSize: "14px",
                 fontWeight: 400,
+              },
+              success: {
+                duration: 5000,
+                style: {
+                  background: "#000000",
+                  color: "#22c55e",
+                  border: "1px solid #22c55e",
+                  borderLeft: "6px solid #22c55e",
+                  borderRadius: "0px",
+                },
+                iconTheme: { primary: "#22c55e", secondary: "#000000" },
+              },
+              error: {
+                duration: 6000,
+                style: {
+                  background: "#000000",
+                  color: "#ff2d55",
+                  border: "1px solid #ff2d55",
+                  borderLeft: "6px solid #ff2d55",
+                  borderRadius: "0px",
+                },
+                iconTheme: { primary: "#ff2d55", secondary: "#000000" },
+              },
+              loading: {
+                style: {
+                  background: "#000000",
+                  color: "#ffffff",
+                  border: "1px solid #ffffff",
+                  borderLeft: "6px solid #ffffff",
+                  borderRadius: "0px",
+                },
               },
             }}
           />

@@ -14,6 +14,7 @@ import {
 import { AxiosError, AxiosResponse } from "axios";
 import {
   assignGuestOrder,
+  bulkReconcileOrders,
   checkPaymentStatus,
   fillTicketDetails,
   generateOrderReport,
@@ -173,5 +174,46 @@ export const useGeneratePartyList = (
     mutationFn: generatePartyList,
     onError,
     onSuccess,
+  });
+};
+
+export const useBulkReconcileOrders = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: (data: AxiosResponse<import("./order.types").BulkReconcileResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AxiosResponse<import("./order.types").BulkReconcileResponse>,
+    AxiosError<ErrorResponse>,
+    import("./order.types").BulkReconcileData
+  >({
+    mutationKey: [`bulk-reconcile-orders`],
+    mutationFn: bulkReconcileOrders,
+    onError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+      onSuccess(data);
+    },
+  });
+};
+
+export const useReconcileSingleOrder = (
+  onError: (e: AxiosError<ErrorResponse>) => void,
+  onSuccess: (data: AxiosResponse<import("./order.types").BulkReconcileResponse>) => void
+) => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AxiosResponse<import("./order.types").BulkReconcileResponse>,
+    AxiosError<ErrorResponse>,
+    string
+  >({
+    mutationKey: [`reconcile-single-order`],
+    mutationFn: (orderId: string) =>
+      bulkReconcileOrders({ orderIds: [orderId] }),
+    onError,
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["get-orders"] });
+      onSuccess(data);
+    },
   });
 };

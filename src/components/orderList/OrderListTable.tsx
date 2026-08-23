@@ -16,9 +16,14 @@ import {
   FiChevronsLeft,
   FiChevronsRight,
   FiMoreHorizontal,
+  FiRefreshCw,
 } from "react-icons/fi";
 import { OptionProps, Order } from "@/constants/types";
-import { useGetOrders } from "@/api/order/order.queries";
+import {
+  useBulkReconcileOrders,
+  useGetOrders,
+  useReconcileSingleOrder,
+} from "@/api/order/order.queries";
 import { FaSort, FaSortDown } from "react-icons/fa6";
 import * as dateFns from "date-fns";
 import { cn } from "@/utils/cn";
@@ -26,6 +31,9 @@ import { parseAsInteger, useQueryState, useQueryStates } from "nuqs";
 import LoadingMessage from "../shared/Loader/LoadingMessage";
 import toast from "react-hot-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "../shared/Popover";
+import { getApiErrorMessage } from "@/utils/utilityFunctions";
+import ErrorToast from "../toast/ErrorToast";
+import SuccessToast from "../toast/SuccessToast";
 
 const OrderListTable = ({
   startDate,
@@ -37,6 +45,7 @@ const OrderListTable = ({
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [eventFilter, setEventFilter] =
     useState<OptionProps["eventStatus"]>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const orderListQuery = useGetOrders({
     eventStatus: eventFilter,
     page,
@@ -46,17 +55,92 @@ const OrderListTable = ({
   });
   const orderListData = orderListQuery.data?.data;
 
-  useEffect(() => {
-    let toastId;
-    if (!toastId && orderListQuery.isFetching) {
-      toastId = toast.loading("Order table data loading");
-    } else {
-      toast.dismiss(toastId);
-      toastId = null;
-    }
+  const pendingOrdersOnPage =
+    orderListData?.orders.filter((o) => o.paymentStatus === "PENDING") ?? [];
+  const allPendingSelected =
+    pendingOrdersOnPage.length > 0 &&
+    pendingOrdersOnPage.every((o) => selectedIds.has(o.id));
 
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllPending = () => {
+    if (allPendingSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        pendingOrdersOnPage.forEach((o) => next.delete(o.id));
+        return next;
+      });
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        pendingOrdersOnPage.forEach((o) => next.add(o.id));
+        return next;
+      });
+    }
+  };
+
+  // Clear selection on page/filter change
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [page, eventFilter, startDate, endDate]);
+
+  const onBulkError = (e: any) => {
+    ErrorToast({
+      title: "Reconcile failed",
+      descriptions: getApiErrorMessage(e, "Failed to reconcile orders"),
+    });
+  };
+  const onBulkSuccess = (res: any) => {
+    const summary = res.data.summary;
+    const verified = summary.verified;
+    const skipped = summary.skipped;
+    const failed = summary.error;
+    const parts: string[] = [];
+    if (verified > 0) parts.push(`${verified} payment${verified > 1 ? "s" : ""} confirmed — emails sent`);
+    if (skipped > 0) parts.push(`${skipped} still pending (no payment found)`);
+    if (failed > 0) parts.push(`${failed} failed to check`);
+    const description = parts.length ? parts.join(". ") + "." : "No changes.";
+    if (verified > 0) {
+      SuccessToast({
+        title: "Success!",
+        description,
+      });
+    } else {
+      ErrorToast({
+        title: "Nothing confirmed",
+        descriptions: [description],
+        variant: "info",
+      });
+    }
+    setSelectedIds(new Set());
+  };
+
+  const { mutate: bulkReconcile, isPending: bulkPending } =
+    useBulkReconcileOrders(onBulkError, onBulkSuccess);
+
+  const { mutate: reconcileOne, isPending: singlePending } =
+    useReconcileSingleOrder(onBulkError, onBulkSuccess);
+
+  const loadingToastRef = React.useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (orderListQuery.isFetching && !loadingToastRef.current) {
+      loadingToastRef.current = toast.loading("Order table data loading");
+    } else if (!orderListQuery.isFetching && loadingToastRef.current) {
+      toast.dismiss(loadingToastRef.current);
+      loadingToastRef.current = undefined;
+    }
     return () => {
-      toastId && toast.dismiss(toastId);
+      if (loadingToastRef.current) {
+        toast.dismiss(loadingToastRef.current);
+        loadingToastRef.current = undefined;
+      }
     };
   }, [orderListQuery.isFetching]);
 
@@ -88,11 +172,53 @@ const OrderListTable = ({
         ]}
       />
       {/* END FILTER SELECT */}
+
+      {/* BULK ACTION BAR */}
+      {selectedIds.size > 0 && (
+        <div className="mt-4 flex items-center justify-between bg-[#1e1e1e] border border-[#2a2a2a] px-4 py-3">
+          <span className="text-white text-sm">
+            {selectedIds.size} pending order{selectedIds.size > 1 ? "s" : ""} selected
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="text-sm text-[#A3A7AA] hover:text-white px-3 py-1.5"
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => bulkReconcile({ orderIds: Array.from(selectedIds) })}
+              disabled={bulkPending || selectedIds.size > 100}
+              className="bg-white text-black text-sm font-medium px-4 py-1.5 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {bulkPending ? (
+                <>
+                  <FiRefreshCw className="animate-spin" /> Confirming...
+                </>
+              ) : (
+                <>Confirm Payments</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+      {selectedIds.size > 100 && (
+        <p className="text-xs text-amber-400 mt-2">Max 100 orders per bulk request. Deselect some.</p>
+      )}
+
       <div className="text-[#A3A7AA] mt-6">
         <div className="overflow-x-auto">
           <table className="w-full bg-[#151515] whitespace-nowrap">
             <thead>
               <tr className="border-b border-b-[#A3A7AA] text-white">
+                <th className="p-4 m-4 text-left">
+                  <Checkbox
+                    checked={allPendingSelected}
+                    onChange={toggleAllPending}
+                    disabled={pendingOrdersOnPage.length === 0}
+                    aria-label="Select all pending on page"
+                  />
+                </th>
                 <th className="p-4 m-4 text-left">Date</th>
                 <th className="p-4 m-4 text-left">Event Name</th>
                 <th className="p-4 m-4 text-left">Order ID</th>
@@ -102,7 +228,7 @@ const OrderListTable = ({
                 <th className="p-4 m-4 text-left">Amount</th>
                 <th className="p-4 m-4 text-left">Payment Status</th>
                 <th className="p-4 m-4 text-left">Order Status</th>
-                {/* <th className="p-4 m-4"></th> */}
+                <th className="p-4 m-4 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -112,9 +238,20 @@ const OrderListTable = ({
                     Loading orders..
                   </td>
                 </tr>
-              ) : orderListData?.orders ? (
+              ) : orderListData?.orders && orderListData.orders.length > 0 ? (
                 orderListData.orders.map((order) => (
                   <tr key={order.id} className="odd:bg-black">
+                    <td className="p-4 m-4">
+                      {order.paymentStatus === "PENDING" ? (
+                        <Checkbox
+                          checked={selectedIds.has(order.id)}
+                          onChange={() => toggleOne(order.id)}
+                          aria-label={`Select order ${order.id}`}
+                        />
+                      ) : (
+                        <span className="opacity-20">—</span>
+                      )}
+                    </td>
                     <td className="p-4 m-4">
                       <div className="capitalize">
                         <div>
@@ -168,6 +305,23 @@ const OrderListTable = ({
                         "-"
                       )}
                     </td>
+                    <td className="p-4 m-4">
+                      {order.paymentStatus === "PENDING" ? (
+                        <button
+                          onClick={() => reconcileOne(order.id)}
+                          disabled={singlePending || bulkPending}
+                          className="text-xs bg-[#2a2a2a] hover:bg-[#333] text-white px-3 py-1.5 rounded disabled:opacity-50 flex items-center gap-1.5"
+                          title="Verify with Stripe - if paid, mark SUCCESSFUL and send confirmation email"
+                        >
+                          <FiRefreshCw
+                            className={cn(singlePending && "animate-spin")}
+                          />
+                          Confirm
+                        </button>
+                      ) : (
+                        <span className="text-xs text-[#555]">—</span>
+                      )}
+                    </td>
                     {/* <td className="p-4 m-4">
                       <Popover>
                         <PopoverTrigger>
@@ -193,7 +347,7 @@ const OrderListTable = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="h-24 text-center">
+                  <td colSpan={10} className="h-24 text-center">
                     No results.
                   </td>
                 </tr>
