@@ -195,125 +195,152 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
       : false
     : true;
 
+  const eventOptions = useMemo(() => {
+    const base = [{ title: "All events", value: "" }];
+    if (Array.isArray(eventsData)) {
+      eventsData.slice(0, 50).forEach((ev: any) => {
+        base.push({ title: ev.name?.slice(0, 36) ?? ev.id.slice(0, 8), value: ev.id });
+      });
+    }
+    return base;
+  }, [eventsData]);
+
   return (
     <>
       {/* FILTER BAR */}
-      <div className="flex flex-col gap-3 mt-2">
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Search */}
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A3A7AA] text-sm pointer-events-none" />
+      <div className="rounded-xl border border-[#262626] bg-[#0f0f0f] p-4 space-y-4">
+        {/* Search row */}
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="relative flex-1 min-w-0">
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6b6b6b] text-sm pointer-events-none" />
             <input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search order, customer, event, email…"
-              className="bg-[#151515] text-white placeholder-[#6b6b6b] pl-9 pr-9 py-3 w-72 text-sm border border-transparent focus:border-[#2a2a2a] focus:outline-none"
+              placeholder="Search by order ID, customer, event, email or phone…"
+              className="w-full bg-[#1a1a1a] border border-[#262626] rounded-lg text-white placeholder-[#6b6b6b] pl-10 pr-9 py-2.5 text-sm focus:border-[#333] focus:bg-[#1e1e1e] focus:outline-none transition-colors"
             />
-            {searchInput && (
+            {searchInput ? (
               <button
                 onClick={handleSearchClear}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A3A7AA] hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 size-6 rounded-md bg-white/10 hover:bg-white/15 text-white/60 hover:text-white grid place-items-center transition-colors"
                 aria-label="Clear search"
               >
-                <FiX />
+                <FiX className="size-3.5" />
+              </button>
+            ) : debouncedSearch && searchInput !== debouncedSearch ? (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#6b6b6b]">Typing…</span>
+            ) : null}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {hasActiveFilters && (
+              <button
+                onClick={handleClearAll}
+                className="text-sm text-[#A3A7AA] hover:text-white px-4 py-2.5 rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] transition-colors"
+              >
+                Clear filters
+              </button>
+            )}
+            {orderListQuery.isFetching && !orderListQuery.isPending && (
+              <span className="text-xs text-[#A3A7AA] flex items-center gap-1.5 px-2">
+                <FiRefreshCw className="animate-spin size-3.5" /> Updating
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Filter grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {!lockedEventId && !hideEventFilter ? (
+            <>
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-medium tracking-widest uppercase text-[#6b6b6b]">Event Period</span>
+                <FilterSelect
+                  onSelect={handleFilterChange(setEventFilter)}
+                  value={eventFilter as string}
+                  items={[
+                    { title: "All Periods", value: "all" },
+                    { title: "Past Events", value: "past" },
+                    { title: "Upcoming Events", value: "upcoming" },
+                  ]}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-medium tracking-widest uppercase text-[#6b6b6b]">Specific Event</span>
+                <FilterSelect
+                  onSelect={(v: string) => {
+                    setSelectedEventId(v);
+                    setPage(1);
+                  }}
+                  value={selectedEventId}
+                  items={eventOptions}
+                  placeholder="All events"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="hidden lg:block" />
+              <div className="hidden lg:block" />
+            </>
+          )}
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-[#6b6b6b]">Payment</span>
+            <FilterSelect
+              onSelect={handleFilterChange(setPaymentFilter)}
+              value={paymentFilter as string}
+              items={[
+                { title: "Any Payment", value: "all" },
+                { title: "Paid", value: "SUCCESSFUL" },
+                { title: "Not Paid", value: "PENDING" },
+                { title: "Failed", value: "FAILED" },
+              ]}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-medium tracking-widest uppercase text-[#6b6b6b]">Order Status</span>
+            <FilterSelect
+              onSelect={handleFilterChange(setStatusFilter)}
+              value={statusFilter as string}
+              items={[
+                { title: "Any Status", value: "all" },
+                { title: "Completed", value: "COMPLETED" },
+                { title: "Pending", value: "PENDING" },
+                { title: "Cancelled", value: "CANCELLED" },
+              ]}
+            />
+          </div>
+        </div>
+        {(lockedEventId || selectedEventId) && (
+          <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
+            <span className="size-2 rounded-full bg-emerald-500/60" />
+            Filtered to single event
+            {!lockedEventId && (
+              <button onClick={() => { setSelectedEventId(""); setPage(1); }} className="text-white/70 hover:text-white underline underline-offset-2">
+                show all
               </button>
             )}
           </div>
-
-          {!lockedEventId && !hideEventFilter && (
-            <>
-              <FilterSelect
-                onSelect={handleFilterChange(setEventFilter)}
-                value={eventFilter as string}
-                items={[
-                  { title: "All Events", value: "all" },
-                  { title: "Past Events", value: "past" },
-                  { title: "Upcoming Events", value: "upcoming" },
-                ]}
-              />
-              {/* Event selector */}
-              <div className="relative">
-                <select
-                  value={selectedEventId}
-                  onChange={(e) => {
-                    setSelectedEventId(e.target.value);
-                    setPage(1);
-                  }}
-                  className="bg-[#151515] text-white w-56 h-12 px-3 pr-8 text-sm border border-transparent focus:border-[#2a2a2a] focus:outline-none appearance-none"
-                >
-                  <option value="">All events (by ID)</option>
-                  {Array.isArray(eventsData) &&
-                    eventsData.slice(0, 50).map((ev: any) => (
-                      <option key={ev.id} value={ev.id}>
-                        {ev.name?.slice(0, 32) ?? ev.id}
-                      </option>
-                    ))}
-                </select>
-                <FaSortDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/60 -mt-1" />
-              </div>
-            </>
-          )}
-
-          <FilterSelect
-            onSelect={handleFilterChange(setPaymentFilter)}
-            value={paymentFilter as string}
-            items={[
-              { title: "Any Payment", value: "all" },
-              { title: "Paid", value: "SUCCESSFUL" },
-              { title: "Not Paid", value: "PENDING" },
-              { title: "Failed", value: "FAILED" },
-            ]}
-          />
-
-          <FilterSelect
-            onSelect={handleFilterChange(setStatusFilter)}
-            value={statusFilter as string}
-            items={[
-              { title: "Any Order Status", value: "all" },
-              { title: "Completed", value: "COMPLETED" },
-              { title: "Pending", value: "PENDING" },
-              { title: "Cancelled", value: "CANCELLED" },
-            ]}
-          />
-
-          {hasActiveFilters && (
-            <button
-              onClick={handleClearAll}
-              className="text-sm text-[#A3A7AA] hover:text-white px-3 py-2 border border-[#2a2a2a] bg-[#151515]"
-            >
-              Clear filters
-            </button>
-          )}
-
-          {orderListQuery.isFetching && !orderListQuery.isPending && (
-            <span className="text-xs text-[#A3A7AA] flex items-center gap-2">
-              <FiRefreshCw className="animate-spin" /> Updating…
-            </span>
-          )}
-        </div>
-        {debouncedSearch && searchInput !== debouncedSearch && (
-          <span className="text-xs text-[#6b6b6b]">Typing…</span>
         )}
       </div>
       {/* END FILTER BAR */}
 
       {/* BULK ACTION BAR */}
       {selectedIds.size > 0 && (
-        <div className="mt-4 flex items-center justify-between bg-[#1e1e1e] border border-[#2a2a2a] px-4 py-3">
+        <div className="mt-4 flex items-center justify-between bg-[#1e1e1e] border border-[#262626] rounded-xl px-4 py-3">
           <span className="text-white text-sm">
             {selectedIds.size} pending order{selectedIds.size > 1 ? "s" : ""} selected
           </span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="text-sm text-[#A3A7AA] hover:text-white px-3 py-1.5"
+              className="text-sm text-[#A3A7AA] hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
             >
               Clear
             </button>
             <button
               onClick={() => bulkReconcile({ orderIds: Array.from(selectedIds) })}
               disabled={bulkPending || selectedIds.size > 100}
-              className="bg-white text-black text-sm font-medium px-4 py-1.5 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-white text-black text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 hover:bg-zinc-100 transition-colors"
             >
               {bulkPending ? (
                 <>
@@ -330,12 +357,12 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
         <p className="text-xs text-amber-400 mt-2">Max 100 orders per bulk request. Deselect some.</p>
       )}
 
-      <div className="text-[#A3A7AA] mt-6">
+      <div className="mt-6 rounded-xl border border-[#262626] overflow-hidden bg-[#0f0f0f]">
         <div className="overflow-x-auto">
-          <table className="w-full bg-[#151515] whitespace-nowrap">
-            <thead>
-              <tr className="border-b border-b-[#A3A7AA] text-white">
-                <th className="p-4 m-4 text-left">
+          <table className="w-full whitespace-nowrap">
+            <thead className="bg-[#1a1a1a]">
+              <tr className="text-[#6b6b6b] text-xs uppercase tracking-widest">
+                <th className="p-3 text-left font-medium w-12">
                   <Checkbox
                     checked={allPendingSelected}
                     onChange={toggleAllPending}
@@ -343,29 +370,29 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
                     aria-label="Select all pending on page"
                   />
                 </th>
-                <th className="p-4 m-4 text-left">Date</th>
-                <th className="p-4 m-4 text-left">Event Name</th>
-                <th className="p-4 m-4 text-left">Order ID</th>
-                <th className="p-4 m-4 text-left">Customer Name</th>
-                <th className="p-4 m-4 text-left">Ticket</th>
-                <th className="p-4 m-4 text-left">Amount</th>
-                <th className="p-4 m-4 text-left">Payment Status</th>
-                <th className="p-4 m-4 text-left">Order Status</th>
-                <th className="p-4 m-4 text-left">Actions</th>
+                <th className="px-4 py-3 text-left font-medium">Date</th>
+                <th className="px-4 py-3 text-left font-medium">Event Name</th>
+                <th className="px-4 py-3 text-left font-medium">Order ID</th>
+                <th className="px-4 py-3 text-left font-medium">Customer</th>
+                <th className="px-4 py-3 text-left font-medium">Tickets</th>
+                <th className="px-4 py-3 text-left font-medium">Amount</th>
+                <th className="px-4 py-3 text-left font-medium">Payment</th>
+                <th className="px-4 py-3 text-left font-medium">Status</th>
+                <th className="px-4 py-3 text-left font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#1e1e1e]">
               {orderListQuery.isPending ? (
                 <tr>
-                  <td colSpan={10} className="h-24 text-center">
-                    <span className="inline-flex items-center gap-2">
-                      <FiRefreshCw className="animate-spin" /> Loading orders..
+                  <td colSpan={10} className="h-24 text-center text-[#6b6b6b]">
+                    <span className="inline-flex items-center gap-2 text-sm">
+                      <FiRefreshCw className="animate-spin" /> Loading orders…
                     </span>
                   </td>
                 </tr>
               ) : orderListQuery.isError ? (
                 <tr>
-                  <td colSpan={10} className="h-24 text-center text-red-400">
+                  <td colSpan={10} className="h-24 text-center text-red-400 text-sm">
                     Failed to load orders.{" "}
                     <button
                       onClick={() => orderListQuery.refetch()}
@@ -377,8 +404,8 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
                 </tr>
               ) : orderListData?.orders && orderListData.orders.length > 0 ? (
                 orderListData.orders.map((order) => (
-                  <tr key={order.id} className="odd:bg-black">
-                    <td className="p-4 m-4">
+                  <tr key={order.id} className="hover:bg-[#1a1a1a]/70 transition-colors group">
+                    <td className="px-4 py-3">
                       {order.paymentStatus === "PENDING" ? (
                         <Checkbox
                           checked={selectedIds.has(order.id)}
@@ -386,86 +413,78 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
                           aria-label={`Select order ${order.id}`}
                         />
                       ) : (
-                        <span className="opacity-20">—</span>
+                        <span className="text-[#333]">—</span>
                       )}
                     </td>
-                    <td className="p-4 m-4">
-                      <div className="capitalize">
-                        <div>
-                          {dateFns.format(
-                            new Date(order.createdAt),
-                            "dd/MM/yyyy"
-                          )}
-                        </div>
-                        <div>
-                          {dateFns.format(new Date(order.createdAt), "hh:mm a")}
-                        </div>
-                      </div>
+                    <td className="px-4 py-3">
+                      <div className="text-white text-sm leading-tight">{dateFns.format(new Date(order.createdAt), "dd MMM yyyy")}</div>
+                      <div className="text-[#6b6b6b] text-xs">{dateFns.format(new Date(order.createdAt), "hh:mm a")}</div>
                     </td>
-                    <td className="p-4 m-4">{order.event.name}</td>
-                    <td className="p-4 m-4 font-mono text-xs max-w-[140px] truncate" title={order.id}>{order.id}</td>
-                    <td className="p-4 m-4">
+                    <td className="px-4 py-3 max-w-[220px] truncate text-white text-sm" title={order.event.name}>{order.event.name}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-white/80 max-w-[140px] truncate" title={order.id}>{order.id}</td>
+                    <td className="px-4 py-3 text-white text-sm whitespace-nowrap">
                       {order.firstName} {order.lastName}
                     </td>
-                    <td className="p-4 m-4">{order.tickets.length}</td>
-                    <td className="p-4 m-4">
-                      ${Number(order.amountPaid).toFixed(2) ?? 0}
-                    </td>
-                    <td className="p-4 m-4">
-                      <span
-                        className={cn(
-                          order.paymentStatus === "SUCCESSFUL"
-                            ? "text-[#34C759]"
-                            : "text-[#E1306C]"
-                        )}
-                      >
-                        {order.paymentStatus === "SUCCESSFUL"
-                          ? "Paid"
-                          : "Not Paid"}
+                    <td className="px-4 py-3 text-center">
+                      <span className="inline-flex size-6 rounded-full bg-[#1e1e1e] text-white text-xs font-medium place-items-center justify-center">
+                        {order.tickets.length}
                       </span>
                     </td>
-                    <td className="p-4 m-4">
+                    <td className="px-4 py-3 text-white text-sm font-medium">${Number(order.amountPaid).toFixed(2) ?? 0}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={cn(
+                          "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border",
+                          order.paymentStatus === "SUCCESSFUL"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : order.paymentStatus === "FAILED"
+                              ? "bg-red-500/10 text-red-400 border-red-500/20"
+                              : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        )}
+                      >
+                        <span className={cn("size-1.5 rounded-full mr-1.5", order.paymentStatus === "SUCCESSFUL" ? "bg-emerald-400" : order.paymentStatus === "FAILED" ? "bg-red-400" : "bg-amber-400")} />
+                        {order.paymentStatus === "SUCCESSFUL" ? "Paid" : order.paymentStatus === "FAILED" ? "Failed" : "Not Paid"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
                       {order.paymentStatus === "SUCCESSFUL" ? (
                         <span
                           className={cn(
+                            "inline-flex px-2.5 py-1 rounded-full text-xs font-medium border",
                             order.status === "COMPLETED"
-                              ? "text-[#34C759]"
-                              : "text-yellow-500"
+                              ? "bg-white text-black border-white"
+                              : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
                           )}
                         >
-                          {order.status === "COMPLETED"
-                            ? "Successful"
-                            : "Pending"}
+                          {order.status === "COMPLETED" ? "Successful" : "Pending"}
                         </span>
                       ) : (
-                        "-"
+                        <span className="text-[#555] text-xs">—</span>
                       )}
                     </td>
-                    <td className="p-4 m-4">
+                    <td className="px-4 py-3">
                       {order.paymentStatus === "PENDING" ? (
                         <button
                           onClick={() => reconcileOne(order.id)}
                           disabled={singlePending || bulkPending}
-                          className="text-xs bg-[#2a2a2a] hover:bg-[#333] text-white px-3 py-1.5 rounded disabled:opacity-50 flex items-center gap-1.5"
+                          className="text-xs bg-[#212121] hover:bg-[#2a2a2a] border border-[#2a2a2a] text-white px-3 py-1.5 rounded-lg disabled:opacity-50 flex items-center gap-1.5 transition-colors"
                           title="Verify with Stripe - if paid, mark SUCCESSFUL and send confirmation email"
                         >
-                          <FiRefreshCw
-                            className={cn(singlePending && "animate-spin")}
-                          />
+                          <FiRefreshCw className={cn("size-3", singlePending && "animate-spin")} />
                           Confirm
                         </button>
                       ) : (
-                        <span className="text-xs text-[#555]">—</span>
+                        <span className="text-xs text-[#444]">—</span>
                       )}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={10} className="h-24 text-center">
+                  <td colSpan={10} className="h-24 text-center text-[#6b6b6b] text-sm">
                     No results{hasActiveFilters ? " for current filters" : ""}.
                     {hasActiveFilters && (
-                      <button onClick={handleClearAll} className="ml-2 underline text-white hover:text-[#A3A7AA]">
+                      <button onClick={handleClearAll} className="ml-2 underline decoration-white/20 underline-offset-4 text-white hover:text-[#A3A7AA] text-sm">
                         Clear filters
                       </button>
                     )}
@@ -476,52 +495,48 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
           </table>
         </div>
 
-        {/* TABLE PAGINATION */}
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="space-x-2 flex items-center">
+        {/* TABLE FOOTER */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 bg-[#0f0f0f] border-t border-[#1e1e1e]">
+          <div className="text-sm text-[#A3A7AA]">
+            {orderListQuery.isFetching ? (
+              <span className="inline-flex items-center gap-2">
+                <FiRefreshCw className="animate-spin size-3.5" /> Loading…
+              </span>
+            ) : orderListData?.ordersCount ? (
+              <span>
+                Showing <span className="text-white font-medium">{page * 10 - 9}–{isLast ? orderListData.ordersCount : page * 10}</span> of{" "}
+                <span className="text-white font-medium">{orderListData.ordersCount}</span>
+              </span>
+            ) : null}
+          </div>
+          <div className="flex items-center gap-2">
             <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed"
+              className="size-8 rounded-lg bg-[#1a1a1a] border border-[#262626] hover:bg-[#1e1e1e] text-white grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               onClick={() =>
                 setPage((prev) => {
-                  if (prev <= 1) {
-                    return 1;
-                  }
+                  if (prev <= 1) return 1;
                   return prev - 1;
                 })
               }
               disabled={page == 1}
+              aria-label="Previous page"
             >
-              <FiChevronsLeft />
+              <FiChevronsLeft className="size-4" />
             </button>
-            <div className="h-10 min-w-10 rounded-lg bg-[#757575] grid place-items-center text-white text-sm px-3">
+            <div className="h-8 min-w-8 rounded-lg bg-white text-black grid place-items-center text-sm font-medium px-3">
               {page}
             </div>
             <button
-              className="size-10 rounded-lg bg-[#151515] text-2xl grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed"
+              className="size-8 rounded-lg bg-[#1a1a1a] border border-[#262626] hover:bg-[#1e1e1e] text-white grid place-items-center disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               onClick={() => setPage((prev) => prev + 1)}
               disabled={isLast}
+              aria-label="Next page"
             >
-              <FiChevronsRight />
+              <FiChevronsRight className="size-4" />
             </button>
           </div>
         </div>
-        {/* END TABLE PAGINATION */}
-        <div className="text-white">
-          {orderListQuery.isFetching ? (
-            <LoadingMessage>Loading order list..</LoadingMessage>
-          ) : page ? (
-            orderListData?.ordersCount ? (
-              <div>
-                Showing {page * 10 - 9}-
-                {isLast ? orderListData.ordersCount : page * 10} of{" "}
-                {orderListData.ordersCount}
-                {orderListData.ordersCount > 50 && (
-                  <span className="text-[#A3A7AA] text-xs ml-2">(capped page size 50 for performance)</span>
-                )}
-              </div>
-            ) : null
-          ) : null}
-        </div>
+        {/* END TABLE FOOTER */}
       </div>
     </>
   );
@@ -533,36 +548,64 @@ type FilterSelectProps = {
   items: { title: string; value: string }[];
   onSelect: (value: any) => void;
   value?: string;
+  placeholder?: string;
 };
 
-function FilterSelect({ items, onSelect, value }: FilterSelectProps) {
+function FilterSelect({ items, onSelect, value, placeholder }: FilterSelectProps) {
   const [selectOpen, setSelectOpen] = useState(false);
-  const current = value ?? items[0].value;
+  const ref = React.useRef<HTMLDivElement>(null);
+  const current = value !== undefined ? value : items[0]?.value;
+  const currentLabel = items.find((item) => item.value === current)?.title ?? placeholder ?? items[0]?.title ?? "";
+  useEffect(() => {
+    if (!selectOpen) return;
+    const onPointer = (e: PointerEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setSelectOpen(false);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setSelectOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointer, true);
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer, true);
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [selectOpen]);
   return (
-    <div className="text-white relative inline-block z-[1]">
+    <div ref={ref} className="text-white relative w-full">
       <button
-        className="bg-[#151515] min-w-36 h-12 px-4 flex items-center gap-x-3 justify-between border border-transparent focus:border-[#2a2a2a] focus:outline-none"
+        className="w-full bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-lg h-10 px-3 flex items-center gap-x-2 justify-between focus:outline-none focus:border-[#333] focus:ring-1 focus:ring-white/5 transition-colors text-left"
         onClick={() => setSelectOpen((state) => !state)}
+        aria-expanded={selectOpen}
+        aria-haspopup="listbox"
       >
-        <span className="text-sm whitespace-nowrap">{items.find((item) => item.value === current)?.title ?? items[0].title}</span>
-        <FaSortDown className="-mt-2 shrink-0" />
+        <span className="text-sm whitespace-nowrap truncate pr-2">{currentLabel}</span>
+        <FaSortDown className={cn("-mt-1 shrink-0 size-3 transition-transform", selectOpen ? "rotate-180 text-white/60" : "text-white/40")} />
       </button>
       <div
+        role="listbox"
         className={cn(
-          "bg-[#151515] border border-black flex-col inline-flex divide-y divide-[#2a2a2a] min-w-36 absolute top-12 mt-2 right-0 overflow-hidden shadow-lg",
-          selectOpen ? "h-max" : "h-0"
+          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex-col inline-flex divide-y divide-[#262626] min-w-full absolute top-[44px] left-0 right-0 overflow-hidden shadow-xl z-20 max-h-64 overflow-y-auto",
+          selectOpen ? "flex" : "hidden"
         )}
       >
         {items.map((item) => (
           <button
-            key={item.value}
+            key={`${item.value}-${item.title}`}
+            role="option"
+            aria-selected={current === item.value}
             onClick={() => {
               onSelect(item.value);
               setSelectOpen(false);
             }}
             className={cn(
-              "px-6 py-3 hover:bg-[#2c2b2b] text-sm text-left whitespace-nowrap",
-              current === item.value && "bg-[#2c2b2b] text-white"
+              "px-3 py-2.5 hover:bg-[#252525] text-sm text-left whitespace-nowrap truncate transition-colors",
+              current === item.value ? "bg-[#252525] text-white font-medium" : "text-[#A3A7AA]"
             )}
           >
             {item.title}

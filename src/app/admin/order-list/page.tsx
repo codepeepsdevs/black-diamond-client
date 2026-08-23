@@ -41,40 +41,46 @@ export default function OrderListPage() {
   } = useGenerateOrderReport(onError, onSuccess);
 
   return (
-    <section>
-      <div className="mx-8 mt-20 pt-10">
-        <h1 className="text-3xl font-semibold text-white">Order List</h1>
-        <p className="text-[#A3A7AA] text-sm">View all your orders.</p>
-
-        {/* TABLE ACTION BUTTONS */}
-        <div className="flex items-center gap-x-6 justify-end my-4">
-          <AdminButton
-            onClick={() =>
-              handleGenerateOrderReport({
-                startDate: date?.from,
-                endDate: date?.to,
-              })
-            }
-            variant="ghost"
-            className="font-medium"
-            disabled={generateOrderReportPending}
-          >
-            {generateOrderReportPending ? (
-              <LoadingMessage>Generating order report..</LoadingMessage>
-            ) : (
-              "Generate order report"
-            )}
-          </AdminButton>
-          <DatePickerWithRange
-            selected={date}
-            onSelect={setDate}
-            mode="range"
-          />
+    <section className="min-h-screen bg-black">
+      <div className="mx-8 mt-20 pt-10 max-w-[1600px]">
+        {/* Header */}
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold tracking-tight text-white">Order List</h1>
+          <p className="text-[#A3A7AA] text-sm">View, search and reconcile all orders. Filters are instantly applied.</p>
         </div>
-        {/* END TABLE ACTION BUTTONS */}
+
+        {/* Action bar */}
+        <div className="mt-6 rounded-xl border border-[#262626] bg-[#0f0f0f] p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            Live data — updates on filter change
+          </div>
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            <AdminButton
+              onClick={() =>
+                handleGenerateOrderReport({
+                  startDate: date?.from,
+                  endDate: date?.to,
+                })
+              }
+              variant="ghost"
+              className="font-medium whitespace-nowrap rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] px-4 py-2.5"
+              disabled={generateOrderReportPending}
+            >
+              {generateOrderReportPending ? (
+                <LoadingMessage>Generating…</LoadingMessage>
+              ) : (
+                "Generate order report"
+              )}
+            </AdminButton>
+            <DatePickerWithRange selected={date} onSelect={setDate} mode="range" />
+          </div>
+        </div>
 
         {/* ORDER TABLE */}
-        <OrderListTable startDate={date?.from} endDate={date?.to} />
+        <div className="mt-6">
+          <OrderListTable startDate={date?.from} endDate={date?.to} />
+        </div>
         {/* END ORDER TABLE */}
       </div>
     </section>

@@ -29,35 +29,27 @@ function Calendar({
       className={cn("p-3", className)}
       classNames={{
         [UI.Months]:
-          "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          "flex flex-col sm:flex-row space-y-6 sm:space-x-6 sm:space-y-0",
         [UI.Month]: "space-y-4",
-        [UI.MonthCaption]: "flex justify-center pt-1 relative items-center",
-        [UI.CaptionLabel]: "text-sm font-medium",
+        [UI.MonthCaption]: "flex justify-center pt-1 relative items-center h-8",
+        [UI.CaptionLabel]: "text-sm font-medium text-white",
         [UI.Nav]:
-          "space-x-1 flex items-center justify-between absolute left-0 right-0",
-        // nav_button: cn(
-        //   "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-        // ),
-        // [UI.PreviousMonthButton]:
-        //   "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
-        // [UI.NextMonthButton]:
-        //   "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          "space-x-1 flex items-center justify-between absolute left-0 right-0 top-0",
         [UI.MonthGrid]: "w-full border-collapse space-y-1",
         [UI.Weekdays]: "flex",
-        [UI.Weekday]: "text-red-500 rounded-md w-9 font-normal text-[0.8rem]",
+        [UI.Weekday]: "text-[#6b6b6b] rounded-md w-9 font-normal text-[0.75rem] uppercase tracking-wide",
         [UI.Week]: "flex w-full mt-2",
         [UI.Day]:
-          "h-9 w-9 text-center grid place-items-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-lime-500/50 [&:has([aria-selected])]:bg-lime-500 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        // day: cn("h-9 w-9 p-0 font-normal aria-selected:opacity-100"),
+          "h-9 w-9 text-center grid place-items-center text-sm p-0 relative rounded-md hover:bg-white/10 transition-colors [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-white/10 [&:has([aria-selected])]:bg-white [&:has([aria-selected])]:text-black first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         [SelectionState.range_end]: "day-range-end",
         [SelectionState.selected]:
-          "bg-orange-500 text-green-500 hover:bg-orange-500 hover:text-green-500 focus:bg-orange-500 focus:text-green-500",
-        [DayFlag.today]: "bg-red-500 text-yellow-500",
+          "bg-white text-black hover:bg-white hover:text-black focus:bg-white focus:text-black rounded-md",
+        [DayFlag.today]: "bg-transparent ring-1 ring-white/20 text-white font-medium",
         [DayFlag.outside]:
-          "day-outside text-red-500 opacity-50 aria-selected:bg-lime-500/50 aria-selected:text-red-500 aria-selected:opacity-30",
-        [DayFlag.disabled]: "text-red-500 opacity-50",
+          "day-outside text-[#6b6b6b] opacity-40 aria-selected:bg-white/10 aria-selected:text-white/60 aria-selected:opacity-100",
+        [DayFlag.disabled]: "text-[#6b6b6b] opacity-30",
         [SelectionState.range_middle]:
-          "aria-selected:bg-green-500 aria-selected:text-yellow-500",
+          "aria-selected:bg-white/10 aria-selected:text-white",
         [DayFlag.hidden]: "invisible",
         ...classNames,
       }}
@@ -75,9 +67,9 @@ function Calendar({
           return (
             <button
               {...props}
-              className="bg-red-500 h-7 w-7 p-0 opacity-50 hover:opacity-100 absolute grid place-items-center left-3 top-0 z-10"
+              className="size-7 rounded-md bg-transparent hover:bg-white/10 text-white/60 hover:text-white grid place-items-center absolute left-0 top-0 transition-colors"
             >
-              <FiChevronLeft />
+              <FiChevronLeft className="size-4" />
             </button>
           );
         },
@@ -85,9 +77,9 @@ function Calendar({
           return (
             <button
               {...props}
-              className="bg-red-500 h-7 w-7 p-0 opacity-50 hover:opacity-100 absolute grid place-items-center right-3 top-0 z-10"
+              className="size-7 rounded-md bg-transparent hover:bg-white/10 text-white/60 hover:text-white grid place-items-center absolute right-0 top-0 transition-colors"
             >
-              <FiChevronRight />
+              <FiChevronRight className="size-4" />
             </button>
           );
         },

@@ -29,41 +29,50 @@ export function DatePickerWithRange({
         <PopoverTrigger asChild>
           <button
             className={cn(
-              "w-full sm:w-[300px] text-[#A3A7AA] flex items-center text-left font-normal py-3 px-2 bg-[#151515]"
+              "w-full sm:w-[320px] flex items-center gap-3 text-left font-normal py-3 px-4 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-xl transition-colors group",
+              "focus:outline-none focus:ring-1 focus:ring-white/10"
             )}
           >
-            <FaCalendar className="mr-2 size-7" />
-            <div className="text-xs space-y-1">
-              <div className="text-white font-medium text-sm">
-                Change Period
-              </div>
-              {props.selected?.from ? (
-                props.selected.to ? (
-                  <>
-                    {format(props.selected.from, "LLL dd, y")} -{" "}
-                    {format(props.selected.to, "LLL dd, y")}
-                  </>
+            <span className="size-9 rounded-lg bg-[#252525] grid place-items-center shrink-0 group-hover:bg-[#2a2a2a] transition-colors">
+              <FaCalendar className="text-white/80 text-sm" />
+            </span>
+            <div className="text-xs space-y-0.5 min-w-0">
+              <div className="text-white font-medium text-sm leading-none">Change Period</div>
+              <div className="text-[#A3A7AA] text-xs truncate">
+                {props.selected?.from ? (
+                  props.selected.to ? (
+                    <>
+                      {format(props.selected.from, "LLL dd, y")} – {format(props.selected.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(props.selected.from, "LLL dd, y")
+                  )
                 ) : (
-                  format(props.selected.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
+                  <span>Pick a date</span>
+                )}
+              </div>
             </div>
-            <FaSortDown className="text-2xl ml-auto -mt-2" />
+            <FaSortDown className="text-white/40 ml-auto -mt-1 shrink-0 group-hover:text-white/60 transition-colors" />
           </button>
         </PopoverTrigger>
         <PopoverContent
-          className="p-0 bg-[#151515] shadow-lg text-white"
-          align="start"
+          className="p-0 bg-[#1a1a1a] border border-[#262626] shadow-2xl rounded-xl overflow-hidden text-white w-auto max-w-[95vw] z-[100]"
+          align="end"
+          side="bottom"
+          sideOffset={8}
+          collisionPadding={16}
+          avoidCollisions
         >
-          <Calendar
-            mode="range"
-            defaultMonth={props.selected?.from}
-            selected={props.selected}
-            onSelect={props.onSelect}
-            numberOfMonths={2}
-          />
+          <div className="bg-[#1a1a1a] max-w-[640px] overflow-hidden">
+            <Calendar
+              mode="range"
+              defaultMonth={props.selected?.from}
+              selected={props.selected}
+              onSelect={props.onSelect}
+              numberOfMonths={2}
+              className="p-4"
+            />
+          </div>
         </PopoverContent>
       </Popover>
     </div>
