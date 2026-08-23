@@ -132,7 +132,7 @@ export default function EditEventDetailsDashboard({
         </div>
       )}
       {/* ACTION BUTTONS */}
-      <div className="flex items-center justify-end mt-12 gap-x-4">
+      <div className="flex flex-wrap items-center justify-end mt-8 gap-3">
         {canModify && (
           <>
             {event?.isPublished ? (
@@ -140,9 +140,9 @@ export default function EditEventDetailsDashboard({
                 disabled={unpublishEventPending}
                 onClick={() => unpublishEvent(eventId)}
                 variant="primary"
-                className="flex items-center gap-2 bg-red-500 disabled:opacity-50"
+                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 border border-red-500/20 rounded-lg px-4 py-2 shadow-sm disabled:opacity-50 transition-colors"
               >
-                {unpublishEventPending ? <LoadingSvg /> : <FiDownload />}{" "}
+                {unpublishEventPending ? <LoadingSvg sizeClass="w-4 h-4" /> : <FiDownload className="size-4" />}{" "}
                 <span>Unpublish</span>
               </AdminButton>
             ) : (
@@ -150,9 +150,9 @@ export default function EditEventDetailsDashboard({
                 disabled={publishEventPending}
                 onClick={() => publishEvent(eventId)}
                 variant="primary"
-                className="flex items-center gap-2 disabled:opacity-50"
+                className="flex items-center gap-2 bg-white text-black hover:bg-zinc-100 border border-white rounded-lg px-4 py-2 shadow-sm disabled:opacity-50 transition-colors"
               >
-                {publishEventPending ? <LoadingSvg /> : <FiUpload />}
+                {publishEventPending ? <LoadingSvg sizeClass="w-4 h-4" variant /> : <FiUpload className="size-4" />}
                 <span>Publish</span>
               </AdminButton>
             )}
@@ -167,78 +167,81 @@ export default function EditEventDetailsDashboard({
             })
           }
           variant="primary"
-          className="flex items-center gap-2 disabled:opacity-50"
+          className="flex items-center gap-2 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-lg px-4 py-2 disabled:opacity-50 transition-colors"
         >
-          {generatePartyListPending ? <LoadingSvg /> : <FiBookOpen />}
+          {generatePartyListPending ? <LoadingSvg sizeClass="w-4 h-4" /> : <FiBookOpen className="size-4" />}
           <span>Party List</span>
         </AdminButton>
 
         <AdminButton
           disabled={checkinDisabled}
           onClick={() => router.push(`/admin/events/${eventId}/checkin`)}
-          className="flex items-center gap-x-2 disabled:opacity-50"
+          className="flex items-center gap-x-2 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-lg px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          <MdOutlineFilterCenterFocus />
+          <MdOutlineFilterCenterFocus className="size-4" />
           <span>Check-in</span>
         </AdminButton>
       </div>
       {/* END ACTION BUTTONS */}
-      <div className="bg-[#151515] overflow-y-auto mt-12">
-        <div className="p-6 flex items-center w-full gap-x-6 whitespace-nowrap">
+      <div className="rounded-xl border border-[#262626] bg-[#0f0f0f] overflow-hidden mt-8">
+        <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <Image
             src={event?.coverImage || ""}
             alt="Cover image"
             width={180}
             height={180}
-            className="size-24 object-cover shrink-0"
+            className="size-28 rounded-xl object-cover shrink-0 border border-[#262626] bg-[#1a1a1a]"
           />
-          <div className="space-y-2 flex-1">
-            <div>{event?.name}</div>
-            <div>
-              <p>
+          <div className="space-y-2.5 flex-1 min-w-0">
+            <h3 className="text-white font-medium text-lg leading-tight truncate">{event?.name || "Untitled Event"}</h3>
+            <div className="space-y-1">
+              <p className="text-[#A3A7AA] text-sm">
                 {getTimeZoneDateRange(
                   new Date(event?.startTime || Date.now()),
                   new Date(event?.endTime || Date.now())
                 )}
               </p>
-              <p>{event?.location}</p>
+              <p className="text-[#6b6b6b] text-sm truncate">{event?.location || "No location"}</p>
             </div>
-            <div className="flex items-center gap-x-4 [&>div]:flex [&>div]:items-center [&>div]:gap-x-2">
-              <div>
+            <div className="flex items-center gap-2 pt-1 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1a1a1a] border border-[#262626] text-sm text-white">
                 <TicketsIcon />
                 <span>${lowestPrice}</span>
-              </div>
-              <div>
-                <FiUser />
-                <span>{totalTickets}</span>
-              </div>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1a1a1a] border border-[#262626] text-sm text-white">
+                <FiUser className="size-3.5" />
+                <span>{totalTickets ?? 0} tickets</span>
+              </span>
             </div>
           </div>
 
-          {daysToEvent === null ? (
-            "N/A"
-          ) : daysToEvent > 0 ? (
-            <p className="text-[#34C759] font-medium text-xl self-end pl-32">
-              Your event is in {daysToEvent} day(s)!
-            </p>
-          ) : daysPastEvent ? (
-            <p className="text-red-500 font-medium text-xl self-end pl-32">
-              This event was {Math.abs(daysPastEvent)} day(s) ago!
-            </p>
-          ) : (
-            "N/A"
-          )}
+          <div className="shrink-0 w-full sm:w-auto sm:text-right">
+            {daysToEvent === null ? (
+              <span className="inline-flex px-3 py-1.5 rounded-full bg-[#1a1a1a] border border-[#262626] text-sm text-[#6b6b6b]">No date</span>
+            ) : daysToEvent > 0 ? (
+              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-sm font-medium">
+                <span className="size-2 rounded-full bg-emerald-400 mr-2 animate-pulse" />
+                In {daysToEvent} day(s)
+              </span>
+            ) : daysPastEvent ? (
+              <span className="inline-flex px-3 py-1.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 text-sm font-medium">
+                {Math.abs(daysPastEvent)} day(s) ago
+              </span>
+            ) : (
+              <span className="inline-flex px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-sm font-medium">Today</span>
+            )}
+          </div>
         </div>
       </div>
 
       {/* EVENT METRICS */}
-      <div className="overflow-x-auto">
-        <div className="flex gap-x-8 whitespace-nowrap mt-12">
+      <div className="overflow-x-auto -mx-1 px-1 pb-2">
+        <div className="flex gap-4 mt-8">
           {/* TICKETS SOLD */}
-          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
-            <div className="flex items-center justify-center gap-x-1">
-              <VscTriangleDown className="text-[#E1306C] text-2xl" />
-              <span>Tickets sold</span>
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-3 text-center bg-[#0f0f0f] border border-[#262626] rounded-xl w-80 h-56 shadow-sm hover:border-[#2a2a2a] transition-colors">
+            <div className="flex items-center justify-center gap-x-1.5 text-sm text-[#6b6b6b]">
+              <VscTriangleDown className="text-[#E1306C] text-lg" />
+              <span className="tracking-wide">Tickets sold</span>
             </div>
             {ticketTypeSalesQuery.isPending ? (
               <div className="flex items-center justify-center min-h-[72px]">
@@ -246,21 +249,23 @@ export default function EditEventDetailsDashboard({
               </div>
             ) : ticketTypeSalesQuery.isError ? (
               <div className="flex items-center justify-center min-h-[72px]">
-                <span className="text-lg font-normal text-red-400">Failed to load</span>
+                <span className="text-sm font-normal text-red-400">Failed to load</span>
               </div>
             ) : (
-              <div className="text-white font-semibold text-6xl">
-                {totalTicketsSold}/{totalTickets}
+              <div className="text-white font-semibold text-5xl tracking-tight">
+                {totalTicketsSold ?? 0}
+                <span className="text-[#6b6b6b] font-normal text-3xl">/{totalTickets ?? 0}</span>
               </div>
             )}
+            <span className="text-xs text-[#6b6b6b]">{totalTicketsSold ?? 0} confirmed</span>
           </div>
           {/* END TICKETS SOLD */}
 
           {/* REVENUE */}
-          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
-            <div className="flex items-center justify-center gap-x-1">
-              <VscTriangleDown className="text-[#E1306C] text-2xl" />
-              <span>Revenue</span>
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-3 text-center bg-[#0f0f0f] border border-[#262626] rounded-xl w-80 h-56 shadow-sm hover:border-[#2a2a2a] transition-colors">
+            <div className="flex items-center justify-center gap-x-1.5 text-sm text-[#6b6b6b]">
+              <VscTriangleDown className="text-[#E1306C] text-lg" />
+              <span className="tracking-wide">Revenue</span>
             </div>
             {eventRevenueQuery.isPending ? (
               <div className="flex items-center justify-center min-h-[72px]">
@@ -268,21 +273,22 @@ export default function EditEventDetailsDashboard({
               </div>
             ) : eventRevenueQuery.isError ? (
               <div className="flex items-center justify-center min-h-[72px]">
-                <span className="text-lg font-normal text-red-400">Failed to load</span>
+                <span className="text-sm font-normal text-red-400">Failed to load</span>
               </div>
             ) : (
-              <div className="text-white font-semibold text-6xl">
-                ${Number(eventRevenue?.revenue).toFixed(2)}
+              <div className="text-white font-semibold text-5xl tracking-tight">
+                ${Number(eventRevenue?.revenue ?? 0).toFixed(2)}
               </div>
             )}
+            <span className="text-xs text-[#6b6b6b]">Total paid</span>
           </div>
           {/* END REVENUE */}
 
           {/* PAGE VIEWS */}
-          <div className="flex flex-col shrink-0 items-center justify-center space-y-4 text-center bg-[#151515] w-80 h-56">
-            <div className="flex items-center justify-center gap-x-1">
-              <VscTriangleDown className="text-[#E1306C] text-2xl" />
-              <span>Page Views</span>
+          <div className="flex flex-col shrink-0 items-center justify-center space-y-3 text-center bg-[#0f0f0f] border border-[#262626] rounded-xl w-80 h-56 shadow-sm hover:border-[#2a2a2a] transition-colors">
+            <div className="flex items-center justify-center gap-x-1.5 text-sm text-[#6b6b6b]">
+              <VscTriangleDown className="text-[#E1306C] text-lg" />
+              <span className="tracking-wide">Page Views</span>
             </div>
             {viewCountQuery.isPending ? (
               <div className="flex items-center justify-center min-h-[72px]">
@@ -290,13 +296,14 @@ export default function EditEventDetailsDashboard({
               </div>
             ) : viewCountQuery.isError ? (
               <div className="flex items-center justify-center min-h-[72px]">
-                <span className="text-lg font-normal text-red-400">Failed to load</span>
+                <span className="text-sm font-normal text-red-400">Failed to load</span>
               </div>
             ) : (
-              <div className="text-white font-semibold text-6xl">
+              <div className="text-white font-semibold text-5xl tracking-tight">
                 {viewCountData?.views ?? 0}
               </div>
             )}
+            <span className="text-xs text-[#6b6b6b]">Unique views</span>
           </div>
           {/* END PAGE VIEWS */}
         </div>
@@ -304,39 +311,38 @@ export default function EditEventDetailsDashboard({
       {/* END EVENT METRICS */}
 
       {/* SHARE EVENT */}
-      <div className="mt-12">
-        <div className="text-2xl font-medium text-white mb-6">Share</div>
+      <div className="mt-10 rounded-xl border border-[#262626] bg-[#0f0f0f] p-6">
+        <div className="text-lg font-medium text-white mb-5">Share</div>
 
-        <div className="space-y-2">
-          <div>Event link</div>
-          <div className="flex items-center gap-x-4">
-            <p className="truncate">{eventLink}</p>
-            <button
-              className="text-[#4267B2] whitespace-nowrap"
-              onClick={() => {
-                try {
-                  navigator.clipboard.writeText(eventLink);
-                  toast.success("Event link copied successfully");
-                } catch (e) {
-                  toast.error("Event link failed to copy");
-                }
-              }}
-            >
-              Copy Link
-            </button>
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <span className="text-xs font-medium tracking-widest uppercase text-[#6b6b6b]">Event link</span>
+            <div className="flex items-center gap-3 rounded-lg border border-[#262626] bg-[#1a1a1a] px-3 py-2.5">
+              <p className="truncate text-sm text-[#A3A7AA] flex-1 min-w-0">{eventLink}</p>
+              <button
+                className="shrink-0 text-sm font-medium text-white bg-[#252525] hover:bg-[#2a2a2a] border border-[#2a2a2a] rounded-lg px-3 py-1.5 transition-colors whitespace-nowrap"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(eventLink);
+                    toast.success("Event link copied successfully");
+                  } catch (e) {
+                    toast.error("Event link failed to copy");
+                  }
+                }}
+              >
+                Copy Link
+              </button>
+            </div>
           </div>
-          <div>
-            <p>Share on</p>
-
-            <div className="flex items-center mt-2 gap-x-4">
-              {/* <FaYoutube /> */}
-              <a href={shareLink("facebook")} target="_blank">
-                <FaFacebookF />
+          <div className="space-y-2">
+            <span className="text-xs font-medium tracking-widest uppercase text-[#6b6b6b]">Share on</span>
+            <div className="flex items-center gap-3">
+              <a href={shareLink("facebook")} target="_blank" className="size-9 rounded-lg bg-[#1a1a1a] border border-[#262626] hover:bg-[#1e1e1e] grid place-items-center text-[#A3A7AA] hover:text-white transition-colors">
+                <FaFacebookF className="size-4" />
               </a>
-              <a href={shareLink("twitter")} target="_blank">
-                <FaTwitter />
+              <a href={shareLink("twitter")} target="_blank" className="size-9 rounded-lg bg-[#1a1a1a] border border-[#262626] hover:bg-[#1e1e1e] grid place-items-center text-[#A3A7AA] hover:text-white transition-colors">
+                <FaTwitter className="size-4" />
               </a>
-              {/* <FaInstagram /> */}
             </div>
           </div>
         </div>
@@ -344,33 +350,53 @@ export default function EditEventDetailsDashboard({
       {/* END SHARE EVENT */}
 
       {/* SALES BY TICKET TYPE */}
-      <div className="mt-16">
-        <div className="text-2xl font-medium text-white">
-          Sale by ticket type
+      <div className="mt-8 rounded-xl border border-[#262626] bg-[#0f0f0f] overflow-hidden">
+        <div className="px-6 py-5 border-b border-[#262626] flex items-center justify-between">
+          <h3 className="text-white font-medium">Sales by ticket type</h3>
+          <span className="text-xs text-[#6b6b6b]">{ticketTypeSales?.length ?? 0} types</span>
         </div>
-
-        <table className="w-full mt-6">
-          <thead className="text-left text-base [&>*]:font-normal">
-            <tr>
-              <th>Ticket Type</th>
-              <th>Sold</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody className="[&>td]:pt-6">
-            {ticketTypeSales?.map((ticketType) => {
-              return (
-                <tr key={ticketType.id}>
-                  <td>{ticketType.name}</td>
-                  <td>
-                    {ticketType._count.tickets}/{ticketType.quantity}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-[#1a1a1a] text-left text-xs uppercase tracking-widest text-[#6b6b6b]">
+              <tr>
+                <th className="px-6 py-3 font-medium">Ticket Type</th>
+                <th className="px-6 py-3 font-medium">Sold</th>
+                <th className="px-6 py-3 font-medium">Price</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#1e1e1e] text-sm">
+              {ticketTypeSales?.length ? (
+                ticketTypeSales.map((ticketType) => {
+                  const sold = ticketType._count.tickets;
+                  const pct = ticketType.quantity ? Math.round((sold / ticketType.quantity) * 100) : 0;
+                  return (
+                    <tr key={ticketType.id} className="hover:bg-[#1a1a1a]/50 transition-colors">
+                      <td className="px-6 py-4 text-white font-medium">{ticketType.name}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-white">
+                            {sold}/{ticketType.quantity}
+                          </span>
+                          <div className="hidden sm:block w-20 h-1.5 rounded-full bg-[#1e1e1e] overflow-hidden">
+                            <div className="h-full bg-white rounded-full" style={{ width: `${Math.min(pct, 100)}%` }} />
+                          </div>
+                          <span className="text-xs text-[#6b6b6b]">{pct}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-white">${ticketType.price}</td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={3} className="px-6 py-8 text-center text-[#6b6b6b] text-sm">
+                    No ticket types yet.
                   </td>
-                  <td>${ticketType.price}</td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
       {/* END SALES BY TICKET TYPE */}
     </div>
