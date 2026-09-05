@@ -590,7 +590,7 @@ function FilterSelect({ items, onSelect, value, placeholder }: FilterSelectProps
       <div
         role="listbox"
         className={cn(
-          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex flex-col divide-y divide-[#262626] absolute top-[44px] inset-x-0 sm:inset-x-auto sm:left-0 sm:min-w-full sm:w-max sm:max-w-[min(380px,calc(100vw-2rem))] shadow-xl z-20 max-h-[min(16rem,50vh)] overflow-y-auto overflow-x-hidden",
+          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex flex-col divide-y divide-[#262626] absolute top-[calc(100%+8px)] left-0 right-0 w-full shadow-2xl z-30 max-h-[min(16rem,45vh)] overflow-y-auto overflow-x-hidden overscroll-contain",
           selectOpen ? "flex" : "hidden"
         )}
       >
