@@ -42,20 +42,20 @@ export default function OrderListPage() {
 
   return (
     <section className="min-h-screen bg-black">
-      <div className="mx-8 mt-20 pt-10 max-w-[1600px]">
+      <div className="mx-4 sm:mx-6 lg:mx-8 mt-16 sm:mt-20 pt-6 sm:pt-10 pb-8 max-w-[1600px]">
         {/* Header */}
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-semibold tracking-tight text-white">Order List</h1>
-          <p className="text-[#A3A7AA] text-sm">View, search and reconcile all orders. Filters are instantly applied.</p>
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Order List</h1>
+          <p className="text-[#A3A7AA] text-sm leading-relaxed">View, search and reconcile all orders. Filters are instantly applied.</p>
         </div>
 
         {/* Action bar */}
-        <div className="mt-6 rounded-xl border border-[#262626] bg-[#0f0f0f] p-4 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-[#6b6b6b]">
+        <div className="mt-6 rounded-xl border border-[#262626] bg-[#0f0f0f] p-3 sm:p-4 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 text-xs text-[#6b6b6b] shrink-0">
             <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
             Live data — updates on filter change
           </div>
-          <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
             <AdminButton
               onClick={() =>
                 handleGenerateOrderReport({
@@ -64,7 +64,7 @@ export default function OrderListPage() {
                 })
               }
               variant="ghost"
-              className="font-medium whitespace-nowrap rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] hover:border-[#2a2a2a] text-white hover:text-white px-4 py-2.5 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2 !text-white"
+              className="font-medium whitespace-nowrap rounded-lg border border-[#262626] bg-[#1a1a1a] hover:bg-[#1e1e1e] hover:border-[#2a2a2a] text-white hover:text-white px-4 py-2.5 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center justify-center gap-2 !text-white w-full sm:w-auto"
               disabled={generateOrderReportPending}
             >
               {generateOrderReportPending ? (
@@ -81,7 +81,7 @@ export default function OrderListPage() {
                 </>
               )}
             </AdminButton>
-            <DatePickerWithRange selected={date} onSelect={setDate} mode="range" />
+            <DatePickerWithRange selected={date} onSelect={setDate} mode="range" className="w-full sm:w-auto" />
           </div>
         </div>
 

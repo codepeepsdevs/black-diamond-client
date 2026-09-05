@@ -51,7 +51,7 @@ export default function AdminLayout({
           {/* The min-w-0 is to prevent the contents of the container from overflowing */}
           <div className="flex-1 min-w-0 max-w-screen-xl mx-auto">
             {isReadOnly(userData?.role || "") && (
-              <div className="mx-8 mt-20 pt-10 mb-4">
+              <div className="mx-4 sm:mx-6 lg:mx-8 mt-16 sm:mt-20 pt-6 sm:pt-10 mb-4">
                 <div className="bg-blue-500 bg-opacity-20 border border-blue-500 text-blue-300 px-4 py-3 rounded">
                   <p className="text-sm font-medium">
                     You are in read-only mode. You can view all data but cannot make changes.

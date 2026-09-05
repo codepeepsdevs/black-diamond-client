@@ -24,19 +24,19 @@ export function DatePickerWithRange({
   onSelect: (value: any) => void;
 }) {
   return (
-    <div className={cn("grid gap-2", className)}>
+    <div className={cn("grid gap-2 w-full sm:w-auto", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <button
             className={cn(
-              "w-full sm:w-[320px] flex items-center gap-3 text-left font-normal py-3 px-4 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-xl transition-colors group",
+              "w-full sm:w-[320px] flex items-center gap-3 text-left font-normal py-3 px-4 bg-[#1a1a1a] hover:bg-[#1e1e1e] border border-[#262626] rounded-xl transition-colors group min-w-0",
               "focus:outline-none focus:ring-1 focus:ring-white/10"
             )}
           >
             <span className="size-9 rounded-lg bg-[#252525] grid place-items-center shrink-0 group-hover:bg-[#2a2a2a] transition-colors">
               <FaCalendar className="text-white/80 text-sm" />
             </span>
-            <div className="text-xs space-y-0.5 min-w-0">
+            <div className="text-xs space-y-0.5 min-w-0 flex-1">
               <div className="text-white font-medium text-sm leading-none">Change Period</div>
               <div className="text-[#A3A7AA] text-xs truncate">
                 {props.selected?.from ? (
@@ -56,21 +56,21 @@ export function DatePickerWithRange({
           </button>
         </PopoverTrigger>
         <PopoverContent
-          className="p-0 bg-[#1a1a1a] border border-[#262626] shadow-2xl rounded-xl overflow-hidden text-white w-auto max-w-[95vw] z-[100]"
+          className="p-0 bg-[#1a1a1a] border border-[#262626] shadow-2xl rounded-xl overflow-hidden text-white w-[calc(100vw-1rem)] sm:w-auto max-w-[95vw] z-[100]"
           align="end"
           side="bottom"
           sideOffset={8}
           collisionPadding={16}
           avoidCollisions
         >
-          <div className="bg-[#1a1a1a] max-w-[640px] overflow-hidden">
+          <div className="bg-[#1a1a1a] max-w-[calc(100vw-1rem)] sm:max-w-[640px] overflow-auto">
             <Calendar
               mode="range"
               defaultMonth={props.selected?.from}
               selected={props.selected}
               onSelect={props.onSelect}
               numberOfMonths={2}
-              className="p-4"
+              className="p-2 sm:p-4"
             />
           </div>
         </PopoverContent>

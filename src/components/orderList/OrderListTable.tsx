@@ -208,7 +208,7 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
   return (
     <>
       {/* FILTER BAR */}
-      <div className="rounded-xl border border-[#262626] bg-[#0f0f0f] p-4 space-y-4">
+      <div className="rounded-xl border border-[#262626] bg-[#0f0f0f] p-3 sm:p-4 space-y-4">
         {/* Search row */}
         <div className="flex flex-col lg:flex-row gap-3">
           <div className="relative flex-1 min-w-0">
@@ -326,7 +326,7 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
 
       {/* BULK ACTION BAR */}
       {selectedIds.size > 0 && (
-        <div className="mt-4 flex items-center justify-between bg-[#1e1e1e] border border-[#262626] rounded-xl px-4 py-3">
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-[#1e1e1e] border border-[#262626] rounded-xl px-3 sm:px-4 py-3">
           <span className="text-white text-sm">
             {selectedIds.size} pending order{selectedIds.size > 1 ? "s" : ""} selected
           </span>
@@ -358,8 +358,8 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
       )}
 
       <div className="mt-6 rounded-xl border border-[#262626] overflow-hidden bg-[#0f0f0f]">
-        <div className="overflow-x-auto">
-          <table className="w-full whitespace-nowrap">
+        <div className="overflow-x-auto overscroll-x-contain -mx-px">
+          <table className="w-full whitespace-nowrap min-w-[720px]">
             <thead className="bg-[#1a1a1a]">
               <tr className="text-[#6b6b6b] text-xs uppercase tracking-widest">
                 <th className="p-3 text-left font-medium w-12">
@@ -590,7 +590,7 @@ function FilterSelect({ items, onSelect, value, placeholder }: FilterSelectProps
       <div
         role="listbox"
         className={cn(
-          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex flex-col divide-y divide-[#262626] min-w-full w-max max-w-[min(380px,calc(100vw-2rem))] absolute top-[44px] left-0 shadow-xl z-20 max-h-64 overflow-y-auto overflow-x-hidden",
+          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex flex-col divide-y divide-[#262626] absolute top-[44px] inset-x-0 sm:inset-x-auto sm:left-0 sm:min-w-full sm:w-max sm:max-w-[min(380px,calc(100vw-2rem))] shadow-xl z-20 max-h-[min(16rem,50vh)] overflow-y-auto overflow-x-hidden",
           selectOpen ? "flex" : "hidden"
         )}
       >
