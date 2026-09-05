@@ -199,7 +199,7 @@ const OrderListTable = ({ startDate, endDate, eventId: lockedEventId, hideEventF
     const base = [{ title: "All events", value: "" }];
     if (Array.isArray(eventsData)) {
       eventsData.slice(0, 50).forEach((ev: any) => {
-        base.push({ title: ev.name?.slice(0, 36) ?? ev.id.slice(0, 8), value: ev.id });
+        base.push({ title: ev.name ?? ev.id.slice(0, 8), value: ev.id });
       });
     }
     return base;
@@ -584,13 +584,13 @@ function FilterSelect({ items, onSelect, value, placeholder }: FilterSelectProps
         aria-expanded={selectOpen}
         aria-haspopup="listbox"
       >
-        <span className="text-sm whitespace-nowrap truncate pr-2">{currentLabel}</span>
+        <span className="text-sm whitespace-nowrap truncate pr-2" title={currentLabel}>{currentLabel}</span>
         <FaSortDown className={cn("-mt-1 shrink-0 size-3 transition-transform", selectOpen ? "rotate-180 text-white/60" : "text-white/40")} />
       </button>
       <div
         role="listbox"
         className={cn(
-          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex-col inline-flex divide-y divide-[#262626] min-w-full absolute top-[44px] left-0 right-0 overflow-hidden shadow-xl z-20 max-h-64 overflow-y-auto",
+          "bg-[#1c1c1c] border border-[#262626] rounded-lg flex flex-col divide-y divide-[#262626] min-w-full w-max max-w-[min(380px,calc(100vw-2rem))] absolute top-[44px] left-0 shadow-xl z-20 max-h-64 overflow-y-auto overflow-x-hidden",
           selectOpen ? "flex" : "hidden"
         )}
       >
@@ -599,12 +599,13 @@ function FilterSelect({ items, onSelect, value, placeholder }: FilterSelectProps
             key={`${item.value}-${item.title}`}
             role="option"
             aria-selected={current === item.value}
+            title={item.title}
             onClick={() => {
               onSelect(item.value);
               setSelectOpen(false);
             }}
             className={cn(
-              "px-3 py-2.5 hover:bg-[#252525] text-sm text-left whitespace-nowrap truncate transition-colors",
+              "px-3 py-2.5 hover:bg-[#252525] text-sm text-left whitespace-normal break-words leading-snug transition-colors w-full",
               current === item.value ? "bg-[#252525] text-white font-medium" : "text-[#A3A7AA]"
             )}
           >
