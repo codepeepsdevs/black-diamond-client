@@ -42,7 +42,17 @@ const EventCard: React.FC<EventCardProps> = ({
 
   const { date, time } = getEventDateAndTime(dateTime);
 
+  const TICKETMASTER_OVERRIDES: Record<string, string> = {
+    "6a9c1cce98b04268bd5a8770":
+      "https://www.ticketmaster.com/a-boogie-wit-da-hoodie-10-buffalo-new-york-09-18-2026/event/000064CA25FBCEE1?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAUGxZlwZG9mAmZkaWQWUNuyo2C_PtYww-54ZrP-Tv5BdcEiSWV4dG4DYWVtAjExAHNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABp01NUSKW7Aq6iOXOCNTOgEPO2oqR2kyiaQaz-8qBnEzNkTJieX-DzhcZYTfk_aem_zAnEgK22Rfl9kTqmOdohyw",
+  };
+
   const handleClick = (id: Event["id"]) => {
+    const externalUrl = TICKETMASTER_OVERRIDES[id];
+    if (externalUrl) {
+      window.open(externalUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
     router.push(`/events/${tab}/${id}`);
   };
   return (
