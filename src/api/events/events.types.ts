@@ -4,7 +4,6 @@ import {
   TicketType,
   PromoCode,
   EventStatus,
-  TicketCount,
 } from "@/constants/types";
 import {
   copyEventSchema,
@@ -68,10 +67,10 @@ export type GetPromocodeResponse = PromoCode & {
   isActive: boolean;
 };
 
-export type GetEventTicketTypesResponse = (TicketType &
-  TicketCount & {
-    saleStatus: "on-sale" | "not-on-sale" | "sale-ended";
-  })[];
+export type GetEventTicketTypesResponse = (TicketType & {
+  soldQuantity: number;
+  saleStatus: "on-sale" | "not-on-sale" | "sale-ended";
+})[];
 
 export type UpdateTicketTypeResponse = TicketType;
 

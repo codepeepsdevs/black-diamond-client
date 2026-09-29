@@ -16,6 +16,7 @@ import {
 } from "@/api/events/events.queries";
 import {
   getLowestTicket,
+  getSoldQuantity,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
 import * as dateFns from "date-fns";
@@ -58,7 +59,7 @@ export default function EventDetailsDashboard({
     return (accValue += ticketType.quantity);
   }, 0);
   const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
-    return (accValue += ticket._count.tickets);
+    return (accValue += getSoldQuantity(ticket));
   }, 0);
 
   const eventLink = `${window.location.protocol}//${window.location.host}/events/${event?.eventStatus?.toLowerCase()}/${eventId}`;
@@ -279,7 +280,7 @@ export default function EventDetailsDashboard({
                 <tr>
                   <td>{ticketType.name}</td>
                   <td>
-                    {ticketType._count.tickets}/{ticketType.quantity}
+                    {getSoldQuantity(ticketType)}/{ticketType.quantity}
                   </td>
                   <td>${ticketType.price}</td>
                 </tr>

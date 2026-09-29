@@ -56,8 +56,7 @@ import { MdGppBad } from "react-icons/md";
 import { useParams, useRouter } from "next/navigation";
 import ErrorToast from "../toast/ErrorToast";
 import SuccessToast from "../toast/SuccessToast";
-import { getApiErrorMessage } from "@/utils/utilityFunctions";
-import { useGetTicketTypeSales } from "@/api/order/order.queries";
+import { getApiErrorMessage, getSoldQuantity } from "@/utils/utilityFunctions";
 import { newYorkTimeZone } from "@/utils/date-formatter";
 import { SelectVisibilityDropDown } from "../newEvents/TicketTypeVisibility";
 import { NewTicketDialog } from "../shared/NewTicketDialog";
@@ -127,8 +126,6 @@ export default function EditTicketsTab({
   });
 
   const ticketTypes = useGetEventTicketTypes(eventId);
-  const ticketTypeSalesQuery = useGetTicketTypeSales(eventId);
-  const ticketTypeSalesData = ticketTypeSalesQuery.data?.data;
 
   function handleAction(
     action: (typeof actions)[number],
@@ -223,8 +220,8 @@ export default function EditTicketsTab({
               ) : null}
               {ticketTypes.data?.data ? (
                 ticketTypes.data?.data.map((ticketType) => {
-                  const soldOut =
-                    ticketType._count.tickets >= ticketType.quantity;
+                  const sold = getSoldQuantity(ticketType);
+                  const soldOut = sold >= ticketType.quantity;
                   return (
                     <tr
                       className="border-b border-b-[#151515] hover:bg-[#131313] transition-all cursor-pointer"
@@ -266,7 +263,7 @@ export default function EditTicketsTab({
                         ) : null}
                       </td>
                       <td>
-                        {ticketType._count.tickets}/{ticketType.quantity}
+                        {sold}/{ticketType.quantity}
                       </td>
                       <td>${ticketType.price.toFixed(2)}</td>
                       <td>

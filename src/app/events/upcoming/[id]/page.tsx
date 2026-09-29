@@ -26,6 +26,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import LoadingSkeleton from "@/components/shared/Loader/LoadingSkeleton";
 import {
   getApiErrorMessage,
+  getSoldQuantity,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
 import ErrorToast from "@/components/toast/ErrorToast";
@@ -60,7 +61,7 @@ const UpComingEventDetailPage = () => {
           ticketTypeId: ticketType.id,
           quantity: 0,
           price: ticketType.price,
-          soldQuantity: ticketType.soldQuantity,
+          soldQuantity: getSoldQuantity(ticketType),
         })),
         addonOrders: eventAddonsQuery.data?.data.map((addon) => ({
           addonId: addon.id,

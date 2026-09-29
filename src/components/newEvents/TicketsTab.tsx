@@ -49,6 +49,7 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { newYorkTimeZone } from "@/utils/date-formatter";
+import { getSoldQuantity } from "@/utils/utilityFunctions";
 import { SelectVisibilityDropDown } from "./TicketTypeVisibility";
 import { NewTicketDialog } from "../shared/NewTicketDialog";
 
@@ -140,7 +141,7 @@ export default function TicketsTab({ isActive }: { isActive: boolean }) {
                 </div>
                 <div>Sold: </div>
                 <div>
-                  {ticketType._count.tickets}/{ticketType.quantity}
+                  {getSoldQuantity(ticketType)}/{ticketType.quantity}
                 </div>
                 <div>${ticketType.price.toFixed(2)}</div>
 

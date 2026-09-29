@@ -18,6 +18,7 @@ import * as dateFns from "date-fns";
 import {
   getApiErrorMessage,
   getLowestTicket,
+  getSoldQuantity,
   getTimeZoneDateRange,
 } from "@/utils/utilityFunctions";
 import {
@@ -77,7 +78,7 @@ export default function EditEventDetailsDashboard({
     return (accValue += ticketType.quantity);
   }, 0);
   const totalTicketsSold = ticketTypeSales?.reduce((accValue, ticket) => {
-    return (accValue += ticket._count.tickets);
+    return (accValue += getSoldQuantity(ticket));
   }, 0);
 
   const eventRevenueQuery = useGetEventRevenue(eventId);
@@ -103,10 +104,6 @@ export default function EditEventDetailsDashboard({
     !event?.isPublished ||
     (daysPastEvent && daysPastEvent > 0) ||
     eventQuery.isPending;
-  console.log("checkinDisabled:", checkinDisabled);
-  console.log("event?.isPublished:", event?.isPublished);
-  console.log("daysPastEvent:", daysPastEvent);
-  console.log("eventQuery.isPending:", eventQuery.isPending);
 
   function shareLink(platform: "facebook" | "twitter") {
     const facebookShare = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventLink)}`;
@@ -368,7 +365,7 @@ export default function EditEventDetailsDashboard({
             <tbody className="divide-y divide-[#1e1e1e] text-sm">
               {ticketTypeSales?.length ? (
                 ticketTypeSales.map((ticketType) => {
-                  const sold = ticketType._count.tickets;
+                  const sold = getSoldQuantity(ticketType);
                   const pct = ticketType.quantity ? Math.round((sold / ticketType.quantity) * 100) : 0;
                   return (
                     <tr key={ticketType.id} className="hover:bg-[#1a1a1a]/50 transition-colors">

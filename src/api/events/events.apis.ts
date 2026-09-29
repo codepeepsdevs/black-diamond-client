@@ -6,7 +6,6 @@ import {
   OptionProps,
   // PageData,
   PromoCode,
-  TicketCount,
   TicketType,
 } from "@/constants/types";
 import { request } from "@/utils/axios-utils";

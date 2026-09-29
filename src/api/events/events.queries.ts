@@ -39,7 +39,6 @@ import {
   EventStatus,
   OptionProps,
   PromoCode,
-  TicketCount,
   TicketType,
 } from "@/constants/types";
 import {

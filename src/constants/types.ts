@@ -266,10 +266,12 @@ export type CalendarEvent = {
   location: string;
 };
 
+/** @deprecated Prefer `soldQuantity` from event/ticket-type APIs. Kept for legacy responses. */
 export type TicketCount = {
-  _count: {
-    tickets: number;
+  _count?: {
+    tickets?: number;
   };
+  soldQuantity?: number;
 };
 
 export type ExtendNested<T, K extends keyof T, V> = {

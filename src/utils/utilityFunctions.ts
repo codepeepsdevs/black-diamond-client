@@ -166,3 +166,14 @@ export function debounce<T extends (...args: any[]) => void>(
     }, delay);
   };
 }
+
+/** Supports both `soldQuantity` (current API) and legacy `_count.tickets`. */
+export function getSoldQuantity(ticketType: {
+  soldQuantity?: number | null;
+  _count?: { tickets?: number } | null;
+}): number {
+  if (typeof ticketType.soldQuantity === "number") {
+    return ticketType.soldQuantity;
+  }
+  return ticketType._count?.tickets ?? 0;
+}
